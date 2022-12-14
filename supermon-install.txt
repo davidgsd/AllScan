@@ -1,4 +1,4 @@
-SuperMon Install / Update Instructions - Supermon 7.2+ (ASL version) - Nov. 27, 2022
+Supermon Install / Update Instructions - Supermon 7.2+ (ASL version) - Nov. 27, 2022
 
 ---------------------------------------------------------------
 

@@ -1,7 +1,7 @@
 # AllScan
 AllStar Favorites Management &amp; Scanning Web App
 
-See https://github.com/davidgsd/AllScan/blob/main/screenshot.png for an example of the AllScan GUI. AllScan supports the following features:
+See [screenshot.png](https://github.com/davidgsd/AllScan/blob/main/screenshot.png) for an example of the AllScan GUI. AllScan supports the following features:
 
 1. Allow Favorites to be added/deleted simply by entering the node# and clicking an 'Add Favorite' button. The favorites.ini file is then updated with the node# and name, description and location data from the ASL DB. (This is a nice step up in user-friendliness vs. manually editing cfg files.)
 
@@ -30,7 +30,7 @@ Lots of updates are in the works but even just the favorites management features
 Currently AllScan supports favorites.ini entries that refer to connecting nodes eg. 'cmd[] = "rpt cmd %node% ilink 3 [node#]"' but will also support other types of commands at some point. The code also saves a backup copy to favorites.ini.bak in case there is any issue. New features will be prioritized based on requests so let me know what you'd like to see.
 
 # Install
-AllScan uses the Asterisk API provided by AllMon2 or Supermon, so the first step is to make sure you have one of those installed, properly configured and working. If you have Supermon already working, AllScan will then work right away with no configuration changes or set up needed. See the https://github.com/davidgsd/AllScan/blob/main/supermon-install.txt file or the Supermon groups.io page for details on how to install Supermon.
+AllScan uses the Asterisk API provided by AllMon2 or Supermon, so the first step is to make sure you have one of those installed, properly configured and working. If you have Supermon already working, AllScan will then work right away with no configuration changes or set up needed. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon.
 
 Make sure you have your node information defined in /var/www/html/supermon/allmon.ini and global.inc (specifically your node numbers in allmon.ini, and $CALL, $LOCATION, and $TITLE2 (eg. "Node 56789") in global.inc). AllScan uses those same settings. Also make sure you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. If for some reason you would rather not install Supermon let me know. I may at some point implement support for automatically using the AllMon2 files if Supermon is not installed or not working. But Supermon is easy to set up and has some nice maintenance/debug features.
 
@@ -50,11 +50,11 @@ Once you are logged in by SSH to your node run the following commands:
 
 (If you get any permissions errors writing to directories/files during the above steps, try switching to superuser by running "sudo su". This should not generally be necessary though.)
 
-Now open a browser and go to your node's IP address followed by /allscan/ eg. http://192.168.1.23/allscan/
+Now open a browser and go to your node's IP address followed by /allscan/ eg. `http://192.168.1.23/allscan/`
 You should see a Connection Status table showing your Node number(s), Call Sign and Location, a control form where you can enter node numbers and use the Connect, Disconnect, etc. buttons, and a Favorites table with at least a few favorites listed. If any of these are not showing check your allmon.ini and global.inc files in /var/www/html/supermon/ and make sure they are properly configured.
 
 # Notes
-SECURITY NOTE: User login support has not yet been implemented. If your node webserver is PUBLICLY accessible you should set up password protection on the /allscan/ directory. If you do not know how to do that, it is NOT recommended that you install AllScan at this time. In the next few weeks a login system will be implemented in AllScan, but currently anyone who has access to your node's IP address will have access to the /allscan/ directory (if they know to check that specific url). If you are using your node only on your local home network and do not have an external port mapped in your internet router to port 80 on your node then having a login and password is generally not necessary, but can still be enabled easily with a few simple steps to enable Apache directory authentication, such as described in this article https://www.digitalocean.com/community/tutorials/how-to-set-up-password-authentication-with-apache-on-ubuntu-20-04
+SECURITY NOTE: User login support has not yet been implemented. If your node webserver is PUBLICLY accessible you should set up password protection on the /allscan/ directory. If you do not know how to do that, it is NOT recommended that you install AllScan at this time. In the next few weeks a login system will be implemented in AllScan, but currently anyone who has access to your node's IP address will have access to the /allscan/ directory (if they know to check that specific url). If you are using your node only on your local home network and do not have an external port mapped in your internet router to port 80 on your node then having a login and password is generally not necessary, but can still be enabled easily with a few simple steps to enable Apache directory authentication, such as described in this [article](https://www.digitalocean.com/community/tutorials/how-to-set-up-password-authentication-with-apache-on-ubuntu-20-04)
 
 Also note: I have not yet tested AllScan on a node with EchoLink enabled but that will soon be fully supported.
 

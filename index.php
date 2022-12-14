@@ -145,6 +145,14 @@ foreach($favs as $n => $f) {
 $out .= $html->tableClose();
 echo $out;
 
+if(file_exists("/sys/class/thermal/thermal_zone0/temp")) {
+    $cpuTemp = exec("/usr/local/sbin/supermon/get_temp");
+	if($cpuTemp) {
+		$cpuTemp = str_replace(['palegreen', 'yellow', 'CPU:'], ['darkgreen', '#660', 'CPU Temp:'], $cpuTemp);
+		p($cpuTemp, null, false);
+	}
+}
+
 asExit();
 
 function processForm($parms) {
