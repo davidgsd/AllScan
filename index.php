@@ -47,12 +47,10 @@ if(isset($parms['Submit'])) {
 	if($pfmsg = processForm($parms))
 		$msg .= BR . $pfmsg;
 }
+
 $remNode = isset($parms['node']) && is_numeric($parms['node']) ? $parms['node'] : '';
 
 echo "<body onLoad=\"initEventStream('" . API . "', 'server.php?nodes=$node');\">\n";
-
-//$cmds = '<input type=button class="small" value="Connect" onClick="submit()">';
-//$cmds2 = '<input type=button class="small" value="Disconnect" onClick="submit()">';
 ?>
 <header>
 <a href="/allscan/" class="h1">AllScan</a> <small>v0.1</small>&ensp;

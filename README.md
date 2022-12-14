@@ -27,10 +27,10 @@ The AllMon/SuperMon directory is set in include/common.php in the API_DIR define
 
 Lots of updates are in the works but even just the favorites management features are already quite handy. I'll also be doing a youtube video soon with a quick demo and walkthrough of the app. But it's such a simple app that anyone can download it, unzip the files and be up and running within minutes, at which point if you've ever used AllMon/SuperMon you'd have the GUI figured out in about 2 minutes.
 
-Currently AllScan supports favorites.ini entries that refer to connecting nodes eg. 'cmd[] = "rpt cmd %node% ilink 3 [node#]"' but will also support other types of commands at some point. The code also saves a backup copy to favorites.ini.bak in case there is any issue. New features will be prioritized based on requests so let me know what you'd like to see.
+Currently AllScan supports favorites.ini entries that refer to connecting nodes eg. 'cmd[] = "rpt cmd %node% ilink 3 [node#]"' but will also support other types of commands at some point. The code also saves a backup copy to favorites.ini.bak in case there is any issue. New features will be prioritized based on requests so let me know what you'd like to see. 
 
 # Install
-AllScan extends AllMon2 or SuperMon so the first step is to make sure you have one of those installed and working well.
+AllScan extends AllMon2 or SuperMon so the first step is to make sure you have one of those installed and working well. If  you have supermon already installed and working, AllScan will work right away with no configuration changes needed at all. See supermon-install.txt file or the SuperMon groups.io page for details on how to install supermon.
 
 You will need SSH access to your node to do this and have basic familiarity with Linux. This has been tested on AllStarLink nodes with Supermon 7, and may not work as well with hamvoip or allmon.
 
@@ -50,8 +50,12 @@ Once you are logged in by SSH to your node run the following commands:
 
 	rmdir AllScan-main
 
+(If you get any permissions errors writing to directories/files during the above steps you can try switching to superuser by running the command "sudo su".)
+
 Now open a browser and go to your node's IP address followed by /allscan/ eg. http://192.168.1.23/allscan/
 
 IMPORTANT NOTE: User login support has not yet been implemented. If your node webserver is PUBLICLY accessible you should set up password protection on the /allscan/ directory. If you do not know how to do that, it is NOT recommended that you install AllScan at this time. In the next few weeks a login system will be implemented in AllScan, but currently anyone who has access to your node's IP address will have access to the /allscan/ directory (if they know to check that specific url). If you are using your node only on your local home network and do not have an external port mapped to port 80 on your node then having a login and password is generally not necessary, but can still be enabled easily with a few simple steps to enable Apache directory authentication, such as described in this article https://www.digitalocean.com/community/tutorials/how-to-set-up-password-authentication-with-apache-on-ubuntu-20-04
+
+Also note: I have not yet tested AllScan on a node with EchoLink enabled but that will be fully supported very soon.
 
 If you have any questions email chc_media at yahoo dot com. 73, NR9V
