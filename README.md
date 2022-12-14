@@ -50,7 +50,7 @@ Once you are logged in by SSH to your node run the following commands:
 
 	rmdir AllScan-main
 
-Now open a browser and go to your nodes IP address followed by /allscan/ eg. http://192.168.1.23/allscan/
+Now open a browser and go to your node's IP address followed by /allscan/ eg. http://192.168.1.23/allscan/
 
 IMPORTANT NOTE: User login support has not yet been implemented. If your node webserver is PUBLICLY accessible you should set up password protection on the /allscan/ directory. If you do not know how to do that, it is NOT recommended that you install AllScan at this time. In the next few weeks a login system will be implemented in AllScan, but currently anyone who has access to your node's IP address will have access to the /allscan/ directory (if they know to check that specific url). If you are using your node only on your local home network and do not have an external port mapped to port 80 on your node then having a login and password is generally not necessary, but can still be enabled easily with a few simple steps to enable Apache directory authentication, such as described in this article https://www.digitalocean.com/community/tutorials/how-to-set-up-password-authentication-with-apache-on-ubuntu-20-04
 

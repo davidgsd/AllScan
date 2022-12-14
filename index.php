@@ -51,8 +51,6 @@ $remNode = isset($parms['node']) && is_numeric($parms['node']) ? $parms['node'] 
 
 echo "<body onLoad=\"initEventStream('" . API . "', 'server.php?nodes=$node');\">\n";
 
-msg("API=".API);
-
 //$cmds = '<input type=button class="small" value="Connect" onClick="submit()">';
 //$cmds2 = '<input type=button class="small" value="Disconnect" onClick="submit()">';
 ?>
