@@ -4,9 +4,10 @@ SuperMon Install / Update Instructions - Supermon 7.2+ (ASL version) - Nov. 27, 
 
 FRESH-INSTALL
 
-This includes all default configuration files. Existing files will be overwritten.
+This includes all default configuration files. Any existing files will be overwritten!
 
-* Login with SSH as root user. ("sudo su" if necessary to change to root)
+* Login with SSH as root user. (Run "sudo su" if necessary to change to root.)
+
 * Enter the following five commands:
 cd /usr/local/sbin
 wget "http://2577.asnode.org:44871/supermonASL_fresh_install" -O supermonASL_fresh_install
@@ -14,26 +15,32 @@ chmod +x supermonASL_fresh_install
 hash
 supermonASL_fresh_install
 
-* Edit the allmon.ini and global.inc files to match your system settings.
+* Edit the allmon.ini and global.inc files to match your system settings, name, callsign, etc.
   They are located in /var/www/html/supermon/
+
 * Setup the Supermon .htpasswd file in the /var/www/html/supermon/ directory.
   (If necessary do a web search on how to set up htaccess password with apache.
   You will not be able log in until you do this.)
-* Add the following line to your root user crontab, this gets the required AllStar database once a day:
+
+* Add the following line to your root user crontab:
 0 3 * * * (/var/www/html/supermon/astdb.php cron)
+  (To do this run "crontab -e" to open the cron table for editing, then paste the above line
+  at the bottom, save and exit. This will update the AllStar database file once a day.)
 
 ---------------------------------------------------------------
 
 UPDATE
 
-No need to download the Updater script, it was installed during the Fresh-Install process shown above.
+No need to download the Update script, it was installed during the Fresh-Install process shown above.
 
-* Login with SSH as root user. ("sudo su" if necessary to change to root)
+* Login with SSH as root user. (Run "sudo su" if necessary to change to root.)
+
 * Run the update script as follows:
 /usr/local/sbin/supermon/supermonASL_latest_update
+
 * Go to your Supermon Web screen and force a reload with Shift-[F5]
 
 ---------------------------------------------------------------
 
-If you run into any issues join the Supermon group and search the posts there or make a new post: 
-https://groups.io/g/Supermon The group is very responsive and helpful.
+If you run into any issues, join the Supermon group at https://groups.io/g/Supermon and
+then search the posts there or make a new post. The group is very responsive and helpful.
