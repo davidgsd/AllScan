@@ -1,0 +1,7 @@
+msg
+old
+downloads
+*.tmp
+*.bak
+*log.txt
+*Log.txt
