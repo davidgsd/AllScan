@@ -40,7 +40,7 @@ Once you are logged in by SSH to your node run the following commands:
 
 	cd /var/www/html/
 
-	mkdir allscan
+	mkdir allscan; cd allscan
 
 	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
 
