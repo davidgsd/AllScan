@@ -90,8 +90,6 @@ echo "<body onLoad=\"initEventStream('" . API . "', 'server.php?nodes=$node');\"
 </p>
 
 <?php
-echo "<p id=\"statmsg\" class=\"gray\">$msg</p>\n";
-
 h2('Favorites');
 // Read in favorites.ini
 $favs = [];
@@ -182,6 +180,9 @@ if(empty($favList)) {
 	$out .= $html->tableClose();
 	echo $out;
 }
+
+// Status Messages field (written to by JS functions)
+echo "<p id=\"statmsg\" class=\"gray\">$msg</p>\n";
 
 // Show CPU Temp
 if(file_exists("/sys/class/thermal/thermal_zone0/temp")) {
