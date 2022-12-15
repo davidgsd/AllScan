@@ -19,8 +19,8 @@ supermonASL_fresh_install
   They are located in /var/www/html/supermon/
 
 * Setup the Supermon .htpasswd file in the /var/www/html/supermon/ directory.
-  (If necessary do a web search on how to set up htaccess password with apache.
-  You will not be able log in until you do this.)
+  (If necessary do a web search on how to set up apache .htaccess password authentication.
+  You will not be able to log into Supermon until you do this.)
 
 * Add the following line to your root user crontab:
 0 3 * * * (/var/www/html/supermon/astdb.php cron)

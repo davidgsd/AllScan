@@ -39,13 +39,9 @@ You will need SSH access to your node and should have basic familiarity with Lin
 Once you are logged in by SSH to your node run the following commands:
 
 	cd /var/www/html/
-
 	mkdir allscan; cd allscan
-
 	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
-
 	unzip main.zip; mv AllScan-main/* .
-
 	rm main.zip; rmdir AllScan-main
 
 (If you get any permissions errors writing to directories/files during the above steps, try switching to superuser by running "sudo su". This should not generally be necessary though.)
@@ -58,5 +54,14 @@ SECURITY NOTE: User login support has not yet been implemented. If your node web
 
 Also note: I have not yet tested AllScan on a node with EchoLink enabled but that will soon be fully supported.
 
+# Troubleshooting / FAQs
+If you get a permissions error when trying to Add a Favorite in AllScan, check that the /var/www/html/supermon dir has 775 permissions and www-data group, and that the /var/www/html/supermon/favorites.ini file exists and has 664 permissions and www-data as the group. These settings should already be that way if your Supermon install is properly working, otherwise it would not be able to edit and save the favorites.ini file. As a test you can go into Supermon, click the Configuration Editor button and try adding a blank line to favorites.ini and see if it saves OK. If not, there was something off with the Supermon install. In that case you might want to check on the Supermon groups.io page to let them know, or just run the following commands to correct those settings:
+
+	cd /var/www/html/supermon/
+	sudo touch favorites.ini
+	sudo chmod 664 favorites.ini
+	sudo chmod 775 .
+	sudo chgrp www-data favorites.ini .
+	
 # Contact
 If you have any questions email chc_media at yahoo dot com. 73, NR9V

@@ -10,6 +10,7 @@
 </head>
 <?php
 require_once("include/common.php");
+require_once("include/viewUtils.php");
 require_once(API . 'global.inc');
 require_once(API . 'common.inc');
 $html = new Html();
@@ -95,7 +96,8 @@ h2('Favorites');
 // Read in favorites.ini
 $favs = [];
 $favcmds = [];
-if(file_exists(API . 'favorites.ini')) {
+$favsFile = API . 'favorites.ini';
+if(file_exists($favsFile)) {
 	$cpConfig = parse_ini_file(API . 'favorites.ini', true);
 	// Combine [general] stanza with this node's stanza
 	$cpCommands = $cpConfig['general'];
@@ -126,9 +128,12 @@ if(file_exists(API . 'favorites.ini')) {
 	}
 	// if(count($favcmds))
 		// varDump($favcmds);
+} else {
+	p("$favsFile not found. Check Supermon/AllMon install or create a blank file with www-data writeable permissions.");
 }
-$hdrCols = ['#', 'Name', 'Desc', 'Location', 'Node'];
-$out = $html->tableOpen($hdrCols, null, 'results');
+
+// Combine favs node, label data with astdb data into favList
+$favList = [];
 foreach($favs as $n => $f) {
 	list($x, $call, $desc, $loc) = array_key_exists($f->node, $astdb) ?
 			$astdb[$f->node] : [$n, '-', 'Not in ASL DB', '-'];
@@ -138,13 +143,46 @@ foreach($favs as $n => $f) {
 		$name = $call;
 	elseif(strpos($name, $call) === false)
 		$name = $call . ' ' . $name;
-	$cols = [$n, $name, $desc, $loc, $f->node];
-	$nodeNumAttr = ['4' => 'class="nodeNum" onClick="setNodeBox('.$f->node.')"'];
-	$out .= $html->tableRow($cols, null, null, false, $nodeNumAttr);
+	$favList[] = [$n, $name, $desc, $loc, $f->node];
 }
-$out .= $html->tableClose();
-echo $out;
 
+// Sort favList by specified column if fs parm is set
+$colKey = ['num','name','desc','loc','node'];
+$sortCol = isset($_GET['fs']) && in_array($_GET['fs'], $colKey) ? $_GET['fs'] : 'num';
+if($sortCol && !empty($favList) && count($favList) > 1) {
+	$col = array_search($sortCol, $colKey);
+	$sortAsc = !(isset($_GET['fso']) && $_GET['fso'] === 'd');
+	$favList = sortArray($favList, $col, !$sortAsc);
+}
+
+// Output Favorites table
+if(empty($favList)) {
+	p('No Favorites have yet been added');
+} else {
+	$hdrCols = ['#', 'Name', 'Desc', 'Location', 'Node'];
+	if(count($favList) > 1) {
+		foreach($hdrCols as $key => &$col) {
+			$ck = $colKey[$key];
+			if($sortCol === $ck) {
+				// Link to sort in opposite order
+				$col = getSortLink($parms, $ck, !$sortAsc, $col, 'fs', 'fso');
+				// Show an arrow indicating current sort col and direction
+				$col .= upDownArrow($sortAsc);
+			} else {
+				// Link to sort in ASC order (or DESC order for time cols)
+				$col = getSortLink($parms, $ck, true, $col, 'fs', 'fso');
+			}
+		}
+	}
+	$out = $html->tableOpen($hdrCols, null, 'results', null);
+	$nodeNumAttr = ['4' => 'class="nodeNum" onClick="setNodeBox('.$f->node.')"'];
+	foreach($favList as $f)
+		$out .= $html->tableRow($f, null, null, false, $nodeNumAttr);
+	$out .= $html->tableClose();
+	echo $out;
+}
+
+// Show CPU Temp
 if(file_exists("/sys/class/thermal/thermal_zone0/temp")) {
     $cpuTemp = exec("/usr/local/sbin/supermon/get_temp");
 	if($cpuTemp) {
@@ -154,6 +192,22 @@ if(file_exists("/sys/class/thermal/thermal_zone0/temp")) {
 }
 
 asExit();
+
+function sortArray($list, $col, $desc) {
+	$colVals = [];
+	foreach($list as $val)
+		$colVals[] = $val[$col];
+	// Sort the column data while retaining array keys
+	if($desc)
+		arsort($colVals);
+	else
+		asort($colVals);
+	// Reorder the input array
+	$out = [];
+	foreach(array_keys($colVals) as $k)
+		$out[] = $list[$k];
+	return $out;
+}
 
 function processForm($parms) {
 	global $astdb;
