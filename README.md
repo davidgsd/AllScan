@@ -38,7 +38,7 @@ You will need SSH access to your node and should have basic familiarity with Lin
 
 Once you are logged in by SSH to your node run the following commands:
 
-	cd /var/www/html/
+	cd /var/www/html
 	mkdir allscan; cd allscan
 	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
 	unzip main.zip; mv AllScan-main/* .
@@ -48,6 +48,15 @@ Once you are logged in by SSH to your node run the following commands:
 
 Now open a browser and go to your node's IP address followed by /allscan/ eg. `http://192.168.1.23/allscan/`
 You should see a Connection Status table showing your Node number(s), Call Sign and Location, a control form where you can enter node numbers and use the Connect, Disconnect, etc. buttons, and a Favorites table with at least a few favorites listed. If any of these are not showing check your allmon.ini and global.inc files in /var/www/html/supermon/ and make sure they are properly configured.
+
+# Update
+AllScan has no configuration files in its own directory currently thus the update process is similar to the install process with exception that you don't need to create the allscan directory and should delete all files in the directory prior to downloading the update. To update AllScan log into your node with SSH and run the following commands:
+
+	cd /var/www/html/allscan
+	rm -rf *
+	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
+	unzip main.zip; mv AllScan-main/* .
+	rm main.zip; rmdir AllScan-main
 
 # Notes
 SECURITY NOTE: User login support has not yet been implemented. If your node webserver is PUBLICLY accessible you should set up password protection on the /allscan/ directory. If you do not know how to do that, it is NOT recommended that you install AllScan at this time. In the next few weeks a login system will be implemented in AllScan, but currently anyone who has access to your node's IP address will have access to the /allscan/ directory (if they know to check that specific url). If you are using your node only on your local home network and do not have an external port mapped in your internet router to port 80 on your node then having a login and password is generally not necessary, but can still be enabled easily with a few simple steps to enable Apache directory authentication, such as described in this [article](https://www.digitalocean.com/community/tutorials/how-to-set-up-password-authentication-with-apache-on-ubuntu-20-04)
