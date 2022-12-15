@@ -1,14 +1,12 @@
-var apiDir = '';
+var apiDir='/allscan/astapi/';
 var source, xhttp;
 var hb;
-var clrMsgTimer;
 var enUrl='';
 
-function initEventStream(dir, url) {
-	apiDir = dir;
+function initEventStream(url) {
 	if(typeof(EventSource)!=="undefined") {
 		// Start SSE
-		source = new EventSource(dir + url);
+		source = new EventSource(apiDir + url);
 		source.onerror = handleEventSourceError;
 		hb = document.getElementById("hb");
 		window.addEventListener("beforeunload",function() {	source.close();	});
@@ -23,10 +21,12 @@ function initEventStream(dir, url) {
 	}
 }
 
-function statMsg(msg, timeMs=5000) {
+function statMsg(msg) {
 	const e = document.getElementById('statmsg');
+	if(e.innerHTML.length > 50000)
+		e.innerHTML = '';
 	e.innerHTML = (e.innerHTML === '') ? msg : (e.innerHTML + '<br>' + msg);
-	clrMsgTimer = setTimeout('clearStatMsg()',timeMs);
+	e.scrollTop = e.scrollHeight;
 }
 function clearStatMsg() {
 	const e = document.getElementById('statmsg');
@@ -34,6 +34,8 @@ function clearStatMsg() {
 }
 
 function handleEventSourceError(event) {
+	if(event !== null && typeof event === 'object')
+		event = JSON.stringify(event);
 	console.log("Event Source error: " + event);
 }
 
@@ -192,11 +194,10 @@ function disconnectNode() {
 function handleXhttpResponse() {
 	if(xhttp.readyState === 4) {
 		if(xhttp.status === 200) {
-			//console.log(xhttp.responseText);
 			statMsg(xhttp.responseText);
 		} else {
-			//console.log('err: ReqStat=' + xhttp.status);
-			statMsg('Error response from server: ' + xhttp.status + '<br>Hit [F5] to reload page');
+			statMsg('Error response from server: ' + xhttp.status);
+			statMsg('Hit [F5] to Reload');
 		}
 	}
 }

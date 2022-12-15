@@ -1,4 +1,5 @@
 <?php
+$AllScanVersion = "v0.2";
 require_once('Html.php');
 require_once('logUtils.php');
 define('API_DIR', '/supermon/'); // Web path to AllMon/Supermon directory
@@ -191,6 +192,41 @@ function getRemoteAddr() {
 	if(strlen($id) < 7 || strlen($id) > 39 || preg_match('/[^0-9a-f\.:]/', $id) == 1)
 		return null;
 	return $id;
+}
+
+function readFileLines($fname, &$msg, $bak=false) {
+	if(!file_exists($fname)) {
+		$msg[] = "$fname not found";
+		return false;
+	}
+	// Read in file and save a copy to .bak extension, verify we have write permission
+	$f = file_get_contents($fname);
+	if(!$f) {
+		$msg[] = "Read $fname failed. Check directory/file permissions";
+		return false;
+	}
+	if($bak && !file_put_contents("$fname.bak", $f)) {
+		$msg[] = "Write $fname.bak failed. Check directory/file permissions";
+		return false;
+	}
+	/* if($bak && !chmod("$fname.bak", 0664)) {
+		$msg[] = "Chmod 0664 $fname.bak failed. Check directory/file permissions";
+		return false;
+	} */
+	return explode(NL, $f);
+}
+
+function writeFileLines($fname, $f, &$msg) {
+	$f = implode(NL, $f);
+	if(!file_put_contents($fname, $f)) {
+		$msg[] = "Write $fname failed. Check directory/file permissions";
+		return false;
+	}
+	/*if(!chmod($fname, 0664)) {
+		$msg[] = "Chmod 0664 $fname.new failed. Check directory/file permissions";
+		return false;
+	}*/
+	return true;
 }
 
 // Escape commas with double quotes, newlines with space, convert objects to arrays

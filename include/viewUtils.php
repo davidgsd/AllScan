@@ -1,5 +1,15 @@
 <?php
 
+function htmlInit($title) {
+	global $html;
+	echo $html->htmlOpen($title)
+		.	'<link href="css/main.css" rel="stylesheet" type="text/css">' . NL
+		.	'<link href="favicon.ico" rel="icon" type="image/x-icon">' . NL
+		.	'<meta name="viewport" content="width=device-width, initial-scale=0.5">' . NL
+		.	'<script src="js/main.js"></script>' . NL
+		.	'</head>' . NL;
+}
+
 function checkboxControl($url, $parms, $name, $title, $isChecked) {
 	global $html;
 	$out = $html->checkbox($name, $title, $isChecked, null, 'bottom', true);

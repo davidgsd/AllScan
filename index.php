@@ -1,43 +1,32 @@
-<!DOCTYPE html>
-<html lang="en" dir="ltr">
-<head>
-<meta charset="utf-8">
-<title>AllScan - AllStarLink Favorites Management & Scanning</title>
-<link href="css/main.css" rel="stylesheet" type="text/css">
-<link href="favicon.ico" rel="icon" type="image/x-icon">
-<meta name="viewport" content="width=device-width, initial-scale=0.5">
-<script src="js/main.js"></script>
-</head>
 <?php
 require_once("include/common.php");
 require_once("include/viewUtils.php");
+require_once("include/hwUtils.php");
 require_once(API . 'global.inc');
 require_once(API . 'common.inc');
 $html = new Html();
+htmlInit('AllScan - AllStarLink Favorites Management & Scanning Web App');
 $title = $CALL . ' ' . $LOCATION;
 $title2 = $TITLE2 . ' - ' . $title;
-// Get Allstar database file
-$db = $ASTDB_TXT;	// Defined in global.inc
+$msg = [];
+
+// Load ASL DB
 $astdb = [];
-if(file_exists($db)) {
-    $fh = fopen($db, "r");
-    if(flock($fh, LOCK_SH)) {
-        while(($line = fgets($fh)) !== FALSE) {
-            $arr = preg_split("/\|/", trim($line));
-            $astdb[$arr[0]] = $arr;
-        }
+$rows = readFileLines($ASTDB_TXT, $msg);
+if($rows) {
+	foreach($rows as $row) {
+        $arr = explode('|', trim($row));
+        $astdb[$arr[0]] = $arr;
     }
-    flock($fh, LOCK_UN);
-    fclose($fh);
+	unset($rows);
 }
 $cnt = count($astdb);
-$msg = "$cnt Nodes in ASL DB";
+$msg[] = "$cnt Nodes in ASL DB";
 
-// Read allmon INI file, get nodes list
+// Read allmon.ini, get nodes list
 if(!file_exists(API . 'allmon.ini'))
 	asExit("allmon.ini not found");
 $cfg = parse_ini_file(API . 'allmon.ini', true);
-//varDump($config);
 $nodes = explode(',', $cfg['All Nodes']['nodes']);
 $node = $nodes[0];
 
@@ -45,22 +34,20 @@ $node = $nodes[0];
 $parms = getRequestParms();
 //varDump($parms);
 if(isset($parms['Submit'])) {
-	if($pfmsg = processForm($parms))
-		$msg .= BR . $pfmsg;
+	processForm($parms, $msg);
 }
 
 $remNode = isset($parms['node']) && is_numeric($parms['node']) ? $parms['node'] : '';
 
-echo "<body onLoad=\"initEventStream('" . API . "', 'server.php?nodes=$node');\">\n";
+echo 	"<body onLoad=\"initEventStream('server.php?nodes=$node');\">" . NL
+	.	'<header>' . NL
+	.	$html->a('/allscan/', null, 'AllScan', 'h1') . " <small>$AllScanVersion</small>" . ENSP
+	.	$html->a('#', null, $title, 'title') . ENSP
+	.	'<span id="hb"><img src="AllScan.png" width=16 height=16 class="nr" alt="*"></span>' . NL
+	.	'</header>' . NL . BR;
 ?>
-<header>
-<a href="/allscan/" class="h1">AllScan</a> <small>v0.1</small>&ensp;
-<a href="#" class="title"><?php echo $title ?></a>&ensp;
-<span id="hb"><img src="AllScan.png" width=16 height=16 alt="*" style="position:relative;top:-1px;" class="nr"></span>
-</header>
-<br>
-<h2>Connection Status</h2>
 
+<h2>Connection Status</h2>
 <table class="gridtable" id="table_<?php echo $node ?>">
 <colgroup><col span="1"><col span="1"><col span="1"><col span="1"><col span="1"><col span="1"><col span="1"></colgroup>
 <thead>
@@ -72,7 +59,6 @@ echo "<body onLoad=\"initEventStream('" . API . "', 'server.php?nodes=$node');\"
 </tbody>
 </table>
 
-<p>
 <form id="nodeForm" method="post" action="/allscan/">
 <fieldset>
 <input type=hidden id="localnode" name="localnode" value="<?php echo $node ?>">
@@ -87,7 +73,6 @@ echo "<body onLoad=\"initEventStream('" . API . "', 'server.php?nodes=$node');\"
 <input type=submit name="Submit" value="Delete Favorite">
 </fieldset>
 </form>
-</p>
 
 <?php
 h2('Favorites');
@@ -96,32 +81,32 @@ $favs = [];
 $favcmds = [];
 $favsFile = API . 'favorites.ini';
 if(file_exists($favsFile)) {
-	$cpConfig = parse_ini_file(API . 'favorites.ini', true);
+	$favsIni = parse_ini_file(API . 'favorites.ini', true);
 	// Combine [general] stanza with this node's stanza
-	$cpCommands = $cpConfig['general'];
-	if(isset($cpConfig[$node])) {
-		foreach($cpConfig[$node] as $type => $arr) {
+	$favsCfg = $favsIni['general'];
+	if(isset($favsIni[$node])) {
+		foreach($favsIni[$node] as $type => $arr) {
 			if($type == 'label') {
 				foreach($arr as $label) {
-					$cpCommands['label'][] = $label;
+					$favsCfg['label'][] = $label;
 				}
 			} elseif($type == 'cmd') {
 				foreach($arr as $cmd) {
-					$cpCommands['cmd'][] = $cmd;
+					$favsCfg['cmd'][] = $cmd;
 				}
-			}			
+			}
 		}
 	}
-	$cpCommands['label'] = array_map('trim', $cpCommands['label']);
-	$cpCommands['cmd'] = array_map('trim', $cpCommands['cmd']);
-	foreach($cpCommands['cmd'] as $i => $c) {
+	$favsCfg['label'] = array_map('trim', $favsCfg['label']);
+	$favsCfg['cmd'] = array_map('trim', $favsCfg['cmd']);
+	foreach($favsCfg['cmd'] as $i => $c) {
 		if(!$c) {
-			unset($cpCommands['cmd'][$i], $cpCommands['label'][$i]);
+			unset($favsCfg['cmd'][$i], $favsCfg['label'][$i]);
 		} else {
 			if(preg_match('/[0-9]{4,6}/', $c, $m) == 1)
-				$favs[$i] = (object)['node'=>$m[0], 'label'=>$cpCommands['label'][$i], 'cmd'=>$c];
+				$favs[$i] = (object)['node'=>$m[0], 'label'=>$favsCfg['label'][$i], 'cmd'=>$c];
 			else
-				$favcmds[$i] = (object)['label'=>$cpCommands['label'][$i], 'cmd'=>$c];
+				$favcmds[$i] = (object)['label'=>$favsCfg['label'][$i], 'cmd'=>$c];
 		}
 	}
 	// if(count($favcmds))
@@ -141,11 +126,11 @@ foreach($favs as $n => $f) {
 		$name = $call;
 	elseif(strpos($name, $call) === false)
 		$name = $call . ' ' . $name;
-	$favList[] = [$n, $name, $desc, $loc, $f->node];
+	$favList[] = [$n, $f->node, $name, $desc, $loc];
 }
 
 // Sort favList by specified column if fs parm is set
-$colKey = ['num','name','desc','loc','node'];
+$colKey = ['num', 'node', 'name', 'desc', 'loc'];
 $sortCol = isset($_GET['fs']) && in_array($_GET['fs'], $colKey) ? $_GET['fs'] : 'num';
 if($sortCol && !empty($favList) && count($favList) > 1) {
 	$col = array_search($sortCol, $colKey);
@@ -157,7 +142,7 @@ if($sortCol && !empty($favList) && count($favList) > 1) {
 if(empty($favList)) {
 	p('No Favorites have yet been added');
 } else {
-	$hdrCols = ['#', 'Name', 'Desc', 'Location', 'Node'];
+	$hdrCols = ['#', 'Node', 'Name', 'Desc', 'Location'];
 	if(count($favList) > 1) {
 		foreach($hdrCols as $key => &$col) {
 			$ck = $colKey[$key];
@@ -174,26 +159,34 @@ if(empty($favList)) {
 	}
 	$out = $html->tableOpen($hdrCols, null, 'results', null);
 	foreach($favList as $f) {
-		$nodeNumAttr = ['4' => 'class="nodeNum" onClick="setNodeBox(' . $f[4] . ')"'];
+		$nodeNumAttr = ['1' => 'class="nodeNum" onClick="setNodeBox(' . $f[1] . ')"'];
 		$out .= $html->tableRow($f, null, null, false, $nodeNumAttr);
 	}
 	$out .= $html->tableClose();
 	echo $out;
 }
 
-// Status Messages field (written to by JS functions)
-echo "<p id=\"statmsg\" class=\"gray\">$msg</p>\n";
+// Status Messages div
+$msg = implode(BR, $msg);
+echo "<div id=\"statmsg\">$msg</div>" . BR;
 
-// Show CPU Temp
-if(file_exists("/sys/class/thermal/thermal_zone0/temp")) {
-    $cpuTemp = exec("/usr/local/sbin/supermon/get_temp");
-	if($cpuTemp) {
-		$cpuTemp = str_replace(['palegreen', 'yellow', 'CPU:'], ['darkgreen', '#660', 'CPU Temp:'], $cpuTemp);
-		p($cpuTemp, null, false);
-	}
-}
+// Show CPU Temp & Info/Update Links
+echo cpuTemp() . BR;
+$links = [
+	'AllScan Info & Updates' => 'https://github.com/davidgsd/AllScan',
+	'AllStarLink.org' => 'https://www.allstarlink.org/',
+	'AllStarLink Forum' => 'https://community.allstarlink.org/',
+	'QRZ ASL Forum' => 'https://forums.qrz.com/index.php?forums/echolink-irlp-tech-board.76/',
+	'eHam.net' => 'https://www.eham.net/'
+];
+$out = [];
+foreach($links as $title => $url)
+	$out[] = $html->a($url, null, $title, null, 'info');
+echo $html->div(implode(ENSP . '|' . ENSP, $out), 'm5');
 
 asExit();
+
+// ---------------------------------------------------
 
 function sortArray($list, $col, $desc) {
 	$colVals = [];
@@ -211,21 +204,24 @@ function sortArray($list, $col, $desc) {
 	return $out;
 }
 
-function processForm($parms) {
+function processForm($parms, &$msg) {
 	global $astdb;
 	$node = $parms['node'];
-	$msg = [];
 	$fname = API . 'favorites.ini';
 	switch($parms['Submit']) {
 		case "Add to Favorites":
 			$msg[] = "Add Node $node to Favorites requested";
+			if(!validDbID($node)) {
+				$msg[] = "Invalid node#.";
+				break;
+			}
 			if(!array_key_exists($node, $astdb)) {
 				$msg[] = "Node $node not found in ASL DB. Check Node Number.";
 				break;
 			}
 			// Parse file lines and add new favorite after last label,cmd lines.
 			// Note: Does not look at [general] or [node#] sections (TBI)
-			if(($favs = readFileLines($fname, $msg)) === false)
+			if(($favs = readFileLines($fname, $msg, true)) === false)
 				break;
 			$n = count($favs);
 			$msg[] = "$n lines read from $fname";
@@ -249,9 +245,14 @@ function processForm($parms) {
 			$msg[] = "Successfully wrote $n lines to $fname";
 			break;
 		case "Delete Favorite":
+			$msg[] = "Delete Node $node from Favorites requested";
+			if(!validDbID($node)) {
+				$msg[] = "Invalid node#.";
+				break;
+			}
 			// Parse file lines and delete favorite's label,cmd lines.
 			// Note: Does not look for [general] or [node#] sections
-			if(($favs = readFileLines($fname, $msg)) === false)
+			if(($favs = readFileLines($fname, $msg, true)) === false)
 				break;
 			$n = count($favs);
 			$msg[] = "$n lines read from $fname";
@@ -281,40 +282,4 @@ function processForm($parms) {
 			$msg[] = "Successfully wrote $n lines to $fname";
 			break;
 	}
-	return implode(BR, $msg);
-}
-
-function readFileLines($fname, &$msg, $bak=true) {
-	if(!file_exists($fname)) {
-		$msg[] = "$fname not found";
-		return false;
-	}
-	// Read in file and save a copy to .bak extension, verify we have write permission
-	$f = file_get_contents($fname);
-	if(!$f) {
-		$msg[] = "Read $fname failed. Check directory/file permissions";
-		return false;
-	}
-	if($bak && !file_put_contents("$fname.bak", $f)) {
-		$msg[] = "Write $fname.bak failed. Check directory/file permissions";
-		return false;
-	}
-	/* if($bak && !chmod("$fname.bak", 0664)) {
-		$msg[] = "Chmod 0664 $fname.bak failed. Check directory/file permissions";
-		return false;
-	} */
-	return explode(NL, $f);
-}
-
-function writeFileLines($fname, $f, &$msg) {
-	$f = implode(NL, $f);
-	if(!file_put_contents($fname, $f)) {
-		$msg[] = "Write $fname failed. Check directory/file permissions";
-		return false;
-	}
-	/*if(!chmod($fname, 0664)) {
-		$msg[] = "Chmod 0664 $fname.new failed. Check directory/file permissions";
-		return false;
-	}*/
-	return true;
 }
