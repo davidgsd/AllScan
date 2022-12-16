@@ -1,4 +1,5 @@
 <?php
+error_reporting(E_ALL & ~E_NOTICE);
 header('Content-Type: text/event-stream');
 header('Cache-Control: no-cache');
 header('X-Accel-Buffering: no');
@@ -141,7 +142,7 @@ function getNode($fp, $node) {
 	global $ami;
 	$actionRand = mt_rand(); // Asterisk Manger Interface an actionID so we can find our own response
 	$actionID = 'xstat' . $actionRand;
-	if(fwrite($fp,"ACTION: RptStatus\r\nCOMMAND: XStat\r\nNODE: $node\r\nActionID: $actionID\r\n\r\n") !== false) {
+	if(fwrite($fp, "ACTION: RptStatus\r\nCOMMAND: XStat\r\nNODE: $node\r\nActionID: $actionID\r\n\r\n") !== false) {
 		// Get RptStatus
 		$rptStatus = $ami->getResponse($fp, $actionID);
 	} else {
@@ -149,13 +150,13 @@ function getNode($fp, $node) {
 	}
 	// format of Conn lines: Node# isKeyed lastKeySecAgo lastUnkeySecAgo
 	$actionID = 'sawstat' . $actionRand;
-	if(fwrite($fp,"ACTION: RptStatus\r\nCOMMAND: SawStat\r\nNODE: $node\r\nActionID: $actionID\r\n\r\n") !== false) {
+	if(fwrite($fp, "ACTION: RptStatus\r\nCOMMAND: SawStat\r\nNODE: $node\r\nActionID: $actionID\r\n\r\n") !== false) {
 		// Get RptStatus
 		$sawStatus = $ami->getResponse($fp, $actionID);
 	} else {
 		sendData(['status'=>'sawStat failed!']);
 	}
-	// Parse this $node. Retutns an array of currently connected nodes
+	// Parse this $node. Returns an array of currently connected nodes
 	$current = parseNode($fp, $rptStatus, $sawStatus);
 	return $current;
 }

@@ -1,5 +1,5 @@
 <?php
-$AllScanVersion = "v0.2";
+$AllScanVersion = "v0.21";
 require_once('Html.php');
 require_once('logUtils.php');
 define('API_DIR', '/supermon/'); // Web path to AllMon/Supermon directory

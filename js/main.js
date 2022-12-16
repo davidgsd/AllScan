@@ -16,11 +16,20 @@ function initEventStream(url) {
 		source.addEventListener('nodetimes', handleNodetimesEvent, false);
 		// Handle connection data
 		source.addEventListener('connection', handleConnectionEvent, false);
+		// Check for offline/online events. If PC/phone goes to sleep or loses connection
+		// we should be able to detect when it's restored and re-init the event stream
+		window.addEventListener("online", handleOnlineEvent);
+		window.addEventListener("offline", handleOfflineEvent);
 	} else {
 		alert("ERROR: Your browser does not support server-sent events.");
 	}
 }
-
+function handleOnlineEvent() {
+	statsMsg('online event');
+}
+function handleOfflineEvent() {
+	statsMsg('offline event');
+}
 function statMsg(msg) {
 	const e = document.getElementById('statmsg');
 	if(e.innerHTML.length > 50000)
@@ -133,7 +142,9 @@ function handleNodesEvent(event) {
 		// $('#table_' + localNode + ' tbody:first').html(tablehtml);
 		const table = document.getElementById('table_' + localNode);
 		tbody0 = table.getElementsByTagName('tbody')[0];
+		const conncnt = document.getElementById('conncnt');
 		tbody0.innerHTML = tablehtml;
+		conncnt.value = total_nodes;
 	}
 }
 
@@ -165,13 +176,18 @@ function connectNode(button) {
 	var localNode = document.getElementById('localnode').value;
 	var remoteNode = document.getElementById('node').value;
 	var perm = document.getElementById('permanent').checked;
+	// Support Disconnect before Connect checkbox. Only applies if conncnt > 0
+	var autodisc = document.getElementById('autodisc').checked;
+	var conncnt = document.getElementById('conncnt').value;
+	if(conncnt < 1)
+		autodisc = false;
 	if(remoteNode.length == 0) {
 		alert('Please enter the remote node number.');
 		return;
 	}
 	xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = handleXhttpResponse;
-	parms = 'remotenode=' + remoteNode + '&perm=' + perm + '&button=' + button + '&localnode=' + localNode;
+	parms = 'remotenode='+remoteNode + '&perm='+perm + '&button='+button + '&localnode='+localNode + '&autodisc='+autodisc;
 	xhttp.open("POST", apiDir + 'connect.php', true);
 	xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xhttp.send(parms);

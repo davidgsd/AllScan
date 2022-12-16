@@ -29,6 +29,7 @@ if(!file_exists(API . 'allmon.ini'))
 $cfg = parse_ini_file(API . 'allmon.ini', true);
 $nodes = explode(',', $cfg['All Nodes']['nodes']);
 $node = $nodes[0];
+$autodisc = !isset($parms['autodisc']) || $parms['autodisc'];
 
 // Handle form submits
 $parms = getRequestParms();
@@ -61,13 +62,18 @@ echo 	"<body onLoad=\"initEventStream('server.php?nodes=$node');\">" . NL
 
 <form id="nodeForm" method="post" action="/allscan/">
 <fieldset>
+<input type=hidden id="conncnt" name="conncnt" value="0">
 <input type=hidden id="localnode" name="localnode" value="<?php echo $node ?>">
-<input type=text id="node" name="node" value="<?php echo $remNode ?>" maxlength="7">
+<label for="node">Node</label><input type=number id="node" name="node" value="<?php echo $remNode ?>"
+	maxlength="10" style="border:2px solid hsl(240,40%,60%);margin:3px;font-size:14px;width:11em;">
+<br>
 <input type=button value="Connect" onClick="connectNode('connect');">
 <input type=button value="Disconnect" onClick="disconnectNode();">
 <input type=button value="Monitor" onClick="connectNode('monitor');">
 <input type=button value="Local Monitor" onClick="connectNode('localmonitor');">
-<input type=checkbox id="permanent"><label for="permanent">Permanent</label>
+<br>
+<input type=checkbox id="permanent"><label for="permanent">Permanent</label>&nbsp;
+<input type=checkbox id="autodisc"<?php if($autodisc) echo ' checked' ?>><label for="autodisc">Disconnect before Connect</label>
 <br>
 <input type=submit name="Submit" value="Add to Favorites">
 <input type=submit name="Submit" value="Delete Favorite">
@@ -227,8 +233,13 @@ function processForm($parms, &$msg) {
 			$msg[] = "$n lines read from $fname";
 			$lastCmdLn = 0;
 			for($i=0; $i < $n; $i++) {
-				if(strpos($favs[$i], 'cmd[]') === 0)
+				if(strpos($favs[$i], 'cmd[]') === 0) {
+					if(strpos($favs[$i], " $node\"")) {
+						$msg[] = "Node $node already exists in favorites.";
+						break(2);
+					}
 					$insertLn = $i + 2;
+				}
 			}
 			// Add blank line after last fav entry if not present
 			if($favs[$insertLn] !== '') {
@@ -262,7 +273,7 @@ function processForm($parms, &$msg) {
 					$delLn = $i + 1;
 			}
 			if(!isset($delLn)) {
-				$msg[] = "Node not found in $fname";
+				$msg[] = "Node $node not found in $fname";
 				break;
 			}
 			$nLines = 2;

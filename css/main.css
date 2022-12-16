@@ -35,7 +35,7 @@ font-family:'Material Icons';
 img {
 vertical-align:middle;
 }
-input[type=text], input[type=password], select, textarea {
+input[type=text], input[type=number], input[type=password], select, textarea {
 background-color:hsl(240,50%,30%);
 color:#fff;
 margin:1px 4px;
@@ -56,6 +56,14 @@ font-size:14px;
 line-height:1;
 vertical-align:middle;
 padding:1px;
+}
+/* Hide number control spin arrows */
+input::-webkit-outer-spin-button, input::-webkit-inner-spin-button {
+-webkit-appearance: none;
+margin:0;
+}
+input[type=number] {
+-moz-appearance: textfield;
 }
 select {
 margin:0px 4px;
@@ -93,7 +101,7 @@ display:inline-block;
 }
 fieldset {
 display:inline-block;
-border:solid 3px rgb(51,51,119);
+border:solid 3px hsl(240,40%,33%);
 padding:4px;
 margin:9px 3px 3px;
 border-radius:5px;
@@ -174,7 +182,7 @@ color:#7e7;
 header {
 display:inline-block;
 background-color:rgba(51,51,119,0.75);
-padding:0 6px 6px;
+padding:3px 6px 4px;
 border-bottom-left-radius:14px;
 border-bottom-right-radius:14px;
 font-size:125%;

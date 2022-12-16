@@ -1,17 +1,17 @@
 <?php
-//include('session.inc');
+error_reporting(E_ALL & ~E_NOTICE);
 require_once('../include/common.php');
 require_once('AMI.php');
-
-// if($_SESSION['sm61loggedin'] !== true) {
-	// die("Please login to use connect/disconnect functions.\n");
-// }
+// TBI: Authenticate user
 
 // Filter and validate user input
 $remotenode = trim(strip_tags($_POST['remotenode']));
-$perm = trim(strip_tags($_POST['perm']));
 $button = trim(strip_tags($_POST['button']));
 $localnode = trim(strip_tags($_POST['localnode']));
+$perm = (trim(strip_tags($_POST['perm'])) === 'true');
+$autodisc = (trim(strip_tags($_POST['autodisc'])) === 'true');
+
+//echo varDumpClean($_POST);
 
 if(!preg_match("/^\d+$/", $localnode))
     die("Invalid local node number\n");
@@ -34,7 +34,13 @@ if($ami->login($fp, $config[$localnode]['user'], $config[$localnode]['passwd']) 
 
 switch($button) {
 	case 'connect':
-		if($perm == 'on') {
+		if($autodisc) {
+			echo "Disconnect all nodes...";
+			$resp = $ami->command($fp, "rpt cmd $localnode ilink 6 0");
+			echo $resp . BR;
+			usleep(500000);
+		}
+		if($perm) {
 			$ilink = 13;
 			echo "Permanently Connect $localnode to $remotenode...";
 		} else {
@@ -43,7 +49,7 @@ switch($button) {
 		}
 		break;
 	case 'monitor':
-		if($perm == 'on') {
+		if($perm) {
 			$ilink = 12;
 			echo "Permanently Monitor $remotenode from $localnode...";
 		} else {
@@ -52,7 +58,7 @@ switch($button) {
 		}
 		break;
 	case 'localmonitor':
-		if($perm == 'on') {
+		if($perm) {
 			$ilink = 18;
 			echo "Permanently Local Monitor $remotenode from $localnode...";
 		} else {
