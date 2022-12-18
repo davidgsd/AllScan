@@ -33,12 +33,10 @@ You will need SSH access to your node and should have basic familiarity with Lin
 Once you are logged in by SSH to your node run the following commands:
 
 	cd /var/www/html
-	mkdir allscan; cd allscan
+	sudo mkdir allscan; cd allscan
 	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
 	unzip main.zip; mv AllScan-main/* .
 	rm main.zip; rmdir AllScan-main
-
-(If you get any permissions errors writing to directories/files during the above steps, try switching to superuser by running "sudo su". This should not generally be necessary though.)
 
 Now open a browser and go to your node's IP address followed by /allscan/ eg. `http://192.168.1.23/allscan/`, and bookmark that URL. You should see a Connection Status table showing your Node number(s), Call Sign and Location, a control form where you can enter node numbers and use the Connect, Disconnect, etc. buttons, and a Favorites table with at least a few favorites listed. If any of these are not showing check your allmon.ini and global.inc files in /var/www/html/supermon/ and make sure they are properly configured.
 
@@ -70,7 +68,7 @@ If you get a permissions error when trying to Add a Favorite in AllScan, check t
 # Contact
 If you have any questions email chc_media at yahoo dot com. 73, NR9V
 
-# Features now in Progress
+# Road Map
 1. Implement Cfg Mgr system that will autodetect Allmon2/Supermon config files if present and properly configured or otherwise use an independent allscan.ini file, validate settings and enable user to enter and edit all needed config settings on the web GUI. Estimated completion: Dec. 20
 2. Add support for reading Last Heard, Last Keyed, and connected node count data from the ASL APIs and showing this information in the favorites table. Estimated completion: Dec. 30
 3. Add support for EchoLink nodes. Estimated completion: Jan. 7
@@ -79,16 +77,21 @@ If you have any questions email chc_media at yahoo dot com. 73, NR9V
 
 # Release Notes
 **v0.22 2022-12-17**
+
 CSS optimizations. Add Asterisk Restart button. Improvements to log messages.
 
 **v0.21 2022-12-16**
+
 Support Disconnect before Connect feature. This sends AMI an 'rpt cmd ilink 6' (Disconnect all links) command and waits 500mS before executing a Connect request, if 'Disconnect before Connect' checkbox is checked (default val = checked) and nodes are connected. To have the default for this checkbox be unchecked, set a url parm of autodisc=0. Disable PHP notices. Change Node text input field to a number field, and make the font size larger to make use of the field more mobile-friendly. Check for online/offline JS events.
 
 **v0.2 2022-12-15**
+
 Add Asterisk API. Code refactoring. Add Message Stats div, set up JS functions to output detailed status and error messages during all event processing. Add info links and CPU temp display.
 
 **v0.15 2022-12-14**
+
 Enable sortable columns on Favorites Table. GUI Updates.
 
 **v0.1 2022-12-13**
+
 Initial Commit.
