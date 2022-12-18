@@ -42,15 +42,15 @@ $remNode = isset($parms['node']) && is_numeric($parms['node']) ? $parms['node'] 
 
 echo 	"<body onLoad=\"initEventStream('server.php?nodes=$node');\">" . NL
 	.	'<header>' . NL
-	.	$html->a('/allscan/', null, 'AllScan', 'h1') . " <small>$AllScanVersion</small>" . ENSP
+	.	$html->a('/allscan/', null, 'AllScan', 'logo') . " <small>$AllScanVersion</small>" . ENSP
 	.	$html->a('#', null, $title, 'title') . ENSP
-	.	'<span id="hb"><img src="AllScan.png" width=16 height=16 class="nr" alt="*"></span>' . NL
+	.	'<span id="hb"><img src="AllScan.png" width=16 height=16 alt="*"></span>' . NL
 	.	'</header>' . NL . BR;
 ?>
 
 <h2>Connection Status</h2>
-<table class="gridtable" id="table_<?php echo $node ?>">
-<colgroup><col span="1"><col span="1"><col span="1"><col span="1"><col span="1"><col span="1"><col span="1"></colgroup>
+<div class="twrap">
+<table class="grid" id="table_<?php echo $node ?>">
 <thead>
 <tr><th colspan="7"><i><?php echo $title2 ?></i></th></tr>
 <tr><th>&nbsp;&nbsp;Node&nbsp;&nbsp;</th><th>Node Info</th><th>Received</th><th>Link</th><th>Dir</th><th>Connected</th><th>Mode</th></tr>
@@ -59,6 +59,7 @@ echo 	"<body onLoad=\"initEventStream('server.php?nodes=$node');\">" . NL
 <tr><td colspan="7">Waiting...</td></tr>
 </tbody>
 </table>
+</div><br>
 
 <form id="nodeForm" method="post" action="/allscan/">
 <fieldset>
@@ -163,7 +164,7 @@ if(empty($favList)) {
 			}
 		}
 	}
-	$out = $html->tableOpen($hdrCols, null, 'results', null);
+	$out = $html->tableOpen($hdrCols, null, 'favs', null);
 	foreach($favList as $f) {
 		$nodeNumAttr = ['1' => 'class="nodeNum" onClick="setNodeBox(' . $f[1] . ')"'];
 		$out .= $html->tableRow($f, null, null, false, $nodeNumAttr);
@@ -177,7 +178,9 @@ $msg = implode(BR, $msg);
 echo "<div id=\"statmsg\">$msg</div>" . BR;
 
 // Show CPU Temp & Info/Update Links
-echo cpuTemp() . BR;
+echo cpuTemp() . ENSP . '|' . ENSP
+	.	'<input type=button class="small" value="Restart Asterisk" onClick="astrestart();">';
+
 $links = [
 	'AllScan Info & Updates' => 'https://github.com/davidgsd/AllScan',
 	'AllStarLink.org' => 'https://www.allstarlink.org/',

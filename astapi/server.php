@@ -1,5 +1,5 @@
 <?php
-error_reporting(E_ALL & ~E_NOTICE);
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
 header('Content-Type: text/event-stream');
 header('Cache-Control: no-cache');
 header('X-Accel-Buffering: no');
@@ -34,7 +34,7 @@ if($rows) {
 // Read allmon.ini
 $allmonini = API . 'allmon.ini';
 if(!file_exists('../' . $allmonini)) {
-	sendData(['status' => "$allmonini not found"]);
+	sendData(['status' => "$allmonini not found."]);
 	exit();
 }
 $cfg = parse_ini_file('../' . $allmonini, true);
@@ -53,12 +53,18 @@ foreach($passedNodes as $i => $node) {
 $ami = new AMI();
 $servers = [];
 $fp = [];
+
 foreach($nodes as $node) {
 	$host = $cfg[$node]['host'];
+	if(!$host) {
+		$data['status'] = "Invalid host setting in $allmonini [$node]";
+		sendData($data, 'connection');
+		continue;
+	}
 	$data = ['host'=>$host, 'node'=>$node];
 	// Connect and login to each manager only once
 	if(!array_key_exists($host, $servers)) {
-		$data['status'] = 'Connecting to Asterisk Manager...';
+		$data['status'] = "Connecting to Asterisk Manager $node $host...";
 		sendData($data, 'connection');
 		$fp[$host] = $ami->connect($cfg[$node]['host']);
 		if($fp[$host] === false) {
@@ -161,9 +167,8 @@ function getNode($fp, $node) {
 	return $current;
 }
 
-function sendData($data, $event=null) {
-	if($event)
-		echo "event: $event\n";
+function sendData($data, $event='error') {
+	echo "event: $event\n";
 	echo 'data: ' . json_encode($data) . "\n\n";
 	ob_flush();
 	flush();

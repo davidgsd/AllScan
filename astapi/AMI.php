@@ -4,12 +4,10 @@ class AMI {
 
 function connect($host) {
     // Set default port if not provided
-    $arr = explode(":", $host);
+    $arr = explode(':', $host);
     $ip = $arr[0];
     $port = isset($arr[1]) ? $arr[1] : 5038;
-    // Open manager socket
-    $fp = fsockopen($ip, $port, $errno, $errstr, 5);
-    return $fp;
+    return fsockopen($ip, $port, $errno, $errstr, 5);
 }
 
 function login($fp, $user, $password) {

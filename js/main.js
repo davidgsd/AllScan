@@ -16,6 +16,8 @@ function initEventStream(url) {
 		source.addEventListener('nodetimes', handleNodetimesEvent, false);
 		// Handle connection data
 		source.addEventListener('connection', handleConnectionEvent, false);
+		// Handle error messages
+		source.addEventListener('error', handleErrorEvent, false);
 		// Check for offline/online events. If PC/phone goes to sleep or loses connection
 		// we should be able to detect when it's restored and re-init the event stream
 		window.addEventListener("online", handleOnlineEvent);
@@ -25,10 +27,10 @@ function initEventStream(url) {
 	}
 }
 function handleOnlineEvent() {
-	statsMsg('online event');
+	statMsg('online event');
 }
 function handleOfflineEvent() {
-	statsMsg('offline event');
+	statMsg('offline event');
 }
 function statMsg(msg) {
 	const e = document.getElementById('statmsg');
@@ -46,17 +48,24 @@ function handleEventSourceError(event) {
 	if(event !== null && typeof event === 'object')
 		event = JSON.stringify(event);
 	console.log("Event Source error: " + event);
+	statMsg("Event Source error: " + event);
 }
 
 function handleConnectionEvent(event) {
 	var statusdata = JSON.parse(event.data);
+	statMsg(statusdata.status);
 	//console.log('ConnectionEvent: ' + statusdata.status);
+	if(!statusdata.node)
+		return;
 	tableID = 'table_' + statusdata.node;
 	//$('#' + tableID + ' tbody:first').html('<tr><td colspan="7">' + statusdata.status + '</td></tr>');
 	const table = document.getElementById(tableID);
 	var tbody0 = table.getElementsByTagName('tbody')[0];
 	tbody0.innerHTML = '<tr><td colspan="7">' + statusdata.status + '</td></tr>';
-	statMsg(statusdata.status);
+}
+function handleErrorEvent(event) {
+	var statusdata = JSON.parse(event.data);
+	statMsg('ERROR: ' + statusdata.status);
 }
 
 function handleNodesEvent(event) {
@@ -181,8 +190,8 @@ function connectNode(button) {
 	var conncnt = document.getElementById('conncnt').value;
 	if(conncnt < 1)
 		autodisc = false;
-	if(remoteNode.length == 0) {
-		alert('Please enter the remote node number.');
+	if(remoteNode < 1) {
+		alert('Please enter a valid remote node number.');
 		return;
 	}
 	xhttp = new XMLHttpRequest();
@@ -207,6 +216,20 @@ function disconnectNode() {
 	xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xhttp.send(parms);
 }
+
+function astrestart() {
+	var localNode = document.getElementById('localnode').value;
+	xhttp = new XMLHttpRequest();
+	xhttp.onreadystatechange = handleXhttpResponse;
+	parms = 'localnode=' + localNode;
+	xhttp.open("POST", apiDir + 'restart.php', true);
+	xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+	xhttp.send(parms);
+	// Reload page
+	statMsg("Reloading...");
+	setTimeout(function() { window.location.reload(); }, 500);
+}
+
 function handleXhttpResponse() {
 	if(xhttp.readyState === 4) {
 		if(xhttp.status === 200) {

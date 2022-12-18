@@ -1,5 +1,5 @@
 <?php
-error_reporting(E_ALL & ~E_NOTICE);
+error_reporting(E_ERROR | E_WARNING | E_PARSE);
 require_once('../include/common.php');
 require_once('AMI.php');
 // TBI: Authenticate user
@@ -13,8 +13,11 @@ $autodisc = (trim(strip_tags($_POST['autodisc'])) === 'true');
 
 //echo varDumpClean($_POST);
 
-if(!preg_match("/^\d+$/", $localnode))
+if(!preg_match("/^\d+$/", $localnode) || !$localnode)
     die("Invalid local node number\n");
+
+if(!preg_match("/^\d+$/", $remotenode) || !$remotenode)
+    die("Invalid remote node number\n");
 
 // Read configuration file
 $allmonini = '../' . API . 'allmon.ini';
