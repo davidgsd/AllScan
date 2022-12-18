@@ -197,7 +197,7 @@ $links = [
 ];
 $out = [];
 foreach($links as $title => $url)
-	$out[] = $html->a($url, null, $title, null, 'info');
+	$out[] = $html->a($url, null, $title, null, '_blank');
 echo $html->div(implode(ENSP . '|' . ENSP, $out), 'm5');
 
 asExit();

@@ -33,7 +33,9 @@ You will need SSH access to your node and should have basic familiarity with Lin
 Once you are logged in by SSH to your node run the following commands:
 
 	cd /var/www/html
-	sudo mkdir allscan; sudo chmod 775 allscan; sudo chgrp repeater allscan; cd allscan
+	sudo mkdir allscan; sudo chmod 775 allscan
+	sudo chgrp $USER allscan
+	cd allscan
 	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
 	unzip main.zip; mv AllScan-main/* .
 	rm main.zip; rmdir AllScan-main
@@ -46,7 +48,8 @@ The update process is similar to the install process with exception that you don
 
 	cd /var/www/html/allscan
 	rm -rf *
-	sudo chmod 775 .; sudo chgrp repeater .
+	sudo chmod 775 .
+	sudo chgrp $USER .
 	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
 	unzip main.zip; mv AllScan-main/* .
 	rm main.zip; rmdir AllScan-main
@@ -59,8 +62,8 @@ SECURITY NOTE: User login support has not yet been implemented. If your node web
 
 Also note: I have not yet tested AllScan on a node with EchoLink enabled but that will soon be fully supported.
 
-# If you don't yet have a node
-Check out the following QRZ Post: [https://forums.qrz.com/index.php?threads/how-to-build-a-professional-grade-full-duplex-allstar-node-for-under-200.839842/](How To Build a High-Quality Full-Duplex AllStar Node for Under $200).
+# Node Notes
+If you do not have a node or if your node is out-of-date, noisy, or unreliable, take a look at the following post: [How To Build a High-Quality Full-Duplex AllStar Node for Under $200](https://forums.qrz.com/index.php?threads/how-to-build-a-professional-grade-full-duplex-allstar-node-for-under-200.839842/).
 
 # Troubleshooting / FAQs
 If you get a permissions error when trying to Add a Favorite in AllScan, check that the /var/www/html/supermon dir has 775 permissions and www-data group, and that the /var/www/html/supermon/favorites.ini file exists and has 664 permissions and www-data as the group. These settings should already be that way if your Supermon install is properly working, otherwise it would not be able to edit and save the favorites.ini file. As a test you can go into Supermon, click the Configuration Editor button and try adding a blank line to favorites.ini and see if it saves OK. If not, there was something off with the Supermon install. In that case you might want to check on the Supermon groups.io page to let them know, or just run the following commands to correct those settings:
