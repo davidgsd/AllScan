@@ -21,7 +21,10 @@ if($rows) {
 	unset($rows);
 }
 $cnt = count($astdb);
-$msg[] = "$cnt Nodes in ASL DB";
+if($cnt) {
+	$mtime = filemtime($ASTDB_TXT);
+	$msg[] = "$cnt Nodes in ASL DB, last updated " . date('Y-m-d', $mtime);
+}
 
 // Read allmon.ini, get nodes list
 if(!file_exists(API . 'allmon.ini'))
@@ -87,39 +90,43 @@ h2('Favorites');
 $favs = [];
 $favcmds = [];
 $favsFile = API . 'favorites.ini';
-if(file_exists($favsFile)) {
+if(!file_exists($favsFile)) {
+	p("$favsFile not found. Check Supermon/AllMon install or create blank file with www-data writeable permissions.");
+} else {
 	$favsIni = parse_ini_file(API . 'favorites.ini', true);
-	// Combine [general] stanza with this node's stanza
-	$favsCfg = $favsIni['general'];
-	if(isset($favsIni[$node])) {
-		foreach($favsIni[$node] as $type => $arr) {
-			if($type == 'label') {
-				foreach($arr as $label) {
-					$favsCfg['label'][] = $label;
-				}
-			} elseif($type == 'cmd') {
-				foreach($arr as $cmd) {
-					$favsCfg['cmd'][] = $cmd;
+	if($favsIni === false) {
+		p("Error parsing $favsFile. Check file format/permissions or create file with www-data writeable permissions.");
+	} else {
+		// Combine [general] stanza with this node's stanza
+		$favsCfg = $favsIni['general'];
+		if(isset($favsIni[$node])) {
+			foreach($favsIni[$node] as $type => $arr) {
+				if($type == 'label') {
+					foreach($arr as $label) {
+						$favsCfg['label'][] = $label;
+					}
+				} elseif($type == 'cmd') {
+					foreach($arr as $cmd) {
+						$favsCfg['cmd'][] = $cmd;
+					}
 				}
 			}
 		}
-	}
-	$favsCfg['label'] = array_map('trim', $favsCfg['label']);
-	$favsCfg['cmd'] = array_map('trim', $favsCfg['cmd']);
-	foreach($favsCfg['cmd'] as $i => $c) {
-		if(!$c) {
-			unset($favsCfg['cmd'][$i], $favsCfg['label'][$i]);
-		} else {
-			if(preg_match('/[0-9]{4,6}/', $c, $m) == 1)
-				$favs[$i] = (object)['node'=>$m[0], 'label'=>$favsCfg['label'][$i], 'cmd'=>$c];
-			else
-				$favcmds[$i] = (object)['label'=>$favsCfg['label'][$i], 'cmd'=>$c];
+		$favsCfg['label'] = array_map('trim', $favsCfg['label']);
+		$favsCfg['cmd'] = array_map('trim', $favsCfg['cmd']);
+		foreach($favsCfg['cmd'] as $i => $c) {
+			if(!$c) {
+				unset($favsCfg['cmd'][$i], $favsCfg['label'][$i]);
+			} else {
+				if(preg_match('/[0-9]{4,6}/', $c, $m) == 1)
+					$favs[$i] = (object)['node'=>$m[0], 'label'=>$favsCfg['label'][$i], 'cmd'=>$c];
+				else
+					$favcmds[$i] = (object)['label'=>$favsCfg['label'][$i], 'cmd'=>$c];
+			}
 		}
+		// if(count($favcmds))
+			// varDump($favcmds);
 	}
-	// if(count($favcmds))
-		// varDump($favcmds);
-} else {
-	p("$favsFile not found. Check Supermon/AllMon install or create a blank file with www-data writeable permissions.");
 }
 
 // Combine favs node, label data with astdb data into favList

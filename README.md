@@ -82,6 +82,10 @@ If you have any questions email chc_media at yahoo dot com. 73, NR9V
 5. Support favorites scanning, detecting of activity on a node and disconnect then connect to next node after a configurable inactivity delay. Estimated completion: Jan. 28
 
 # Release Notes
+**v0.23 2022-12-18**
+
+When JS online event is received, reload page after 2 Sec delay, to automatically restart server event-stream connection after PC/browser was asleep or offline. Add print of astdb.txt file Last Update time.
+
 **v0.22 2022-12-17**
 
 CSS optimizations. Add Asterisk Restart button. Improvements to log messages.

@@ -27,10 +27,11 @@ function initEventStream(url) {
 	}
 }
 function handleOnlineEvent() {
-	statMsg('online event');
+	statMsg('Online event received. Reloading page in 2 Seconds...');
+	setTimeout(function() { window.location.reload(); }, 2000);
 }
 function handleOfflineEvent() {
-	statMsg('offline event');
+	statMsg('Offline event received.');
 }
 function statMsg(msg) {
 	const e = document.getElementById('statmsg');
