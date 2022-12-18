@@ -24,30 +24,33 @@ Lots of updates and additions are still in the works but the existing features a
 Currently AllScan supports favorites.ini entries that refer to connecting nodes eg. 'cmd[] = "rpt cmd %node% ilink 3 [node#]"' but will also support other types of commands at some point. The code also saves a backup copy to favorites.ini.bak in case of any issue. New features will be prioritized based on requests so let me know what you'd like to see.
 
 # Install
-The first step is to make sure you have AllMon2 or Supermon installed, properly configured and working. If you have Supermon already working, AllScan will then work right away with no configuration changes needed, and will use the favorites.ini file in the /var/www/html/supermon/ directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon.
+The first step is to make sure you are using the latest 2.0 Beta version of the ASL Distribution (available [here](http://downloads.allstarlink.org/index.php?b=ASL_Images_Beta)), and that you have AllMon2 or Supermon installed, properly configured and working. If you have Supermon already working, AllScan will then work right away with no configuration changes needed, and will use the favorites.ini file in the /var/www/html/supermon/ directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon.
 
 Make sure you have your node information defined in /var/www/html/supermon/allmon.ini and global.inc (specifically your node numbers in allmon.ini, and $CALL, $LOCATION, and $TITLE2 (eg. "Node 56789") in global.inc). AllScan uses those same settings. Also make sure you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. AllScan will soon support automatically using the AllMon2 files if Supermon is not installed/configured, but Supermon is very easy to set up and has some nice maintenance/debug features.
 
-You will need SSH access to your node and should have basic familiarity with Linux. This has been tested on AllStarLink nodes with Supermon 7, and may not work as well with hamvoip or allmon.
+You will need SSH access to your node and should have basic familiarity with Linux. This has been tested on AllStarLink 2.0 Beta nodes with Supermon 7, and may not work as well or may require some adjustments to install or configuration steps with HamVOIP, pre-2.0 ASL releases, or AllMon.
 
 Once you are logged in by SSH to your node run the following commands:
 
 	cd /var/www/html
-	sudo mkdir allscan; cd allscan
+	sudo mkdir allscan; sudo chmod 775 allscan; sudo chgrp repeater allscan; cd allscan
 	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
 	unzip main.zip; mv AllScan-main/* .
 	rm main.zip; rmdir AllScan-main
+	chmod 664 allscan.ini; chgrp www-data allscan.ini
 
 Now open a browser and go to your node's IP address followed by /allscan/ eg. `http://192.168.1.23/allscan/`, and bookmark that URL. You should see a Connection Status table showing your Node number(s), Call Sign and Location, a control form where you can enter node numbers and use the Connect, Disconnect, etc. buttons, and a Favorites table with at least a few favorites listed. If any of these are not showing check your allmon.ini and global.inc files in /var/www/html/supermon/ and make sure they are properly configured.
 
 # Update
-AllScan has no configuration files in its own directory currently thus the update process is similar to the install process with exception that you don't need to create the allscan directory and should delete all files in the directory prior to downloading the update. To update AllScan log into your node with SSH and run the following commands:
+The update process is similar to the install process with exception that you don't need to create the allscan directory and should delete all files in the directory prior to downloading the update. To update AllScan log into your node with SSH and run the following commands:
 
 	cd /var/www/html/allscan
 	rm -rf *
+	sudo chmod 775 .; sudo chgrp repeater .
 	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
 	unzip main.zip; mv AllScan-main/* .
 	rm main.zip; rmdir AllScan-main
+	chmod 664 allscan.ini; chgrp www-data allscan.ini
 
 Now open a browser and go to your node's IP address followed by /allscan/, and force a full reload by pressing Shift-[F5], or in mobile browsers do a long-press of the reload button. This will ensure your browser also reloads the JavaScript and CSS files.
 
@@ -55,6 +58,9 @@ Now open a browser and go to your node's IP address followed by /allscan/, and f
 SECURITY NOTE: User login support has not yet been implemented. If your node webserver is PUBLICLY accessible you should set up password protection on the /allscan/ directory. If you do not know how to do that, it is NOT recommended that you install AllScan at this time. In the next few weeks a login system will be implemented in AllScan, but currently anyone who has access to your node's IP address will have access to the /allscan/ directory (if they know to check that specific url). If you are using your node only on your local home network and do not have an external port mapped in your internet router to port 80 on your node then having a login and password is generally not necessary, but can still be enabled easily with a few simple steps to enable Apache directory authentication, such as described in this [article](https://www.digitalocean.com/community/tutorials/how-to-set-up-password-authentication-with-apache-on-ubuntu-20-04)
 
 Also note: I have not yet tested AllScan on a node with EchoLink enabled but that will soon be fully supported.
+
+# If you don't yet have a node
+Check out the following QRZ Post: [https://forums.qrz.com/index.php?threads/how-to-build-a-professional-grade-full-duplex-allstar-node-for-under-200.839842/](How To Build a High-Quality Full-Duplex AllStar Node for Under $200).
 
 # Troubleshooting / FAQs
 If you get a permissions error when trying to Add a Favorite in AllScan, check that the /var/www/html/supermon dir has 775 permissions and www-data group, and that the /var/www/html/supermon/favorites.ini file exists and has 664 permissions and www-data as the group. These settings should already be that way if your Supermon install is properly working, otherwise it would not be able to edit and save the favorites.ini file. As a test you can go into Supermon, click the Configuration Editor button and try adding a blank line to favorites.ini and see if it saves OK. If not, there was something off with the Supermon install. In that case you might want to check on the Supermon groups.io page to let them know, or just run the following commands to correct those settings:

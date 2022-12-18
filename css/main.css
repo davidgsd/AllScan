@@ -135,7 +135,12 @@ color:#5a5;
 td {
 max-width:20em;
 }
-
+@media screen and (min-width: 750px) {
+	td { max-width:30em; }
+}
+@media screen and (min-width: 990px) {
+	article { max-width:40em; }
+}
 .nodeNum {
 cursor:pointer;
 }
