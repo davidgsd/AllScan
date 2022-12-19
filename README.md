@@ -17,9 +17,9 @@ These features will essentially give ASL the same memory management and scan cap
 
 Currently AllScan is Beta software. It does the basics of showing detailed node status, supporting connect, disconnect and other common commands, supporting one-click add/delete of favorites to favorites.ini, and showing the Favorites list and allowing it to be sorted by any column.
 
-Prior to installing AllScan it is highly recommended that you have a working install of AllMon2 or SuperMon. AllScan will then automatically read the AM/SM config files and need no additional configuration. The AllMon/Supermon directory is set in include/common.php in the API_DIR define and can be changed to any location. Because AllMon does not have a favorites.ini file however you would want to place a blank favorites.ini file in the allmon directory if you use AllMon2. (AllMon's controlpanel.ini.txt/php file could also be used and may be supported at some point. That file seems equivalent to favorites.ini with exception that it uses "labels[]/cmds[]" instead of "label[]/cmd[]" entries.)
+Prior to installing AllScan it is highly recommended that you have a working install of SuperMon or AllMon2. AllScan can automatically read their config files and need no additional configuration. If you use AllMon rather than Supermon, because it does not have a favorites.ini file you would want to place a blank favorites.ini file in allscan directory. (AllMon's controlpanel.ini.* file may also be supported at some point.)
 
-Lots of updates and additions are still in the works but the existing features are already very useful. AllScan is a very easy-to-use app that anyone can download, unzip and be up and running within minutes. If you've ever used AllMon or Supermon you'll have the GUI figured out in seconds.
+Many additions are still in the works but the existing features are already very useful. AllScan is very easy-to-use and can be downloaded and installed in minutes.
 
 Currently AllScan supports favorites.ini entries that refer to connecting nodes eg. 'cmd[] = "rpt cmd %node% ilink 3 [node#]"' but will also support other types of commands at some point. The code also saves a backup copy to favorites.ini.bak in case of any issue. New features will be prioritized based on requests so let me know what you'd like to see.
 
