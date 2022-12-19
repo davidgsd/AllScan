@@ -44,7 +44,6 @@ if(isset($parms['Submit'])) {
 
 $remNode = isset($parms['node']) && is_numeric($parms['node']) ? $parms['node'] : '';
 
-
 echo 	"<body$onLoad>" . NL
 	.	'<header>' . NL
 	.	$html->a('/allscan/', null, 'AllScan', 'logo') . " <small>$AllScanVersion</small>" . ENSP
@@ -212,7 +211,7 @@ asExit();
 // Get nodes list and host IP(s)
 // Check for file in our directory and if not found look in the supermon and allmon2 dirs
 function readAllmonIni(&$msg, &$hosts) {
-	$file = ['allmon.ini', '../supermon/allmon.ini', '../allmon2/allmon.ini.php'];
+	$file = ['allmon.ini', '/etc/asterisk/allmon.ini.php', '../supermon/allmon.ini', '../allmon2/allmon.ini.php'];
 	foreach($file as $f) {
 		if(file_exists($f)) {
 			$cfg = parse_ini_file($f, true);
