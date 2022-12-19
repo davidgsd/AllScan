@@ -5,8 +5,6 @@ header('Cache-Control: no-cache');
 header('X-Accel-Buffering: no');
 date_default_timezone_set('America/New_York');
 require_once('../include/common.php');
-require_once('../' . API . 'global.inc');
-require_once('../' . API . 'common.inc');
 require_once('AMI.php');
 require_once('nodeInfo.php');
 
@@ -19,25 +17,15 @@ if(empty($_GET['nodes'])) {
 // Read parms
 $passedNodes = explode(',', trim(strip_tags($_GET['nodes'])));
 
-// Load ASL DB
-$astdb = [];
-$msg = [];
-$rows = readFileLines($ASTDB_TXT, $msg);
-if($rows) {
-	foreach($rows as $row) {
-        $arr = explode('|', trim($row));
-        $astdb[$arr[0]] = $arr;
-    }
-	unset($rows);
-}
-
-// Read allmon.ini
-$allmonini = API . 'allmon.ini';
-if(!file_exists('../' . $allmonini)) {
-	sendData(['status' => "$allmonini not found."]);
+// Load allmon.ini
+$cfg = readAllmonCfg();
+if($cfg === false) {
+	sendData(['status' => "allmon.ini not found."]);
 	exit();
 }
-$cfg = parse_ini_file('../' . $allmonini, true);
+
+// Load ASL DB
+$astdb = readAstDb2();
 
 // Verify nodes are in ini file
 $nodes = [];
@@ -209,7 +197,7 @@ function sortNodes($nodes) {
 		} else {
 			$nodes[$nodeNum]['last_keyed'] = 'Never';
 		}
-		$sortedNodes[$nodeNum]=$nodes[$nodeNum];
+		$sortedNodes[$nodeNum] = $nodes[$nodeNum];
 	}
 	return $sortedNodes;
 }

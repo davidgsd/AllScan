@@ -2,48 +2,46 @@
 require_once("include/common.php");
 require_once("include/viewUtils.php");
 require_once("include/hwUtils.php");
-require_once(API . 'global.inc');
-require_once(API . 'common.inc');
+define('API', '../supermon/'); // Relative path to AllMon/Supermon directory
 $html = new Html();
-htmlInit('AllScan - AllStarLink Favorites Management & Scanning Web App');
-$title = $CALL . ' ' . $LOCATION;
-$title2 = $TITLE2 . ' - ' . $title;
 $msg = [];
 
-// Load ASL DB
-$astdb = [];
-$rows = readFileLines($ASTDB_TXT, $msg);
-if($rows) {
-	foreach($rows as $row) {
-        $arr = explode('|', trim($row));
-        $astdb[$arr[0]] = $arr;
-    }
-	unset($rows);
-}
-$cnt = count($astdb);
-if($cnt) {
-	$mtime = filemtime($ASTDB_TXT);
-	$msg[] = "$cnt Nodes in ASL DB, last updated " . date('Y-m-d', $mtime);
-}
+htmlInit('AllScan - AllStarLink Favorites Management & Scanning Web App');
 
+// Load node and host definitions
 $hosts = [];
 $nodes = readAllmonIni($msg, $hosts);
 if(!empty($nodes) && !empty($hosts)) {
 	$node = $nodes[0];
 	$host = $hosts[0];
-	$onLoad = " onLoad=\"initEventStream('server.php?nodes=$node')\"";
+
+	// Load ASL DB
+	$astdb = readAstDb($msg);
+
+	if($astdb !== false)
+		$onLoad = " onLoad=\"initEventStream('server.php?nodes=$node')\"";
+
+	// Handle form submits
+	$parms = getRequestParms();
+	if(isset($parms['Submit']) && $astdb !== false) {
+		processForm($parms, $msg);
+	}
 }
-$autodisc = !isset($parms['autodisc']) || $parms['autodisc'];
 
-// Handle form submits
-$parms = getRequestParms();
-//varDump($parms);
-if(isset($parms['Submit'])) {
-	processForm($parms, $msg);
+// Load Title cfgs
+$globalinc = 'global.inc';
+if(!file_exists($globalinc))
+	$globalinc = '../supermon/global.inc';
+if(file_exists($globalinc)) {
+	include($globalinc);
+	$title = $CALL . ' ' . $LOCATION;
+	$title2 = $TITLE2 . ' - ' . $title;
+} else {
+	$msg[] = 'global.inc not found. Check Supermon install or place "global.inc" file in allscan dir containing '
+		.	'$CALL, $LOCATION, and $TITLE2 settings';
 }
 
-$remNode = isset($parms['node']) && is_numeric($parms['node']) ? $parms['node'] : '';
-
+// Output header
 echo 	"<body$onLoad>" . NL
 	.	'<header>' . NL
 	.	$html->a('/allscan/', null, 'AllScan', 'logo') . " <small>$AllScanVersion</small>" . ENSP
@@ -51,8 +49,11 @@ echo 	"<body$onLoad>" . NL
 	.	'<span id="hb"><img src="AllScan.png" width=16 height=16 alt="*"></span>' . NL
 	.	'</header>' . NL . BR;
 
-if(!isset($node))
+if(!isset($node) || $astdb === false)
 	asExit(implode(BR, $msg));
+
+$autodisc = !isset($parms['autodisc']) || $parms['autodisc'];
+$remNode = isset($parms['node']) && is_numeric($parms['node']) ? $parms['node'] : '';
 ?>
 
 <h2>Connection Status</h2>
@@ -207,42 +208,6 @@ echo $html->div(implode(ENSP . '|' . ENSP, $out), 'm5');
 asExit();
 
 // ---------------------------------------------------
-
-// Get nodes list and host IP(s)
-// Check for file in our directory and if not found look in the supermon and allmon2 dirs
-function readAllmonIni(&$msg, &$hosts) {
-	$file = ['allmon.ini', '/etc/asterisk/allmon.ini.php', '../supermon/allmon.ini', '../allmon2/allmon.ini.php'];
-	foreach($file as $f) {
-		if(file_exists($f)) {
-			$cfg = parse_ini_file($f, true);
-			if($cfg === false) {
-				$msg[] = "Error parsing $f";
-			} else {
-				$nodes = [];
-				foreach($cfg as $n => $c) {
-					if(validDbId($n) && isset($c['host']) && $c['host']) {
-						$nodes[] = $n;
-						$hosts[] = $c['host'];
-					}
-				}
-				if(empty($nodes) || empty($hosts)) {
-					$msg[] = "No valid node found in $f";
-					$msg[] = varDumpClean($cfg, true);
-				} else {
-					$msg[] = "Node $nodes[0] $hosts[0] read from $f";
-					if(count($nodes) > 1)
-						$msg[] = "(More than one node is defined in $f, AllScan currently uses only the first.)";
-					return $nodes;
-				}
-			}
-		}
-	}
-	$cwd = getcwd();
-	$msg[] = "No valid [node#] and host definitions found. Check that you have AllMon2 or Supermon installed, "
-		.	"or place an allmon.ini file in $cwd/ containing a [YourNode#] line followed by a "
-		.	"host=[NodeIPAddr:Port] line (eg. \"host=127.0.0.1:5038\").";
-	return false;
-}
 
 function sortArray($list, $col, $desc) {
 	$colVals = [];

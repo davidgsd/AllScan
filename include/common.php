@@ -1,9 +1,7 @@
 <?php
-$AllScanVersion = "v0.24";
+$AllScanVersion = "v0.25";
 require_once('Html.php');
 require_once('logUtils.php');
-define('API_DIR', '/supermon/'); // Web path to AllMon/Supermon directory
-define('API', '..' . API_DIR); // Relative file system path to AllMon/Supermon directory
 
 function msg($txt, $class=null) {
 	global $html;
@@ -13,6 +11,128 @@ function msg($txt, $class=null) {
 		$txt .= BR;
 	}
 	echo $txt . NL;
+}
+
+// Get nodes list and host IP(s)
+function readAllmonIni(&$msg, &$hosts) {
+	// Check for file in our directory and if not found look in the asterisk, supermon and allmon2 dirs
+	$file = ['allmon.ini', '/etc/asterisk/allmon.ini.php', '../supermon/allmon.ini', '../allmon2/allmon.ini.php'];
+	foreach($file as $f) {
+		if(file_exists($f)) {
+			$cfg = parse_ini_file($f, true);
+			if($cfg === false) {
+				$msg[] = "Error parsing $f";
+			} else {
+				$nodes = [];
+				foreach($cfg as $n => $c) {
+					if(validDbId($n) && isset($c['host']) && $c['host']) {
+						$nodes[] = $n;
+						$hosts[] = $c['host'];
+					}
+				}
+				if(empty($nodes) || empty($hosts)) {
+					$msg[] = "No valid node found in $f";
+					$msg[] = varDumpClean($cfg, true);
+				} else {
+					$msg[] = "Node $nodes[0] $hosts[0] read from $f";
+					if(count($nodes) > 1)
+						$msg[] = "(More than one node is defined in $f, AllScan currently uses only the first.)";
+					return $nodes;
+				}
+			}
+		}
+	}
+	$cwd = getcwd();
+	$msg[] = "No valid [node#] and host definitions found. Check that you have AllMon2 or Supermon installed, "
+		.	"or place an allmon.ini file in $cwd/ containing a [YourNode#] line followed by a "
+		.	"host=[NodeIPAddr:Port] line (eg. \"host=127.0.0.1:5038\").";
+	return false;
+}
+
+// Below called by astapi files, which should only happen if controller file eg. index.php already called 
+// readAllmonIni() above which confirms there is a valid file available
+function readAllmonCfg() {
+	// Check for file in our directory and if not found look in the asterisk, supermon and allmon2 dirs
+	$file = ['../allmon.ini', '/etc/asterisk/allmon.ini.php', '../../supermon/allmon.ini', '../../allmon2/allmon.ini.php'];
+	foreach($file as $f) {
+		if(file_exists($f)) {
+			$cfg = parse_ini_file($f, true);
+			if($cfg === false)
+				continue;
+			return $cfg;
+		}
+	}
+	return false;
+}
+
+// Read AstDB file, looking in all commonly used locations
+function readAstDb(&$msg) {
+	// Check for file in our directory and if not found look in the asterisk, supermon and allmon2 dirs
+	// If it exists in more than one place use the newest
+	$file = ['astdb.txt', '../supermon/astdb.txt', '/var/log/asterisk/astdb.txt'];
+	$mtime = [0, 0, 0];
+	foreach($file as $i => $f) {
+		if(file_exists($f)) {
+			$mtime[$i] = filemtime($f);
+			$msg[] = "$f last updated " . date('Y-m-d', $mtime[$i]);
+		}
+	}
+	arsort($mtime, SORT_NUMERIC);
+	if(!reset($mtime)) {
+		$msg[] = "No astdb.txt file found. Check that you have AllMon2 or Supermon properly installed, "
+			.	"and a cron job or other mechanism set up to periodically update the file.";
+		return false;
+	}
+	$keys = array_keys($mtime);
+	$file = $file[$keys[0]];
+	$msg[] = "Reading $file...";
+	$rows = readFileLines($file, $msg);
+	if(!$rows) {
+		return false;
+	}
+	foreach($rows as $row) {
+		$arr = explode('|', trim($row));
+		$astdb[$arr[0]] = $arr;
+	}
+	unset($rows);
+	$cnt = count($astdb);
+	if(!$cnt) {
+		$msg[] = "$file invalid. Check that you have AllMon2 or Supermon properly installed, "
+			.	"and a cron job or other mechanism set up to periodically update the file.";
+		return false;
+	}
+	$msg[] = "$cnt Nodes in ASL DB";
+	return $astdb;
+}
+
+// Below called by astapi files, which should only happen if controller file eg. index.php already called 
+// readAllmonIni() above which confirms there is a valid file available
+function readAstDb2() {
+	// Check for file in our directory and if not found look in the asterisk, supermon and allmon2 dirs
+	// If it exists in more than one place use the newest
+	$file = ['../astdb.txt', '../../supermon/astdb.txt', '/var/log/asterisk/astdb.txt'];
+	$mtime = [0, 0, 0];
+	foreach($file as $i => $f) {
+		if(file_exists($f)) {
+			$mtime[$i] = filemtime($f);
+		}
+	}
+	arsort($mtime, SORT_NUMERIC);
+	if(!reset($mtime)) {
+		return false;
+	}
+	$keys = array_keys($mtime);
+	$file = $file[$keys[0]];
+	$rows = readFileLines($file, $msg);
+	if(!$rows) {
+		return false;
+	}
+	foreach($rows as $row) {
+		$arr = explode('|', trim($row));
+		$astdb[$arr[0]] = $arr;
+	}
+	unset($rows);
+	return $astdb;
 }
 
 function escapeXmlKey($key) {

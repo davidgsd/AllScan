@@ -44,12 +44,15 @@ function clearStatMsg() {
 	const e = document.getElementById('statmsg');
 	e.innerHTML = '';
 }
-
 function handleEventSourceError(event) {
 	if(event !== null && typeof event === 'object')
 		event = JSON.stringify(event);
 	console.log("Event Source error: " + event);
 	statMsg("Event Source error: " + event);
+}
+function handleErrorEvent(event) {
+	var statusdata = JSON.parse(event.data);
+	statMsg('ERROR: ' + statusdata.status);
 }
 
 function handleConnectionEvent(event) {
@@ -63,10 +66,6 @@ function handleConnectionEvent(event) {
 	const table = document.getElementById(tableID);
 	var tbody0 = table.getElementsByTagName('tbody')[0];
 	tbody0.innerHTML = '<tr><td colspan="7">' + statusdata.status + '</td></tr>';
-}
-function handleErrorEvent(event) {
-	var statusdata = JSON.parse(event.data);
-	statMsg('ERROR: ' + statusdata.status);
 }
 
 function handleNodesEvent(event) {
@@ -212,17 +211,16 @@ function disconnectNode() {
 	}
 	xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = handleXhttpResponse;
-	parms = 'remotenode=' + remoteNode + '&perm=' + perm + '&button=disconnect' + '&localnode=' + localNode;
+	parms = 'remotenode='+remoteNode + '&perm='+perm + '&button=disconnect' + '&localnode='+localNode;
 	xhttp.open("POST", apiDir + 'connect.php', true);
 	xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xhttp.send(parms);
 }
-
 function astrestart() {
 	var localNode = document.getElementById('localnode').value;
 	xhttp = new XMLHttpRequest();
 	xhttp.onreadystatechange = handleXhttpResponse;
-	parms = 'localnode=' + localNode;
+	parms = 'localnode='+localNode;
 	xhttp.open("POST", apiDir + 'restart.php', true);
 	xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	xhttp.send(parms);
@@ -247,10 +245,6 @@ function setNodeBox(n) {
 	remoteNode.value = n;
 }
 
-function enableXhttp(url){
-	checkTimer=setTimeout('checkServerAlerts("'+url+'")',1000);
-	enUrl=url;
-}
 function checkServerAlerts(url) {
 	var tag = document.getElementById('test');
 	var val = tag.innerHTML;

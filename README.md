@@ -80,6 +80,9 @@ If you have any questions email chc_media at yahoo dot com. 73, NR9V
 5. Support favorites scanning, detecting of activity on a node and disconnect then connect to next node after a configurable inactivity delay. Estimated completion: Jan. 28
 
 # Release Notes
+**v0.25 2022-12-19**<br>
+Enable automatic reading of allmon.ini file also from /etc/asterisk/, and astdb.txt file from allscan's directory or from ../supermon/ or /var/log/asterisk/.
+
 **v0.24 2022-12-18**<br>
 Enable automatic reading of allmon.ini file from allscan's directory or from ../supermon/ or ../allmon/allmon.ini.php. Provide detailed messages about any issues found when trying to read the file.
 
