@@ -5,7 +5,7 @@ function htmlInit($title) {
 	echo $html->htmlOpen($title)
 		.	'<link href="css/main.css" rel="stylesheet" type="text/css">' . NL
 		.	'<link href="favicon.ico" rel="icon" type="image/x-icon">' . NL
-		.	'<meta name="viewport" content="width=device-width, initial-scale=0.5">' . NL
+		.	'<meta name="viewport" content="width=device-width, initial-scale=0.6">' . NL
 		.	'<script src="js/main.js"></script>' . NL
 		.	'</head>' . NL;
 }

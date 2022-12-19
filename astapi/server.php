@@ -66,7 +66,7 @@ foreach($nodes as $node) {
 	if(!array_key_exists($host, $servers)) {
 		$data['status'] = "Connecting to Asterisk Manager $node $host...";
 		sendData($data, 'connection');
-		$fp[$host] = $ami->connect($cfg[$node]['host']);
+		$fp[$host] = $ami->connect($host);
 		if($fp[$host] === false) {
 			$data['status'] = 'Connect to Asterisk Manager Failed';
 		} else {

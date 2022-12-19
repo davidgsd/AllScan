@@ -33,29 +33,24 @@ You will need SSH access to your node and should have basic familiarity with Lin
 Once you are logged in by SSH to your node run the following commands:
 
 	cd /var/www/html
-	sudo mkdir allscan; sudo chmod 775 allscan
-	sudo chgrp $USER allscan
-	cd allscan
+	mkdir allscan; sudo chmod 775 allscan; sudo chgrp $USER allscan
 	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
-	unzip main.zip; mv AllScan-main/* .
-	rm main.zip; rmdir AllScan-main
-	chmod 664 allscan.ini; chgrp www-data allscan.ini
+	unzip main.zip; rm main.zip
+	cp -rf AllScan-main/* allscan/
+	rm -rf AllScan-main
 
 Now open a browser and go to your node's IP address followed by /allscan/ eg. `http://192.168.1.23/allscan/`, and bookmark that URL. You should see a Connection Status table showing your Node number(s), Call Sign and Location, a control form where you can enter node numbers and use the Connect, Disconnect, etc. buttons, and a Favorites table with at least a few favorites listed. If any of these are not showing check your allmon.ini and global.inc files in /var/www/html/supermon/ and make sure they are properly configured.
 
 # Update
-The update process is similar to the install process with exception that you don't need to create the allscan directory and should delete all files in the directory prior to downloading the update. To update AllScan log into your node with SSH and run the following commands:
+The update process is similar to the install process with exception that you don't need to create the allscan directory. To update AllScan log into your node with SSH and run the following commands:
 
-	cd /var/www/html/allscan
-	rm -rf *
-	sudo chmod 775 .
-	sudo chgrp $USER .
+	cd /var/www/html
 	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
-	unzip main.zip; mv AllScan-main/* .
-	rm main.zip; rmdir AllScan-main
-	chmod 664 allscan.ini; chgrp www-data allscan.ini
+	unzip main.zip; rm main.zip
+	cp -rf AllScan-main/* allscan/
+	rm -rf AllScan-main
 
-Now open a browser and go to your node's IP address followed by /allscan/, and force a full reload by pressing Shift-[F5], or in mobile browsers do a long-press of the reload button. This will ensure your browser also reloads the JavaScript and CSS files.
+Now open a browser and go to your node's IP address followed by /allscan/, and **force a full reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.
 
 # Notes
 SECURITY NOTE: User login support has not yet been implemented. If your node webserver is PUBLICLY accessible you should set up password protection on the /allscan/ directory. If you do not know how to do that, it is NOT recommended that you install AllScan at this time. In the next few weeks a login system will be implemented in AllScan, but currently anyone who has access to your node's IP address will have access to the /allscan/ directory (if they know to check that specific url). If you are using your node only on your local home network and do not have an external port mapped in your internet router to port 80 on your node then having a login and password is generally not necessary, but can still be enabled easily with a few simple steps to enable Apache directory authentication, such as described in this [article](https://www.digitalocean.com/community/tutorials/how-to-set-up-password-authentication-with-apache-on-ubuntu-20-04)
@@ -85,26 +80,23 @@ If you have any questions email chc_media at yahoo dot com. 73, NR9V
 5. Support favorites scanning, detecting of activity on a node and disconnect then connect to next node after a configurable inactivity delay. Estimated completion: Jan. 28
 
 # Release Notes
-**v0.23 2022-12-18**
+**v0.24 2022-12-18**<br>
+Enable automatic reading of allmon.ini file from allscan's directory or from ../supermon/ or ../allmon/allmon.ini.php. Provide detailed messages about any issues found when trying to read the file.
 
+**v0.23 2022-12-18**<br>
 When JS online event is received, reload page after 2 Sec delay, to automatically restart server event-stream connection after PC/browser was asleep or offline. Add print of astdb.txt file Last Update time.
 
-**v0.22 2022-12-17**
-
+**v0.22 2022-12-17**<br>
 CSS optimizations. Add Asterisk Restart button. Improvements to log messages.
 
-**v0.21 2022-12-16**
-
+**v0.21 2022-12-16**<br>
 Support Disconnect before Connect feature. This sends AMI an 'rpt cmd ilink 6' (Disconnect all links) command and waits 500mS before executing a Connect request, if 'Disconnect before Connect' checkbox is checked (default val = checked) and nodes are connected. To have the default for this checkbox be unchecked, set a url parm of autodisc=0. Disable PHP notices. Change Node text input field to a number field, and make the font size larger to make use of the field more mobile-friendly. Check for online/offline JS events.
 
-**v0.2 2022-12-15**
-
+**v0.2 2022-12-15**<br>
 Add Asterisk API. Code refactoring. Add Message Stats div, set up JS functions to output detailed status and error messages during all event processing. Add info links and CPU temp display.
 
-**v0.15 2022-12-14**
-
+**v0.15 2022-12-14**<br>
 Enable sortable columns on Favorites Table. GUI Updates.
 
-**v0.1 2022-12-13**
-
+**v0.1 2022-12-13**<br>
 Initial Commit.

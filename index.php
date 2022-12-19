@@ -26,12 +26,13 @@ if($cnt) {
 	$msg[] = "$cnt Nodes in ASL DB, last updated " . date('Y-m-d', $mtime);
 }
 
-// Read allmon.ini, get nodes list
-if(!file_exists(API . 'allmon.ini'))
-	asExit("allmon.ini not found");
-$cfg = parse_ini_file(API . 'allmon.ini', true);
-$nodes = explode(',', $cfg['All Nodes']['nodes']);
-$node = $nodes[0];
+$hosts = [];
+$nodes = readAllmonIni($msg, $hosts);
+if(!empty($nodes) && !empty($hosts)) {
+	$node = $nodes[0];
+	$host = $hosts[0];
+	$onLoad = " onLoad=\"initEventStream('server.php?nodes=$node')\"";
+}
 $autodisc = !isset($parms['autodisc']) || $parms['autodisc'];
 
 // Handle form submits
@@ -43,12 +44,16 @@ if(isset($parms['Submit'])) {
 
 $remNode = isset($parms['node']) && is_numeric($parms['node']) ? $parms['node'] : '';
 
-echo 	"<body onLoad=\"initEventStream('server.php?nodes=$node');\">" . NL
+
+echo 	"<body$onLoad>" . NL
 	.	'<header>' . NL
 	.	$html->a('/allscan/', null, 'AllScan', 'logo') . " <small>$AllScanVersion</small>" . ENSP
 	.	$html->a('#', null, $title, 'title') . ENSP
 	.	'<span id="hb"><img src="AllScan.png" width=16 height=16 alt="*"></span>' . NL
 	.	'</header>' . NL . BR;
+
+if(!isset($node))
+	asExit(implode(BR, $msg));
 ?>
 
 <h2>Connection Status</h2>
@@ -203,6 +208,42 @@ echo $html->div(implode(ENSP . '|' . ENSP, $out), 'm5');
 asExit();
 
 // ---------------------------------------------------
+
+// Get nodes list and host IP(s)
+// Check for file in our directory and if not found look in the supermon and allmon2 dirs
+function readAllmonIni(&$msg, &$hosts) {
+	$file = ['allmon.ini', '../supermon/allmon.ini', '../allmon2/allmon.ini.php'];
+	foreach($file as $f) {
+		if(file_exists($f)) {
+			$cfg = parse_ini_file($f, true);
+			if($cfg === false) {
+				$msg[] = "Error parsing $f";
+			} else {
+				$nodes = [];
+				foreach($cfg as $n => $c) {
+					if(validDbId($n) && isset($c['host']) && $c['host']) {
+						$nodes[] = $n;
+						$hosts[] = $c['host'];
+					}
+				}
+				if(empty($nodes) || empty($hosts)) {
+					$msg[] = "No valid node found in $f";
+					$msg[] = varDumpClean($cfg, true);
+				} else {
+					$msg[] = "Node $nodes[0] $hosts[0] read from $f";
+					if(count($nodes) > 1)
+						$msg[] = "(More than one node is defined in $f, AllScan currently uses only the first.)";
+					return $nodes;
+				}
+			}
+		}
+	}
+	$cwd = getcwd();
+	$msg[] = "No valid [node#] and host definitions found. Check that you have AllMon2 or Supermon installed, "
+		.	"or place an allmon.ini file in $cwd/ containing a [YourNode#] line followed by a "
+		.	"host=[NodeIPAddr:Port] line (eg. \"host=127.0.0.1:5038\").";
+	return false;
+}
 
 function sortArray($list, $col, $desc) {
 	$colVals = [];
