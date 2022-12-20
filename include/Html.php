@@ -318,11 +318,10 @@ function formClose() {
 	return "</form>";
 }
 // TABLES
-function tableOpen($hdrCols=null, $caption=null, $class=null, $escFunc=0) {
-	if($class !== null)
-		$out = "<table class=\"$class\">";
-	else
-		$out = "<table>";
+function tableOpen($hdrCols=null, $caption=null, $class=null, $escFunc=0, $id=null) {
+	$class = $class ? " class=\"$class\"" : '';
+	$id = $id ? " id=\"$id\"" : '';
+	$out = "<table$id$class>";
 	if($caption)
 		$out .= "<caption>" . htmlspecial($caption) . "</caption>\n";
 	if($hdrCols)

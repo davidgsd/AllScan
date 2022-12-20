@@ -176,7 +176,7 @@ if(empty($favList)) {
 			}
 		}
 	}
-	$out = $html->tableOpen($hdrCols, null, 'favs', null);
+	$out = $html->tableOpen($hdrCols, null, 'favs', null, "favs_$node");
 	foreach($favList as $f) {
 		$nodeNumAttr = ['1' => 'class="nodeNum" onClick="setNodeBox(' . $f[1] . ')"'];
 		$out .= $html->tableRow($f, null, null, false, $nodeNumAttr);

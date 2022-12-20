@@ -80,6 +80,9 @@ If you have any questions email chc_media at yahoo dot com. 73, NR9V
 5. Support favorites scanning, detecting of activity on a node and disconnect then connect to next node after a configurable inactivity delay. Estimated completion: Jan. 28
 
 # Release Notes
+**v0.26 2022-12-19**<br>
+Implement ASL Stats API infrastructure. Improve handling of page reload logic after browser JS online event when node is no longer accessible.
+
 **v0.25 2022-12-19**<br>
 Enable automatic reading of allmon.ini file also from /etc/asterisk/, and astdb.txt file from allscan's directory or from ../supermon/ or /var/log/asterisk/.
 

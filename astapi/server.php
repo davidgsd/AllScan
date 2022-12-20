@@ -155,7 +155,7 @@ function getNode($fp, $node) {
 	return $current;
 }
 
-function sendData($data, $event='error') {
+function sendData($data, $event='errMsg') {
 	echo "event: $event\n";
 	echo 'data: ' . json_encode($data) . "\n\n";
 	ob_flush();
