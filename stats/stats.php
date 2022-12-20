@@ -34,9 +34,15 @@ foreach($nodes as $n) {
 		sendData(['status' => "Node $n not a public node"], 'stats');
 		continue;
 	}
-	$data = file_get_contents("https://stats.allstarlink.org/api/stats/$n");
+	$error = '';
+	$url = "https://stats.allstarlink.org/api/stats/$n";
+	if(function_exists('curl_init')) {
+		$data = doWebRequest($url, null, $error);
+	} else {
+		$data = file_get_contents($url);
+	}
 	if(!$data) {
-		sendData(['status' => "No ASL API response for Node $n"], 'stats');
+		sendData(['status' => "ASL API response failed for Node $n. Error=$error"], 'stats');
 		break;
 	}
 	$resp = json_decode($data);
@@ -75,6 +81,62 @@ function parseStats($resp, $time) {
 		$s->wt = $node->access_webtransceiver;
 	}
 	return $s;
+}
+
+function doWebRequest($url, $parms=null, &$error) {
+	$ch = curl_init();
+	$timeout = 10;
+	$def = [
+        CURLOPT_URL => $url,
+        CURLOPT_RETURNTRANSFER => true,
+		CURLOPT_CONNECTTIMEOUT => $timeout,
+        CURLOPT_TIMEOUT => $timeout,
+    ];
+    curl_setopt_array($ch, $def);
+	curl_setopt($ch, CURLOPT_GET, true);
+	if($parms !== null) {
+		//curl_setopt($ch, CURLOPT_GET, true);
+		/* $p = [];
+		foreach($parms as $k=>$v)
+			$p[] = "$k=$v";
+		curl_setopt($ch, CURLOPT_POSTFIELDS, implode('&', $p)); */
+	}
+	$result = curl_exec($ch);
+	if(!$result) {
+		$errno = curl_errno($ch);
+		if($errno == 28) {
+			$error = "Network response timeout";
+		} else {
+			$err = curl_error($ch);
+			if($err)
+				$error = "HTTP Error: $err";
+			else
+				$error = "Unknown HTTP error";
+		}
+		curl_close($ch);
+		return null;
+	}
+	$intRetCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+	curl_close($ch);
+	if($intRetCode != 200) {
+		if($intRetCode == 400) {
+			$error = "ASL HTTP return code 400 (Timeout).";
+		} elseif($intRetCode == 403) {
+			$error = "ASL HTTP return code 403.";
+		} else {
+			$rc = ($intRetCode == 404) ? '404 (Error)' : $intRetCode;
+			$error = "ASL HTTP return code $rc";
+		}
+		/* if($intRetCode != 400) {
+			p("Request URL: $url");
+			if($parms) {
+				msg("Parms:");
+				varDumpClean($parms);
+			}
+		} */
+		return null;
+	}
+	return $result;
 }
 
 function sendData($data, $event='errMsg') {

@@ -78,7 +78,7 @@ function handleStatsResponse() {
 			var resp = JSON.parse(xhs.responseText);
 			// Data structure: event=stats; status=LogMsg; stats=statsStruct
 			var e = resp.event;
-			statMsg(resp.data.status);
+			scanMsg(resp.data.status);
 			if(resp.data.stats === undefined) {
 				statMsg('No stats response, will retry in 60 Seconds...');
 				statsTmr = setTimeout(getStats, 60000);
@@ -178,6 +178,10 @@ function statMsg(msg) {
 function clearStatMsg() {
 	const e = document.getElementById('statmsg');
 	e.innerHTML = '';
+}
+function scanMsg(msg) {
+	const e = document.getElementById('scanmsg');
+	e.innerHTML = msg;
 }
 
 function handleErrMsgEvent(event) {

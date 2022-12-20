@@ -145,12 +145,18 @@ display:inline-block;
 margin:0.5em;
 min-width:460px;
 max-width:750px;
-height:5.5em;
+height:4.4em;
 font-size:0.9em;
 line-height:1.2;
 overflow-y:scroll;
 resize:both;
 color:#aaa;
+}
+#scanmsg {
+color:#999;
+margin:0.25em;
+font-size:0.9em;
+line-height:1.2;
 }
 
 table {

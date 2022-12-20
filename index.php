@@ -188,6 +188,7 @@ if(empty($favList)) {
 }
 
 // Status Messages div
+echo "<p id=\"scanmsg\"></p>";
 $msg = implode(BR, $msg);
 echo "<div id=\"statmsg\">$msg</div>" . BR;
 
