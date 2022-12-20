@@ -145,7 +145,7 @@ foreach($favs as $n => $f) {
 		$name = $call;
 	elseif(strpos($name, $call) === false)
 		$name = $call . ' ' . $name;
-	$favList[] = [$n, $f->node, $name, $desc, $loc];
+	$favList[] = [$n, $f->node, $name, $desc, $loc, NBSP, NBSP];
 }
 
 // Sort favList by specified column if fs parm is set
@@ -161,9 +161,11 @@ if($sortCol && !empty($favList) && count($favList) > 1) {
 if(empty($favList)) {
 	p('No Favorites have yet been added');
 } else {
-	$hdrCols = ['#', 'Node', 'Name', 'Desc', 'Location'];
+	$hdrCols = ['#', 'Node', 'Name', 'Desc', 'Location', '<small>Rx%</small>', '<small>LCnt</small>'];
 	if(count($favList) > 1) {
 		foreach($hdrCols as $key => &$col) {
+			if($key > 4)
+				break;
 			$ck = $colKey[$key];
 			if($sortCol === $ck) {
 				// Link to sort in opposite order
@@ -176,7 +178,7 @@ if(empty($favList)) {
 			}
 		}
 	}
-	$out = $html->tableOpen($hdrCols, null, 'favs', null, "favs_$node");
+	$out = $html->tableOpen($hdrCols, null, 'favs', null, 'favs');
 	foreach($favList as $f) {
 		$nodeNumAttr = ['1' => 'class="nodeNum" onClick="setNodeBox(' . $f[1] . ')"'];
 		$out .= $html->tableRow($f, null, null, false, $nodeNumAttr);

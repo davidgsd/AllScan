@@ -80,6 +80,9 @@ If you have any questions email chc_media at yahoo dot com. 73, NR9V
 5. Support favorites scanning, detecting of activity on a node and disconnect then connect to next node after a configurable inactivity delay. Estimated completion: Jan. 28
 
 # Release Notes
+**v0.3 2022-12-19**<br>
+Implement ASL Stats functions and color coding of Favorites Table '#' and new 'Rx%' and 'LCnt' columns. Color codes for '#' col: Dark Green: Node Active, Medium Green: Active, WT enabled, Red: Node is Keyed. Rx% refers to node's reported TxTime divided by its UpTime. LCnt is the reported number of Connected Links (ie. nodes/hubs/links).
+
 **v0.26 2022-12-19**<br>
 Implement ASL Stats API infrastructure. Improve handling of page reload logic after browser JS online event when node is no longer accessible.
 

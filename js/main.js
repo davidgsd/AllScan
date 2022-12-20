@@ -1,10 +1,8 @@
 var apiDir='/allscan/astapi/';
 var statsDir='/allscan/stats/';
-var source, xhttp;
-var hb;
-var enUrl='';
-var reloadRetries=0, reloadTimer;
-var statsState=0;
+var source, xh, hb;
+var rldRetries=0, rldTmr;
+var statsState=0, statsIdx=0, xhs, statsTmr, ftbl;
 
 function initEventStream(url) {
 	if(typeof(EventSource) === 'undefined') {
@@ -32,50 +30,98 @@ function initEventStream(url) {
 	//setTimeout(handleOnlineEvent, 5000);
 	// Call initAslApi() who will read in nodes in the favorites list and do various API requests to get their 
 	// current status eg. last heard, num connected nodes, last keyed, etc.
-	//setTimeout(getStats, 250);
+	ftbl = document.getElementById('favs');
+	setTimeout(getStats, 250);
 }
 
 function getStats() {
-	const table = document.getElementById('favs_' + localNode);
-	var rnodes = [];
+	// ASL API request limit is 30 reqs/minute. In case more than one node is on this server ideally do no
+	// more than one req per 4 secs and increase that time if any requests return an error.
+	var rnodes=[], node;
 	switch(statsState) {
 		case 0: // init
 			// Parse favorites table for node numbers
-			for(var r=0, n=table.rows.length-1; r < n; r++) {
-				//for(var c=0, m=table.rows[r].cells.length; c < m; c++) {
-				rnodes[r] = table.rows[r+1].cells[1].innerHTML;
+			for(var r=0, n=ftbl.rows.length-1; r < n; r++) {
+				//for(var c=0, m=ftbl.rows[r].cells.length; c < m; c++) {
+				node = ftbl.rows[r+1].cells[1].innerHTML
+				if(node >= 2000 && node < 2000000)
+					rnodes[r] = ftbl.rows[r+1].cells[1].innerHTML;
 			}
 			var cnt = rnodes.length;
-			statMsg('Requesting ASL Stats for '+cnt+' nodes...');
-			var parms = 'nodes=' + rnodes.join(',');
-			//console.log(rnodes.join(','));
-			// Call stats/stats.php with node list
+			if(cnt == 0) {
+				//statsTmr = setTimeout(getStats, 15000);
+				return;
+			}
+			if(statsIdx >= cnt)
+				statsIdx=0;
+			var node = rnodes[statsIdx];
+			//statMsg('Requesting ASL Stats for ' + node + '...');
+			//var parms = 'node=' + rnodes.join(',');
+			var parms = 'node=' + node;
 			xhttpStatsInit(statsDir + 'stats.php', parms);
+			statsIdx++;
 			break;
 	}
-	setTimeout(getStats, 60000);
+	// statsTmr = setTimeout(getStats, 60000);
 }
 function xhttpStatsInit(url, parms) {
-	xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = handleXhttpStatsResponse;
-	xhttp.open('POST', url, true);
-	xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-	xhttp.send(parms);
+	xhs = new XMLHttpRequest();
+	xhs.onreadystatechange = handleStatsResponse;
+	xhs.open('POST', url, true);
+	xhs.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xhs.send(parms);
 }
-function handleXhttpStatsResponse() {
-	if(xhttp.readyState === 4) {
-		if(xhttp.status === 200) {
-			//statMsg('statsResponse: ' + xhttp.responseText);
-			var resp = JSON.parse(xhttp.responseText);
-			//varDump(resp);
+function handleStatsResponse() {
+	if(xhs.readyState === 4) {
+		if(xhs.status === 200) {
+			//statMsg('statsResponse: ' + xhs.responseText);
+			var resp = JSON.parse(xhs.responseText);
+			// Data structure: event=stats; status=LogMsg; stats=statsStruct
 			var e = resp.event;
-			if(resp.data !== undefined)
-				var data = resp.data;
-			var status = data.status;
-			statMsg('statsResponse: event='+e + ', status='+status);
+			statMsg(resp.data.status);
+			if(resp.data.stats === undefined) {
+				statMsg('No stats response, will retry in 60 Seconds...');
+				statsTmr = setTimeout(getStats, 60000);
+				return;
+			}
+			var s = resp.data.stats;
+			var row;
+			// Update the favs table. Node keyed=maroon background, active=green, show #connections column
+			for(var r=0, n=ftbl.rows.length-1; r < n; r++) {
+				//for(var c=0, m=ftbl.rows[r].cells.length; c < m; c++) {
+				var cells = ftbl.rows[r+1].cells;
+				var node = cells[1].innerHTML;
+				if(node != s.node)
+					continue;
+				// Tx=$s->keyed Act=$s->active $s->timeAgo LCnt=$s->linkCnt Bsy%=$s->busyPct TxTm=$s->txtime WT=$s->wt
+				// Colors: Tx=maroon Busy=0-50% green LinkCnt:0-50 blue
+				// Cols #:Tx/Act/NotAct LCnt:linkCnt (Blue 0-50) Bsy%:busyPct (Green 0-50)
+				var c0 = cells[0];
+				if(s.keyed == 1)
+					c0.className = 'tColor';
+				else if(s.active == 1)
+					c0.className = (s.wt == 1) ? 'wColor' : 'gColor';
+				else
+					c0.className = '';
+				// Color Bsy%t column green, max 50%
+				var busy = cells[5];
+				var grn = Math.round(Math.log(3 + s.busyPct) * 5);
+				if(grn > 50)
+					grn = 50;
+				busy.innerHTML = s.busyPct;
+				busy.style.backgroundColor = (s.busyPct > 5) ? 'hsl(150,50%,'+grn+'%)' : 'transparent';
+				// Color LCnt column blue, max 50% = 50 links
+				var lcnt = cells[6];
+				var blue = Math.round(Math.log(3 + s.linkCnt) * 8);
+				if(blue > 30)
+					blue = 30;
+				lcnt.innerHTML = s.linkCnt;
+				lcnt.style.backgroundColor = (s.linkCnt > 3) ? 'hsl(240,40%,'+blue+'%)' : 'transparent';
+			}
+			statsTmr = setTimeout(getStats, 2500);
 		} else {
-			statMsg('Error response from server: ' + xhttp.status);
-			statMsg('[F5] to Reload');
+			statMsg('Error response from server: ' + xhs.status);
+			statsTmr = setTimeout(getStats, 60000);
 		}
 	}
 }
@@ -91,18 +137,18 @@ function handleEventSourceError(event) {
 
 function handleOnlineEvent() {
 	statMsg('Online event received. Reloading...');
-	reloadTimer = setTimeout(reloadPage, 2000);
+	rldTmr = setTimeout(reloadPage, 2000);
 }
 function handleOfflineEvent() {
 	statMsg('Offline event received.');
-	reloadRetries=0;
-	if(reloadTimer !== undefined) {
-		clearTimeout(reloadTimer);
+	rldRetries=0;
+	if(rldTmr !== undefined) {
+		clearTimeout(rldTmr);
 	}
 }
 function reloadPage() {
 	// Verify location valid before reloading
-	if(reloadRetries == 0)
+	if(rldRetries == 0)
 		statMsg('Verifying node is accessible...');
 	var request = new XMLHttpRequest();
 	request.open('GET', window.location, true);
@@ -110,12 +156,12 @@ function reloadPage() {
 		if(request.status == 200) {
 			request.abort();
 			window.location.reload();
-		} else if(reloadRetries < 8) { // Try again after a delay
-			reloadRetries++;
+		} else if(rldRetries < 8) { // Try again after a delay
+			rldRetries++;
 			var s = request.status > 0 ? ' (stat=' + request.status + ')' : '';
-			var t = 2 + reloadRetries;
+			var t = 2 + rldRetries;
 			statMsg(`Node unreachable${s}, will retry in ${t} Secs...`);
-			reloadTimer = setTimeout(reloadPage, t * 1000);
+			rldTmr = setTimeout(reloadPage, t * 1000);
 		} else {
 			statMsg('Node unreachable. Check internet/LAN connections and power to node.');
 		}
@@ -146,8 +192,8 @@ function handleConnectionEvent(event) {
 		return;
 	tableID = 'table_' + data.node;
 	//$('#' + tableID + ' tbody:first').html('<tr><td colspan="7">' + data.status + '</td></tr>');
-	const table = document.getElementById(tableID);
-	var tbody0 = table.getElementsByTagName('tbody')[0];
+	const cstbl = document.getElementById(tableID);
+	var tbody0 = cstbl.getElementsByTagName('tbody')[0];
 	tbody0.innerHTML = '<tr><td colspan="7">' + data.status + '</td></tr>';
 }
 function handleNodesEvent(event) {
@@ -228,8 +274,8 @@ function handleNodesEvent(event) {
 			tablehtml += '<tr><td colspan="7">' + total_nodes + ' nodes connected</td></tr>';
 		}
 		// $('#table_' + localNode + ' tbody:first').html(tablehtml);
-		const table = document.getElementById('table_' + localNode);
-		tbody0 = table.getElementsByTagName('tbody')[0];
+		const cstbl = document.getElementById('table_' + localNode);
+		tbody0 = cstbl.getElementsByTagName('tbody')[0];
 		const conncnt = document.getElementById('conncnt');
 		tbody0.innerHTML = tablehtml;
 		conncnt.value = total_nodes;
@@ -239,7 +285,7 @@ function handleNodetimesEvent(event) {
 	var tabledata = JSON.parse(event.data);
 	for(localNode in tabledata) {
 		tableID = 'table_' + localNode;
-		table = document.getElementById(tableID);
+		cstbl = document.getElementById(tableID);
 		for(row in tabledata[localNode].remote_nodes) {
 			var rowdata = tabledata[localNode].remote_nodes[row];
 			rowID='lkey' + row;
@@ -294,19 +340,18 @@ function astrestart() {
 	setTimeout(function() { window.location.reload(); }, 500);
 }
 function xhttpSend(url, parms) {
-	xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange = handleXhttpResponse;
-	xhttp.open('POST', url, true);
-	xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
-	xhttp.send(parms);
+	xh = new XMLHttpRequest();
+	xh.onreadystatechange = handleXhttpResponse;
+	xh.open('POST', url, true);
+	xh.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xh.send(parms);
 }
 function handleXhttpResponse() {
-	if(xhttp.readyState === 4) {
-		if(xhttp.status === 200) {
-			statMsg(xhttp.responseText);
+	if(xh.readyState === 4) {
+		if(xh.status === 200) {
+			statMsg(xh.responseText);
 		} else {
-			statMsg('Error response from server: ' + xhttp.status);
-			statMsg('[F5] to Reload');
+			statMsg('Error response from server: ' + xh.status);
 		}
 	}
 }
@@ -321,39 +366,4 @@ function varDump(v) {
 	for(const prop in v)
 		logLines.push(`${prop} (${typeof v[prop]}): ${v[prop] || "n/a"}`);
 	console.log(logLines.join("\n"));
-}
-
-function checkServerAlerts(url) {
-	var tag = document.getElementById('test');
-	var val = tag.innerHTML;
-	val = '&val='+val;
-	var xhttp = new XMLHttpRequest();
-	xhttp.onreadystatechange=function() {
-		if(xhttp.readyState === 4) {
-			if(xhttp.status === 200) {
-				var xml = xhttp.responseXML;
-				var res = getConnStatusObj(xml);
-				tag.innerHTML = res.test;
-				checkTimer = setTimeout('checkServerAlerts("'+url+'")',2000);
-			} else {
-				tag.innerHTML = 'err: ReqStat=' + xhttp.status;
-				checkTimer = setTimeout('checkServerAlerts("'+url+'")',30000);
-			}
-		}
-	};
-	xhttp.open("GET", url+val, true);
-	xhttp.send(null);
-}
-function getConnStatusObj(xml) {
-	var rows=xml.getElementsByTagName('status');
-	if(rows.length < 1)
-		return null;
-	var row=rows[0];
-	var tags=["test"];
-	var res={};
-	for(var i=0; i < tags.length; i++) {
-		var tag=row.getElementsByTagName(tags[i])[0];
-		res[tags[i]]=tag.firstChild.data;
-	}
-	return res;
 }
