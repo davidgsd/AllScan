@@ -35,7 +35,7 @@ foreach($nodes as $n) {
 		continue;
 	}
 	$error = '';
-	$url = "https://stats.allstarlink.org/api/stats/$n";
+	$url = "http://stats.allstarlink.org/api/stats/$n";
 	if(function_exists('curl_init')) {
 		$data = doWebRequest($url, null, $error);
 	} else {
