@@ -50,7 +50,7 @@ Once you are logged in by SSH to your node run the following commands:
 	cp -rf AllScan-main/* allscan/
 	rm -rf AllScan-main
 
-	\# Below needed only if you do not have php-curl installed and get ASL Stats functions errors
+	# Below needed only if you do not have php-curl installed and get ASL stats errors
 	sudo apt-get install php-curl; sudo service apache2 restart
 
 Now open a browser and go to your node's IP address followed by /allscan/ eg. `http://192.168.1.23/allscan/`, and bookmark that URL. You should see a Connection Status table showing your Node number(s), Call Sign and Location, a control form where you can enter node numbers and use the Connect, Disconnect, etc. buttons, and a Favorites table with at least a few favorites listed. If any of these are not showing check your allmon.ini and global.inc files in /var/www/html/supermon/ and make sure they are properly configured. 
@@ -60,15 +60,15 @@ The update process is similar to the install process with exception that you don
 
 	cd /var/www/html
 
-	\# Note: To make a backup copy of your existing allscan installation do the following:
-	\# cp -a allscan allscan-old
+	# Note: To make a backup copy of your existing allscan folder do the following:
+	# cp -a allscan allscan-old
 
 	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
 	unzip main.zip; rm main.zip
 	cp -rf AllScan-main/* allscan/
 	rm -rf AllScan-main
 
-	\# Below needed only if you do not have php-curl installed and get ASL Stats functions errors
+	# Below needed only if you do not have php-curl installed and get ASL stats errors
 	sudo apt-get install php-curl; sudo service apache2 restart
 
 Now open a browser and go to your node's IP address followed by /allscan/, and <u>be sure to force a full reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button</u>, so your browser will load the updated JavaScript and CSS files.
