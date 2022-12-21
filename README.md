@@ -101,7 +101,7 @@ If you get a permissions error when trying to Add a Favorite in AllScan, check t
 If you keep your favorites.ini file in the allscan directory and see error messages when writing the file from allscan, run the same steps as above but in the /var/www/html/allscan/ folder.
 
 # Contact
-If you have any questions email chc_media at yahoo dot com. 73, NR9V
+If you have any questions email chc_media at yahoo dot com. Also see (AllScan.info)[https://AllScan.info]. 73, NR9V
 
 # Road Map
 1. Enhanced config file validation and editing. Estimated completion: Dec. 24
@@ -117,7 +117,7 @@ Add default global.inc file docs/global.inc.sample and give user option to confi
 GUI optimizations. Add default favorites file docs/favorites.ini.sample and give user option to copy this to ./favorites.ini if file was not found in . or ../supermon/.
 
 **v0.31 2022-12-20**<br>
-Use PHP cURL lib for ASL Stats data download if present. Move ASL stats output messages to <p> tag under Favorites Table.
+Use PHP cURL lib for ASL Stats data download if present. Move ASL stats output messages to p tag above Status Messages box.
 
 **v0.3 2022-12-19**<br>
 Implement ASL Stats functions, color coding of Favorites Table and new 'Rx%' and 'LCnt' columns. ASL APIs are limited to 30 requests/minute per IP Address. AllScan defaults to one stats request per 2.5 seconds but will reduce that frequency if over limit http code eg. 429 or another error is encountered during an API request. Improve handling of page reload logic after browser JS online event when node is not accessible.
