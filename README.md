@@ -11,15 +11,15 @@ See [screenshot.png](https://github.com/davidgsd/AllScan/blob/main/screenshot.pn
 
 4. Allow favorites to be easily edited, deleted, and copied/pasted.
 
-5. Allow 'Scanning' of Favorites and other nodes by leveraging the ASL database and info such as Keyed status and Connected Nodes data. AllScan shows what favorites are active and have recently been active, and in a future release will allow connecting to favorites one at a time sequentially and if no activity after a configurable time then disconnecting and moving to the next.
+5. Allow 'Scanning' of Favorites and other nodes using ASL stats info such as Keyed status and Connected Nodes data. AllScan shows what favorites are active and have recently been active, and in a future release will allow connecting to favorites one at a time sequentially and if no activity after a configurable time then disconnecting and moving to the next.
 
-These features essentially give ASL the same memory management and scan capabilities that analog radios have had for decades. AllScan follows the latest web development standards and best-practices, with PHP, JavaScript, HTML, and CSS cleanly partitioned. AllScan is mobile-friendly and optimized for ease of use on both small and large screens. AllScan is intended to work well in both PC browsers and mobile browsers, using the same UI for both.
+This essentially gives ASL the same memory management and scan capabilities that analog radios have had for decades. AllScan follows the latest web development standards and best-practices, with PHP, JavaScript, HTML, and CSS cleanly partitioned. No bloated frameworks or 3rd party libraries are used. AllScan is mobile-friendly and optimized for ease of use on both small and large screens. AllScan is intended to work well in both PC browsers and mobile browsers, using the same UI for both.
 
-Currently AllScan is Beta software. It supports showing detailed node status, supporting connect, disconnect and other common commands, supporting one-click add/delete of favorites to favorites.ini, showing the Favorites list and color-coded ASL stats, and allowing the Favorties Table to be sorted by any column.
+AllScan is currently Beta software. It supports showing detailed node status, supporting connect, disconnect and other common commands, supporting one-click add/delete of favorites to favorites.ini, showing the Favorites list and color-coded ASL stats, and allowing the Favorties Table to be sorted by any column.
 
-Prior to installing AllScan it is recommended that you have a working install of SuperMon or AllMon2. AllScan can automatically read their config files and thereby need no additional configuration. If you use AllMon rather than Supermon, because it does not have a favorites.ini file you would want to place a blank favorites.ini file in the allscan directory. (AllMon's controlpanel.ini file may also be supported at some point.)
+AllScan supports multiple locations of the favorites.ini file, giving priority to the allscan folder, or secondarily using the ../supermon folder. You can in fact have several sets of favorites and switch between them, contact me for details on that. If no favorites.ini file is found AllScan will ask you if you'd like to create the file and if so will copy the the docs/favorites.ini.sample file to ./favorites.ini, which has a small list of popular nodes to get you started. AllMon's controlpanel.ini file may also be supported at some point.
 
-AllScan is very easy-to-use and can be downloaded and installed in minutes. Currently AllScan supports favorites.ini entries that refer to connecting nodes eg. 'cmd[] = "rpt cmd %node% ilink 3 [node#]"' but will also support other types of commands at some point. The code also saves a backup copy to favorites.ini.bak in case of any issue.
+Prior to installing AllScan it is recommended that you have a working install of SuperMon or AllMon2. AllScan can automatically read their config files and thereby need no additional configuration. AllScan is very easy-to-use and can be downloaded and installed in minutes. Currently AllScan supports favorites.ini entries that refer to connecting nodes eg. 'cmd[] = "rpt cmd %node% ilink 3 [node#]"' but will also support other types of commands at some point. The code also saves a backup copy to favorites.ini.bak in case of any issue.
 
 As AllScan receives stats data from the ASL stats server it updates the Favorites Table rows with color coded details showing the following:
 
@@ -44,7 +44,8 @@ You will need SSH access to your node and should have basic familiarity with Lin
 Once you are logged in by SSH to your node run the following commands:
 
 	cd /var/www/html
-	mkdir allscan; sudo chmod 775 allscan; sudo chgrp $USER allscan
+	mkdir allscan; sudo chmod 775 allscan
+	sudo chgrp www-data allscan # If www-data not defined replace with web server's group name
 	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
 	unzip main.zip; rm main.zip
 	cp -rf AllScan-main/* allscan/
@@ -53,14 +54,18 @@ Once you are logged in by SSH to your node run the following commands:
 	# Below needed only if you do not have php-curl installed and get ASL stats errors
 	sudo apt-get install php-curl; sudo service apache2 restart
 
-Now open a browser and go to your node's IP address followed by /allscan/ eg. `http://192.168.1.23/allscan/`, and bookmark that URL. You should see a Connection Status table showing your Node number(s), Call Sign and Location, a control form where you can enter node numbers and use the Connect, Disconnect, etc. buttons, and a Favorites table with at least a few favorites listed. If any of these are not showing check your allmon.ini and global.inc files in /var/www/html/supermon/ and make sure they are properly configured. 
+Now open a browser and go to your node's IP address followed by /allscan/ eg. `http://192.168.1.23/allscan/`, and bookmark that URL. You should see a Connection Status table showing your Node number(s), Call Sign and Location, a control form where you can enter node numbers and use the Connect, Disconnect, etc. buttons, and a Favorites table with at least a few favorites listed. If any of these are not showing check your allmon.ini and global.inc files in /var/www/html/supermon/ and make sure they are properly configured.
 
 # Update
 The update process is similar to the install process with exception that you don't need to create the allscan directory. To update AllScan log into your node with SSH and run the following commands:
 
 	cd /var/www/html
 
-	# Note: To make a backup copy of your existing allscan folder do the following:
+	# If the allscan dir does not have 775 permissions or the web server group name run the following
+	sudo chmod 775 allscan
+	sudo chgrp www-data allscan # If www-data not defined replace with web server's group name
+
+	# To make a backup copy of your existing allscan folder do the following
 	# cp -a allscan allscan-old
 
 	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
@@ -82,14 +87,16 @@ Also note: I have not yet tested AllScan on a node with EchoLink enabled but tha
 If you do not have a node or if your node is out-of-date, noisy, or unreliable, take a look at the following post: [How To Build a High-Quality Full-Duplex AllStar Node for Under $200](https://forums.qrz.com/index.php?threads/how-to-build-a-professional-grade-full-duplex-allstar-node-for-under-200.839842/).
 
 # Troubleshooting / FAQs
-If you get a permissions error when trying to Add a Favorite in AllScan, check that the /var/www/html/supermon dir has 775 permissions and www-data group, and that the /var/www/html/supermon/favorites.ini file exists and has 664 permissions and www-data as the group. These settings should already be that way if your Supermon install is properly working, otherwise it would not be able to edit and save the favorites.ini file. As a test you can go into Supermon, click the Configuration Editor button and try adding a blank line to favorites.ini and see if it saves OK. If not, there was something off with the Supermon install. In that case you might want to check on the Supermon groups.io page to let them know, or just run the following commands to correct those settings:
+If you get a permissions error when trying to Add a Favorite in AllScan, check that the /var/www/html/allscan and supermon dirs have 775 permissions and www-data group, and that the favorites.ini file exists in one or both of directories and has 664 permissions and www-data as the group. These settings should already be that way if your Supermon install is properly working, otherwise it would not be able to edit and save the favorites.ini file. As a test you can go into Supermon, click the Configuration Editor button and try adding a blank line to favorites.ini and see if it saves OK. If not, there is something improperly configured with the Supermon install. The following commands should correct those settings:
 
 	cd /var/www/html/supermon/
 	sudo touch favorites.ini
 	sudo chmod 664 favorites.ini
 	sudo chmod 775 .
 	sudo chgrp www-data favorites.ini .
-	
+
+If you keep your favorites.ini file in the allscan directory and see error messages when writing the file from allscan, run the same steps as above but in the /var/www/html/allscan/ folder.
+
 # Contact
 If you have any questions email chc_media at yahoo dot com. 73, NR9V
 
@@ -100,20 +107,17 @@ If you have any questions email chc_media at yahoo dot com. 73, NR9V
 4. Other features that are highly requested or that seem like a good fit.
 
 # Release Notes
+**v0.32 2022-12-20**<br>
+GUI optimizations. Add default favorites file docs/favorites.ini.sample and give user option to copy this to ./favoriies.ini if no favorites.ini file was found in . or ../supermon/.
+
 **v0.31 2022-12-20**<br>
 Use PHP cURL lib for ASL Stats data download if present. Move ASL stats output messages to <p> tag under Favorites Table.
 
 **v0.3 2022-12-19**<br>
-Implement ASL Stats functions and color coding of Favorites Table '#' and new 'Rx%' and 'LCnt' columns. Color codes for '#' col: Dark Green: Node Active, Medium Green: Active, WT enabled, Red: Node is Keyed. Rx% refers to node's reported TxTime divided by its Uptime. LCnt is the reported number of Connected Links (ie. nodes/hubs/links). ASL APIs are limited to 30 requests/minute per IP Address. AllScan currently defaults to one stats request per 2.5 seconds but will reduce that frequency if over limit http code eg. 429 or another error is encountered during an API request.
-
-**v0.26 2022-12-19**<br>
-Implement ASL Stats API infrastructure. Improve handling of page reload logic after browser JS online event when node is no longer accessible.
+Implement ASL Stats functions, color coding of Favorites Table and new 'Rx%' and 'LCnt' columns. ASL APIs are limited to 30 requests/minute per IP Address. AllScan defaults to one stats request per 2.5 seconds but will reduce that frequency if over limit http code eg. 429 or another error is encountered during an API request. Improve handling of page reload logic after browser JS online event when node is not accessible.
 
 **v0.25 2022-12-19**<br>
-Enable automatic reading of allmon.ini file also from /etc/asterisk/, and astdb.txt file from allscan's directory or from ../supermon/ or /var/log/asterisk/.
-
-**v0.24 2022-12-18**<br>
-Enable automatic reading of allmon.ini file from allscan's directory or from ../supermon/ or ../allmon/allmon.ini.php. Provide detailed messages about any issues found when trying to read the file.
+Enable automatic reading of astdb.txt file from allscan's directory or from ../supermon/ or /var/log/asterisk/. Enable automatic reading of allmon.ini file from allscan's directory or from /etc/asterisk/, ../supermon/, or ../allmon/allmon.ini.php. Provide detailed messages about any issues found when trying to read the file.
 
 **v0.23 2022-12-18**<br>
 When JS online event is received, reload page after 2 Sec delay, to automatically restart server event-stream connection after PC/browser was asleep or offline. Add print of astdb.txt file Last Update time.

@@ -80,15 +80,15 @@ display:inline-block;
 fieldset, #statmsg {
 border:solid 3px rgb(51,51,119);
 padding:3px;
-margin:8px 3px 3px;
+margin:3px;
 border-radius:10px;
 }
 fieldset legend {
 font-size:16px;
 color:hsl(180,75%,50%);
 }
-label {
-font-size:12px;
+form + h2 {
+margin-top:3px;
 }
 header {
 display:inline-block;
@@ -140,12 +140,19 @@ cursor:pointer;
 vertical-align:text-bottom;
 border-radius:0;
 }
+#node {
+border:2px solid hsl(240,40%,60%);
+margin:2px;
+padding:0 2px;
+font-size:14px;
+width:6em;
+}
 #statmsg {
 display:inline-block;
-margin:0.5em;
+margin:3px;
 min-width:460px;
 max-width:750px;
-height:4.4em;
+height:3.3em;
 font-size:0.9em;
 line-height:1.2;
 overflow-y:scroll;
@@ -164,7 +171,7 @@ margin:0 auto;
 clear:both;
 }
 td {
-max-width:24em;
+max-width:32em;
 }
 /* @media screen and (min-width: 750px) {
 	td { max-width:30em; }
@@ -258,8 +265,8 @@ padding:0;
 border-radius:12px;
 }
 
-input[type=button].small, input[type=submit].small {
-font-size:10px;
+label, input[type=button].small, input[type=submit].small {
+font-size:11px;
 }
 
 a.menu {

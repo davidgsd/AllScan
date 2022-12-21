@@ -1,5 +1,5 @@
 <?php
-$AllScanVersion = "v0.31";
+$AllScanVersion = "v0.32";
 require_once('Html.php');
 require_once('logUtils.php');
 
@@ -196,6 +196,9 @@ function csvToArray($csv) {
 	return $arr;
 }
 
+function error($s) {
+	return "<span class=\"error\">$s</span>";
+}
 function errMsg($msg, $logToFile=false) {
 	global $html;
 	echo $html->pre($msg, 'error');
@@ -322,14 +325,14 @@ function readFileLines($fname, &$msg, $bak=false) {
 	// Read in file and save a copy to .bak extension, verify we have write permission
 	$f = file_get_contents($fname);
 	if(!$f) {
-		$msg[] = "Read $fname failed. Check directory/file permissions";
+		$msg[] = error("Read $fname failed. Check directory/file permissions");
 		return false;
 	}
 	if($bak && !file_put_contents("$fname.bak", $f)) {
-		$msg[] = "Write $fname.bak failed. Check directory/file permissions";
+		$msg[] = error("Write $fname.bak failed. Check directory/file permissions");
 		return false;
 	}
-	/* if($bak && !chmod("$fname.bak", 0664)) {
+	/* if($bak && !chmod("$fname.bak", 0664)) {
 		$msg[] = "Chmod 0664 $fname.bak failed. Check directory/file permissions";
 		return false;
 	} */
@@ -339,10 +342,10 @@ function readFileLines($fname, &$msg, $bak=false) {
 function writeFileLines($fname, $f, &$msg) {
 	$f = implode(NL, $f);
 	if(!file_put_contents($fname, $f)) {
-		$msg[] = "Write $fname failed. Check directory/file permissions";
+		$msg[] = error("Write $fname failed. Check directory/file permissions");
 		return false;
 	}
-	/*if(!chmod($fname, 0664)) {
+	/*if(!chmod($fname, 0664)) {
 		$msg[] = "Chmod 0664 $fname.new failed. Check directory/file permissions";
 		return false;
 	}*/

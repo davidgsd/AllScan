@@ -21,10 +21,6 @@ foreach($nodes as $n) {
 	}
 }
 $cnt = count($nodes);
-
-//sendData(['status' => "$cnt valid nodes in request"], 'stats');
-//exit();
-
 $stats = [];
 $time = time();
 

@@ -1,0 +1,43 @@
+; The %node% template will be replaced with your node number at run time.
+; Put favorites in the [general] section that will show for all nodes.
+;
+[general]
+;
+label[] = " === SELECT ==="
+cmd[] = " "
+
+label[] = "East Coast Reflector 27339"
+cmd[] = "rpt cmd %node% ilink 3 27339"
+
+label[] = "M0HOY HUBNet, Manchester, UK 51288"
+cmd[] = "rpt cmd %node% ilink 3 51288"
+
+label[] = "WW7PSR 146.960 Seattle, WA 2462"
+cmd[] = "rpt cmd %node% ilink 3 2462"
+
+label[] = "KB8ZGL SOUTHCARS HUB, US 27404"
+cmd[] = "rpt cmd %node% ilink 3 27404"
+
+label[] = "W2JLD Hub 1, Rochester, NY 47620"
+cmd[] = "rpt cmd %node% ilink 3 47620"
+
+label[] = "N5ZLW Route66 52613"
+cmd[] = "rpt cmd %node% ilink 3 52613"
+
+label[] = "W7YRC YARC Hub, Prescott, AZ 502370"
+cmd[] = "rpt cmd %node% ilink 3 502370"
+
+label[] = "N8UKF 443.200 Fusion, Muskegon MI 54576"
+cmd[] = "rpt cmd %node% ilink 3 54576"
+
+label[] = "N6LXX MAIN HUB, HARVARD HUB 29833"
+cmd[] = "rpt cmd %node% ilink 3 29883"
+
+label[] = "K6RRR San Diego Hangout 28404"
+cmd[] = "rpt cmd %node% ilink 3 28404"
+
+;
+; Put favorites for specific nodes here.
+;
+;[1999]
+;

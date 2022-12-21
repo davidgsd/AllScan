@@ -2,14 +2,16 @@
 require_once("include/common.php");
 require_once("include/viewUtils.php");
 require_once("include/hwUtils.php");
-define('API', '../supermon/'); // Relative path to AllMon/Supermon directory
 $html = new Html();
-$msg = [];
-
 htmlInit('AllScan - AllStarLink Favorites Management & Scanning Web App');
+
+define('favsini', 'favorites.ini');
+define('smfavsini', '../supermon/favorites.ini');
+$favsFile = file_exists(favsini) ? favsini : (file_exists(smfavsini) ? smfavsini : null);
 
 // Load node and host definitions
 $hosts = [];
+$msg = [];
 $nodes = readAllmonIni($msg, $hosts);
 if(!empty($nodes) && !empty($hosts)) {
 	$node = $nodes[0];
@@ -53,7 +55,7 @@ if(!isset($node) || $astdb === false)
 	asExit(implode(BR, $msg));
 
 $autodisc = !isset($parms['autodisc']) || $parms['autodisc'];
-$remNode = isset($parms['node']) && is_numeric($parms['node']) ? $parms['node'] : '';
+$remNode = (isset($parms['node']) && validDbID($parms['node']) && strlen($parms['node']) < 9) ? $parms['node'] : '';
 ?>
 
 <h2>Connection Status</h2>
@@ -71,10 +73,12 @@ $remNode = isset($parms['node']) && is_numeric($parms['node']) ? $parms['node'] 
 
 <form id="nodeForm" method="post" action="/allscan/">
 <fieldset>
-<input type=hidden id="conncnt" name="conncnt" value="0">
 <input type=hidden id="localnode" name="localnode" value="<?php echo $node ?>">
-<label for="node">Node</label><input type=number id="node" name="node" value="<?php echo $remNode ?>"
-	maxlength="10" style="border:2px solid hsl(240,40%,60%);margin:3px;font-size:14px;width:11em;">
+<input type=hidden id="conncnt" name="conncnt" value="0">
+<label for="node">Node#</label><input type="text" inputmode="numeric" pattern="[0-9]*"
+	id="node" name="node" maxlength="8" value="<?php echo $remNode ?>">
+<input type=submit name="Submit" value="Add Favorite" class="small">
+<input type=submit name="Submit" value="Delete Favorite" class="small">
 <br>
 <input type=button value="Connect" onClick="connectNode('connect');">
 <input type=button value="Disconnect" onClick="disconnectNode();">
@@ -82,10 +86,8 @@ $remNode = isset($parms['node']) && is_numeric($parms['node']) ? $parms['node'] 
 <input type=button value="Local Monitor" onClick="connectNode('localmonitor');">
 <br>
 <input type=checkbox id="permanent"><label for="permanent">Permanent</label>&nbsp;
-<input type=checkbox id="autodisc"<?php if($autodisc) echo ' checked' ?>><label for="autodisc">Disconnect before Connect</label>
-<br>
-<input type=submit name="Submit" value="Add to Favorites">
-<input type=submit name="Submit" value="Delete Favorite">
+<input type=checkbox id="autodisc"<?php if($autodisc) echo ' checked' ?>><label
+	for="autodisc">Disconnect before Connect</label>
 </fieldset>
 </form>
 
@@ -94,11 +96,13 @@ h2('Favorites');
 // Read in favorites.ini
 $favs = [];
 $favcmds = [];
-$favsFile = API . 'favorites.ini';
-if(!file_exists($favsFile)) {
-	p("$favsFile not found. Check Supermon/AllMon install or create blank file with www-data writeable permissions.");
+if(!$favsFile) {
+	msg("favorites.ini not found. Check Supermon install or click below to create file in allscan directory.");
+	echo '<form id="nodeForm" method="post" action="/allscan/"><fieldset>' . NL
+		.'<input type=submit name="Submit" value="Create Favorites.ini File" class="small">' . NL
+		.'</fieldset></form>' . BR;
 } else {
-	$favsIni = parse_ini_file(API . 'favorites.ini', true);
+	$favsIni = parse_ini_file($favsFile, true);
 	if($favsIni === false) {
 		p("Error parsing $favsFile. Check file format/permissions or create file with www-data writeable permissions.");
 	} else {
@@ -131,6 +135,7 @@ if(!file_exists($favsFile)) {
 		}
 		// if(count($favcmds))
 			// varDump($favcmds);
+		$msg[] = _count($favs) . " favorites read from $favsFile";
 	}
 }
 
@@ -212,28 +217,11 @@ asExit();
 
 // ---------------------------------------------------
 
-function sortArray($list, $col, $desc) {
-	$colVals = [];
-	foreach($list as $val)
-		$colVals[] = $val[$col];
-	// Sort the column data while retaining array keys
-	if($desc)
-		arsort($colVals);
-	else
-		asort($colVals);
-	// Reorder the input array
-	$out = [];
-	foreach(array_keys($colVals) as $k)
-		$out[] = $list[$k];
-	return $out;
-}
-
 function processForm($parms, &$msg) {
-	global $astdb;
+	global $astdb, $favsFile;
 	$node = $parms['node'];
-	$fname = API . 'favorites.ini';
 	switch($parms['Submit']) {
-		case "Add to Favorites":
+		case "Add Favorite":
 			$msg[] = "Add Node $node to Favorites requested";
 			if(!validDbID($node)) {
 				$msg[] = "Invalid node#.";
@@ -245,10 +233,10 @@ function processForm($parms, &$msg) {
 			}
 			// Parse file lines and add new favorite after last label,cmd lines.
 			// Note: Does not look at [general] or [node#] sections (TBI)
-			if(($favs = readFileLines($fname, $msg, true)) === false)
+			if(($favs = readFileLines($favsFile, $msg, true)) === false)
 				break;
 			$n = count($favs);
-			$msg[] = "$n lines read from $fname";
+			$msg[] = "$n lines read from $favsFile";
 			$lastCmdLn = 0;
 			for($i=0; $i < $n; $i++) {
 				if(strpos($favs[$i], 'cmd[]') === 0) {
@@ -269,9 +257,9 @@ function processForm($parms, &$msg) {
 			$cmd = "cmd[] = \"rpt cmd %node% ilink 3 $node\"";
 			array_splice($favs, $insertLn, 0, [$label, $cmd, '']);
 			$n = count($favs);
-			if(!writeFileLines($fname, $favs, $msg))
+			if(!writeFileLines($favsFile, $favs, $msg))
 				break;
-			$msg[] = "Successfully wrote $n lines to $fname";
+			$msg[] = "Successfully wrote $n lines to $favsFile";
 			break;
 		case "Delete Favorite":
 			$msg[] = "Delete Node $node from Favorites requested";
@@ -281,23 +269,23 @@ function processForm($parms, &$msg) {
 			}
 			// Parse file lines and delete favorite's label,cmd lines.
 			// Note: Does not look for [general] or [node#] sections
-			if(($favs = readFileLines($fname, $msg, true)) === false)
+			if(($favs = readFileLines($favsFile, $msg, true)) === false)
 				break;
 			$n = count($favs);
-			$msg[] = "$n lines read from $fname";
+			$msg[] = "$n lines read from $favsFile";
 			$lastCmdLn = 0;
 			for($i=0; $i < $n; $i++) {
 				if(strpos($favs[$i], 'cmd[]') == 0 && strpos($favs[$i], " $node\""))
 					$delLn = $i + 1;
 			}
 			if(!isset($delLn)) {
-				$msg[] = "Node $node not found in $fname";
+				$msg[] = "Node $node not found in $favsFile";
 				break;
 			}
 			$nLines = 2;
 			$startLn = $delLn - $nLines;
 			if($startLn <= 0) {
-				$msg[] = "Invalid $fname format";
+				$msg[] = error("Invalid $favsFile format");
 				break;
 			}
 			// Also delete blank line after entry if present
@@ -306,9 +294,36 @@ function processForm($parms, &$msg) {
 			for($i=0; $i < $nLines; $i++)
 				unset($favs[$startLn + $i]);
 			$n = count($favs);
-			if(!writeFileLines($fname, $favs, $msg))
+			if(!writeFileLines($favsFile, $favs, $msg))
 				break;
-			$msg[] = "Successfully wrote $n lines to $fname";
+			$msg[] = "Successfully wrote $n lines to $favsFile";
+			break;
+		case "Create Favorites.ini File":
+			$from = 'docs/favorites.ini.sample';
+			$to = favsini;
+			if(copy($from, $to)) {
+				$msg[] = "Copied $from to $to OK";
+				chmod($to, 0664);
+				$favsFile = $to;
+			} else {
+				$msg[] = error("Copy $from to $to Error. Check directory permissions.");
+			}
 			break;
 	}
+}
+
+function sortArray($list, $col, $desc) {
+	$colVals = [];
+	foreach($list as $val)
+		$colVals[] = $val[$col];
+	// Sort the column data while retaining array keys
+	if($desc)
+		arsort($colVals);
+	else
+		asort($colVals);
+	// Reorder the input array
+	$out = [];
+	foreach(array_keys($colVals) as $k)
+		$out[] = $list[$k];
+	return $out;
 }
