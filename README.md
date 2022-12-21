@@ -102,13 +102,14 @@ If you get a permissions error when trying to Add a Favorite in AllScan, check t
 If you keep your favorites.ini file in the allscan directory and see error messages when writing the file from allscan, run the same steps as above but in the /var/www/html/allscan/ folder.
 
 # Contact
-If you have any questions email chc_media at yahoo dot com. Also see (AllScan.info)[https://AllScan.info]. 73, NR9V
+If you have any questions email chc_media at yahoo dot com. Also see [AllScan.info](https://AllScan.info). 73, NR9V
 
 # Road Map
-1. Enhanced config file validation and editing. Estimated completion: Dec. 24
-4. Implement user authentication system supporting management of multiple users with Read-only, Limited, or Full permissions. This will use cookies rather than php sessions in order to provide better control over login durations and support "Remember Me" option to prevent frequent re-logging in. Estimated completion: Jan. 5
+1. Additional refinements to existing features
+2. Implement user authentication system supporting multiple users with Read-only, Limited, or Full permissions and full control over login durations. Estimated completion: Jan. 5
 3. Add support for EchoLink nodes. Estimated completion: Jan. 12
-4. Other features that are highly requested or that seem like a good fit.
+4. Other features that are highly requested or that seem like a good fit
+5. Additional stats/scan features
 
 # Release Notes
 **v0.33 2022-12-20**<br>
