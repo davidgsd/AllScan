@@ -13,11 +13,11 @@ See [screenshot.png](https://github.com/davidgsd/AllScan/blob/main/screenshot.pn
 
 5. Allow 'Scanning' of Favorites and other nodes using ASL stats info such as Keyed status and Connected Nodes data. AllScan shows what favorites are active and have recently been active, and in a future release will allow connecting to favorites one at a time sequentially and if no activity after a configurable time then disconnecting and moving to the next.
 
-This essentially gives ASL the same memory management and scan capabilities that analog radios have had for decades. AllScan follows the latest web development standards and best-practices, with PHP, JavaScript, HTML, and CSS cleanly partitioned. No bloated frameworks or 3rd party libraries are used. AllScan is mobile-friendly and optimized for ease of use on both small and large screens. AllScan is intended to work well in both PC browsers and mobile browsers, using the same UI for both.
+This essentially gives ASL the same memory management and scan capabilities that analog radios have had for decades. AllScan follows the latest web development standards and best-practices, with PHP, JavaScript, HTML, and CSS cleanly partitioned. No 3rd party frameworks or libraries are used. AllScan is mobile-friendly and optimized for ease of use on both small and large screens. AllScan works well in both PC browsers and mobile browsers, using the same UI for both.
 
 AllScan is currently Beta software. It supports showing detailed node status, supporting connect, disconnect and other common commands, supporting one-click add/delete of favorites to favorites.ini, showing the Favorites list and color-coded ASL stats, and allowing the Favorties Table to be sorted by any column.
 
-AllScan supports multiple locations of the favorites.ini file, giving priority to the allscan folder, or secondarily using the ../supermon folder. You can in fact have several sets of favorites and switch between them, contact me for details on that. If no favorites.ini file is found AllScan will ask you if you'd like to create the file and if so will copy the the docs/favorites.ini.sample file to ./favorites.ini, which has a small list of popular nodes to get you started. AllMon's controlpanel.ini file may also be supported at some point.
+AllScan supports multiple locations of the favorites.ini file, giving priority to the allscan folder, or secondarily using the ../supermon folder. Multiple sets of favorites can be used and easily switched between. If no favorites.ini file is found AllScan will ask if you'd like to create the file, and if so will copy docs/favorites.ini.sample file to ./favorites.ini, which has a small list of nodes to get you started. (AllMon's controlpanel.ini file may also be supported at some point.)
 
 Prior to installing AllScan it is recommended that you have a working install of SuperMon or AllMon2. AllScan can automatically read their config files and thereby need no additional configuration. AllScan is very easy-to-use and can be downloaded and installed in minutes. Currently AllScan supports favorites.ini entries that refer to connecting nodes eg. 'cmd[] = "rpt cmd %node% ilink 3 [node#]"' but will also support other types of commands at some point. The code also saves a backup copy to favorites.ini.bak in case of any issue.
 
@@ -27,6 +27,7 @@ Color codes for '#' column:
 * Dark Green: Node Active (registered and reporting to AllStarLink Network)
 * Medium Green: Node Active, Web-Transceiver enabled (node may be more likely to accept connections)
 * Red: Node is Keyed (transmitting audio to the AllStarLink Network)
+
 (Note: The ASL stats data is not always accurate. Some active keyed nodes may not show as Keyed. This is not an issue in AllScan. The remote node may not be reporting that information or may only report it at certain intervals. It may be possible in a future release to get the keyed status more reliably from another ASL stats API/page, or to connect to nodes in Local Monitor mode.)
 
 'Rx%' column: The remote node's reported TxTime divided by its Uptime, provides a general indication of how busy the node tends to be.
