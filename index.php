@@ -9,6 +9,10 @@ define('favsini', 'favorites.ini');
 define('smfavsini', '../supermon/favorites.ini');
 $favsFile = file_exists(favsini) ? favsini : (file_exists(smfavsini) ? smfavsini : null);
 
+define('globalinc', 'global.inc');
+define('smglobalinc', '../supermon/global.inc');
+$globalInc = file_exists(globalinc) ? globalinc : (file_exists(smglobalinc) ? smglobalinc : null);
+
 // Load node and host definitions
 $hosts = [];
 $msg = [];
@@ -31,16 +35,13 @@ if(!empty($nodes) && !empty($hosts)) {
 }
 
 // Load Title cfgs
-$globalinc = 'global.inc';
-if(!file_exists($globalinc))
-	$globalinc = '../supermon/global.inc';
-if(file_exists($globalinc)) {
-	include($globalinc);
+if($globalInc) {
+	include($globalInc);
 	$title = $CALL . ' ' . $LOCATION;
 	$title2 = $TITLE2 . ' - ' . $title;
 } else {
-	$msg[] = 'global.inc not found. Check Supermon install or place "global.inc" file in allscan dir containing '
-		.	'$CALL, $LOCATION, and $TITLE2 settings';
+	$title = '[CALL] [LOCATION]';
+	$title2 = '[TITLE2] - ' . $title;
 }
 
 // Output header
@@ -53,6 +54,11 @@ echo 	"<body$onLoad>" . NL
 
 if(!isset($node) || $astdb === false)
 	asExit(implode(BR, $msg));
+
+if(!$globalInc) {
+	p('global.inc not found. Check Supermon install or enter data below to create file in ' . getcwd() . '/.');
+	showGlobalIncForm();
+}
 
 $autodisc = !isset($parms['autodisc']) || $parms['autodisc'];
 $remNode = (isset($parms['node']) && validDbID($parms['node']) && strlen($parms['node']) < 9) ? $parms['node'] : '';
@@ -97,10 +103,8 @@ h2('Favorites');
 $favs = [];
 $favcmds = [];
 if(!$favsFile) {
-	msg("favorites.ini not found. Check Supermon install or click below to create file in allscan directory.");
-	echo '<form id="nodeForm" method="post" action="/allscan/"><fieldset>' . NL
-		.'<input type=submit name="Submit" value="Create Favorites.ini File" class="small">' . NL
-		.'</fieldset></form>' . BR;
+	msg('favorites.ini not found. Check Supermon install or click below to create file in ' . getcwd() . '/.');
+	showFavsIniForm();
 } else {
 	$favsIni = parse_ini_file($favsFile, true);
 	if($favsIni === false) {
@@ -218,7 +222,7 @@ asExit();
 // ---------------------------------------------------
 
 function processForm($parms, &$msg) {
-	global $astdb, $favsFile;
+	global $astdb, $favsFile, $globalInc;
 	$node = $parms['node'];
 	switch($parms['Submit']) {
 		case "Add Favorite":
@@ -307,6 +311,25 @@ function processForm($parms, &$msg) {
 				$favsFile = $to;
 			} else {
 				$msg[] = error("Copy $from to $to Error. Check directory permissions.");
+			}
+			break;
+		case CREATE_GLOBALINC_FILE:
+			$from = 'docs/global.inc.sample';
+			$file = file_get_contents($from);
+			if($file === false)  {
+				$msg[] = error("$from not found");
+				break;
+			}
+			$tags = ['[CALL]', '[LOCATION]', '[TITLE2]'];
+			$parms = [$parms['call'], $parms['location'], $parms['title2']];
+			$file = str_replace($tags, $parms, $file);
+			$to = globalinc;
+			if(file_put_contents($to, $file)) {
+				$msg[] = "Wrote to $to OK";
+				chmod($to, 0664);
+				$globalInc = $to;
+			} else {
+				$msg[] = error("Error saving $to. Check directory permissions.");
 			}
 			break;
 	}

@@ -1,4 +1,7 @@
 <?php
+require_once('commonForms.php');
+define(CREATE_GLOBALINC_FILE, 'Create global.inc File');
+define(EDIT_GLOBALINC_FILE, 'Edit global.inc File');
 
 function htmlInit($title) {
 	global $html;
@@ -8,6 +11,30 @@ function htmlInit($title) {
 		.	'<meta name="viewport" content="width=device-width, initial-scale=0.6">' . NL
 		.	'<script src="js/main.js"></script>' . NL
 		.	'</head>' . NL;
+}
+
+function showGlobalIncForm($parms=null) {
+	$form = new stdClass();
+	$form->id = 'editGlobalIncForm';
+	if($parms === null)
+		$parms = (object)['call'=>'', 'location'=>'', 'title2'=>''];
+	$form->fields = [
+		'CALL'		=> ['text' => ['call', $parms->call]],
+		'LOCATION' 	=> ['text' => ['location', $parms->location]],
+		'TITLE2'  	=> ['text' => ['title2', $parms->title2]]];
+	if(isset($parms->edit)) {
+		$form->submit = EDIT_GLOBALINC_FILE;
+	} else {
+		$form->submit = CREATE_GLOBALINC_FILE;
+	}
+	$form->fieldsetLegend = '';
+	echo htmlForm($form) . BR;
+}
+
+function showFavsIniForm() {
+	echo '<form id="nodeForm" method="post" action="/allscan/"><fieldset>' . NL
+		.'<input type=submit name="Submit" value="Create Favorites.ini File">' . NL
+		.'</fieldset></form>' . BR;
 }
 
 function checkboxControl($url, $parms, $name, $title, $isChecked) {

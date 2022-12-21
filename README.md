@@ -27,19 +27,20 @@ Color codes for '#' column:
 * Dark Green: Node Active (registered and reporting to AllStarLink Network)
 * Medium Green: Node Active, Web-Transceiver enabled (node may be more likely to accept connections)
 * Red: Node is Keyed (transmitting audio to the AllStarLink Network)
+(Note: The ASL stats data is not always accurate. Some active keyed nodes may not show as Keyed. This is not an issue in AllScan. The remote node may not be reporting that information or may only report it at certain intervals. It may be possible in a future release to get the keyed status more reliably from another ASL stats API/page, or to connect to nodes in Local Monitor mode.)
 
-'Rx%' column: The remote node's reported TxTime divided by its Uptime, provides a general indication of how busy the note tends to be.
+'Rx%' column: The remote node's reported TxTime divided by its Uptime, provides a general indication of how busy the node tends to be.
 
 'LCnt' column: The reported number of Connected Links (ie. user nodes, hubs, bridges, or other links).
 
 ASL's stats APIs are limited to 30 requests/minute per IP Address. AllScan currently defaults to one stats request per 2.5 seconds but will reduce that frequency if over limit http code (eg. 429) or other http error codes are received during API requests.
 
 # Install
-First check that you are using a recent 2.0 Beta version of the ASL Distribution (available [here](http://downloads.allstarlink.org/index.php?b=ASL_Images_Beta)), and that you have AllMon2 or Supermon installed, properly configured and working. If you have Supermon already working, AllScan will then work right away with no additional configuration needed, and will use the favorites.ini file in the supermon directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon.
+Ideally you should be using a recent (2021 or later) 2.0 Beta version of the ASL Distribution (available [here](http://downloads.allstarlink.org/index.php?b=ASL_Images_Beta)), and you should have AllMon2 or Supermon properly configured and working. If you have Supermon already working, AllScan will then work right away with no additional configuration needed, and will use the favorites.ini file in the supermon directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon. Make sure you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. Supermon is easy to set up and has some nice maintenance/debug features.
 
-Make sure your node information is defined in /etc/asterisk/allmon.ini and in the supermon global.inc (specifically your $CALL, $LOCATION, and $TITLE2 (eg. "Node 56789") in global.inc). AllScan uses those same settings. Also make sure you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. AllScan supports automatically using the AllMon2 files if Supermon is not installed/configured, but Supermon is easy to set up and has some nice maintenance/debug features.
+AllScan will use the ../supermon/global.inc file automatically if global.inc is not present in the allscan folder. If you do not have Supermon installed or its global.inc file cannot be read AllScan will prompt you to enter your Call, Location and Node Title and save to global.inc.
 
-You will need SSH access to your node and should have basic familiarity with Linux. This has been tested on AllStarLink 2.0 Beta nodes with Supermon 7, but should also work fine with HamVOIP, pre-2.0 ASL releases, or AllMon.
+You will need SSH access to your node and should have basic familiarity with Linux. This has been tested on AllStarLink 2.0 Beta with Supermon 7, but should also work fine with HamVOIP and pre-2.0 ASL releases.
 
 Once you are logged in by SSH to your node run the following commands:
 
@@ -49,15 +50,15 @@ Once you are logged in by SSH to your node run the following commands:
 	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
 	unzip main.zip; rm main.zip
 	cp -rf AllScan-main/* allscan/
-	rm -rf AllScan-main
+	rmdir AllScan-main
 
 	# Below needed only if you do not have php-curl installed and get ASL stats errors
 	sudo apt-get install php-curl; sudo service apache2 restart
 
-Now open a browser and go to your node's IP address followed by /allscan/ eg. `http://192.168.1.23/allscan/`, and bookmark that URL. You should see a Connection Status table showing your Node number(s), Call Sign and Location, a control form where you can enter node numbers and use the Connect, Disconnect, etc. buttons, and a Favorites table with at least a few favorites listed. If any of these are not showing check your allmon.ini and global.inc files in /var/www/html/supermon/ and make sure they are properly configured.
+Now open a browser and go to your node's IP address followed by /allscan/ eg. `http://192.168.1.23/allscan/`, and bookmark that URL. You should see a Connection Status table showing your Node number(s), Call Sign and Location, a control form where you can enter node numbers and use the Connect, Disconnect, etc. buttons, and a Favorites table with at least a few favorites listed. If any of these are not showing check your global.inc file and make sure it's properly configured.
 
 # Update
-The update process is similar to the install process with exception that you don't need to create the allscan directory. To update AllScan log into your node with SSH and run the following commands:
+The update process is similar to the install process with exception that you don't need to create the allscan directory and should make a backup copy of it. Log into your node with SSH and run the following commands:
 
 	cd /var/www/html
 
@@ -65,13 +66,13 @@ The update process is similar to the install process with exception that you don
 	sudo chmod 775 allscan
 	sudo chgrp www-data allscan # If www-data not defined replace with web server's group name
 
-	# To make a backup copy of your existing allscan folder do the following
-	# cp -a allscan allscan-old
+	# Make a backup copy of your existing allscan folder (optional but recommended)
+	cp -a allscan allscan-old
 
 	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
 	unzip main.zip; rm main.zip
 	cp -rf AllScan-main/* allscan/
-	rm -rf AllScan-main
+	rmdir AllScan-main
 
 	# Below needed only if you do not have php-curl installed and get ASL stats errors
 	sudo apt-get install php-curl; sudo service apache2 restart
@@ -84,7 +85,7 @@ SECURITY NOTE: User login support has not yet been implemented. If your node web
 Also note: I have not yet tested AllScan on a node with EchoLink enabled but that will soon be fully supported.
 
 # Node Notes
-If you do not have a node or if your node is out-of-date, noisy, or unreliable, take a look at the following post: [How To Build a High-Quality Full-Duplex AllStar Node for Under $200](https://forums.qrz.com/index.php?threads/how-to-build-a-professional-grade-full-duplex-allstar-node-for-under-200.839842/).
+If you do not have a node or if your node is out-of-date, noisy, or unreliable, check out the following post: [How To Build a High-Quality Full-Duplex AllStar Node for Under $200](https://forums.qrz.com/index.php?threads/how-to-build-a-professional-grade-full-duplex-allstar-node-for-under-200.839842/).
 
 # Troubleshooting / FAQs
 If you get a permissions error when trying to Add a Favorite in AllScan, check that the /var/www/html/allscan and supermon dirs have 775 permissions and www-data group, and that the favorites.ini file exists in one or both of directories and has 664 permissions and www-data as the group. These settings should already be that way if your Supermon install is properly working, otherwise it would not be able to edit and save the favorites.ini file. As a test you can go into Supermon, click the Configuration Editor button and try adding a blank line to favorites.ini and see if it saves OK. If not, there is something improperly configured with the Supermon install. The following commands should correct those settings:
@@ -107,8 +108,11 @@ If you have any questions email chc_media at yahoo dot com. 73, NR9V
 4. Other features that are highly requested or that seem like a good fit.
 
 # Release Notes
+**v0.33 2022-12-20**<br>
+Add default global.inc file docs/global.inc.sample and give user option to configure and save this to ./global.inc if file was not found in . or ../supermon/. Documentation updates.
+
 **v0.32 2022-12-20**<br>
-GUI optimizations. Add default favorites file docs/favorites.ini.sample and give user option to copy this to ./favoriies.ini if no favorites.ini file was found in . or ../supermon/.
+GUI optimizations. Add default favorites file docs/favorites.ini.sample and give user option to copy this to ./favorites.ini if file was not found in . or ../supermon/.
 
 **v0.31 2022-12-20**<br>
 Use PHP cURL lib for ASL Stats data download if present. Move ASL stats output messages to <p> tag under Favorites Table.

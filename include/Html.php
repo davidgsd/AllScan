@@ -307,7 +307,7 @@ function cmdButton($title, $parms, $class=null, $url=null, $titleTag=null) {
 
 function fieldsetOpen($legend=null) {
 	$out = "<fieldset>\n";
-	if($legend !== null)
+	if($legend)
 		$out .= "<legend>" . htmlspecial($legend) . "</legend>\n";
 	return $out;
 }

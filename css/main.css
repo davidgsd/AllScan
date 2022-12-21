@@ -210,6 +210,9 @@ table tr:last-child td:last-child {
 border-bottom-right-radius:10px;
 }
 
+table.noborder, table.noborder tr th, table.noborder tr td {
+border:0;
+}
 table.favs {
 margin:0 auto 0.5em;
 }
