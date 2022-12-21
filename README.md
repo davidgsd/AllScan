@@ -57,6 +57,8 @@ Once you are logged in by SSH to your node run the following commands:
 
 Now open a browser and go to your node's IP address followed by /allscan/ eg. `http://192.168.1.23/allscan/`, and bookmark that URL. You should see a Connection Status table showing your Node number(s), Call Sign and Location, a control form where you can enter node numbers and use the Connect, Disconnect, etc. buttons, and a Favorites table with at least a few favorites listed. If any of these are not showing check your global.inc file and make sure it's properly configured.
 
+Note for HamVOIP nodes: The web server folder may be /srv/http/ instead of /var/www/html/, and the web server group name may be http instead of www-data.
+
 # Update
 The update process is similar to the install process with exception that you don't need to create the allscan directory and should make a backup copy of it. Log into your node with SSH and run the following commands:
 
@@ -77,12 +79,12 @@ The update process is similar to the install process with exception that you don
 	# Below needed only if you do not have php-curl installed and get ASL stats errors
 	sudo apt-get install php-curl; sudo service apache2 restart
 
-Now open a browser and go to your node's IP address followed by /allscan/, and <u>be sure to force a full reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button</u>, so your browser will load the updated JavaScript and CSS files.
+Now open a browser and go to your node's IP address followed by /allscan/, and **be sure to force a full reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.
+
+Note for HamVOIP nodes: The web server folder may be /srv/http/ instead of /var/www/html/, and the web server group name may be http instead of www-data.
 
 # Notes
-SECURITY NOTE: User login support has not yet been implemented. If your node webserver is PUBLICLY accessible you should set up password protection on the /allscan/ directory. If you do not know how to do that, it is NOT recommended that you install AllScan at this time. In the next few weeks a login system will be implemented in AllScan, but currently anyone who has access to your node's IP address will have access to the /allscan/ directory (if they know to check that specific url). If you are using your node only on your local home network and do not have an external port mapped in your internet router to port 80 on your node then having a login and password is generally not necessary, but can still be enabled easily with a few simple steps to enable Apache directory authentication, such as described in this [article](https://www.digitalocean.com/community/tutorials/how-to-set-up-password-authentication-with-apache-on-ubuntu-20-04)
-
-Also note: I have not yet tested AllScan on a node with EchoLink enabled but that will soon be fully supported.
+SECURITY NOTE: User login support has not yet been implemented. If your node webserver is publicly accessible you might want to set up password protection on the /allscan/ directory. If you don't, someone could potentially edit your favorites or connect/disconnect remote nodes, though that's about all they could do. In the next couple weeks a login system will be implemented in AllScan. If you're using your node only on your local home network and do not have an external port mapped in your internet router to port 80 on your node then having a login and password is generally not necessary, but can still be enabled easily with a few simple steps to enable Apache directory authentication, such as described in this [article](https://www.digitalocean.com/community/tutorials/how-to-set-up-password-authentication-with-apache-on-ubuntu-20-04)
 
 # Node Notes
 If you do not have a node or if your node is out-of-date, noisy, or unreliable, check out the following post: [How To Build a High-Quality Full-Duplex AllStar Node for Under $200](https://forums.qrz.com/index.php?threads/how-to-build-a-professional-grade-full-duplex-allstar-node-for-under-200.839842/).
