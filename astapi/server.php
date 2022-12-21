@@ -45,7 +45,7 @@ $fp = [];
 foreach($nodes as $node) {
 	$host = $cfg[$node]['host'];
 	if(!$host) {
-		$data['status'] = "Invalid host setting in $allmonini [$node]";
+		$data['status'] = "Invalid host setting in allmon.ini [$node]";
 		sendData($data, 'connection');
 		continue;
 	}
@@ -53,17 +53,16 @@ foreach($nodes as $node) {
 	// Connect and login to each manager only once
 	if(!array_key_exists($host, $servers)) {
 		$data['status'] = "Connecting to Asterisk Manager $node $host...";
-		sendData($data, 'connection');
 		$fp[$host] = $ami->connect($host);
 		if($fp[$host] === false) {
-			$data['status'] = 'Connect to Asterisk Manager Failed';
+			$data['status'] .= 'Connect Failed. Check allmon.ini settings.';
 		} else {
 			// Try to login
 			if($ami->login($fp[$host], $cfg[$node]['user'], $cfg[$node]['passwd']) !== false) {
 				$servers[$host] = 'y';
-				$data['status'] = 'Login OK';
+				$data['status'] .= 'Login OK';
 			} else {
-				$data['status'] = "Login Failed. Check $allmonini settings.";
+				$data['status'] .= "Login Failed. Check allmon.ini settings.";
 			}
 		}
 		sendData($data, 'connection');
