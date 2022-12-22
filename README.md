@@ -107,7 +107,7 @@ If you have any questions email chc_media at yahoo dot com. Also see [AllScan.in
 
 # Release Notes
 **v0.34 2022-12-21**<br>
-Optimize stats request timing to more quickly populate the favorites table after loading and then go to a reduced request rate over time, to reduces the chance of the stats request limit (30 per minute) being exceeded if there are multiple AllScan web clients on a node. Link favorite Names to the ASL stats page for the remote node. Update JS reload function to prevent POST data being resubmitted after page refresh.
+Optimize stats request timing to more quickly populate the favorites table after page load, then go to a reduced request rate over time, to reduce the chance of the ASL stats request limit (30 per minute) being exceeded if there are multiple AllScan web clients on a node. Link Favorites table Names text to the ASL stats page for the node. Update JS reload function to prevent POST data being resubmitted after page refresh.
 
 **v0.33 2022-12-20**<br>
 Add default global.inc file docs/global.inc.sample and give user option to configure and save this to ./global.inc if file was not found in . or ../supermon/. Documentation updates.
