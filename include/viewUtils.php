@@ -1,7 +1,8 @@
 <?php
 require_once('commonForms.php');
-define(CREATE_GLOBALINC_FILE, 'Create global.inc File');
-define(EDIT_GLOBALINC_FILE, 'Edit global.inc File');
+define('CREATE_GLOBALINC_FILE', 'Create global.inc File');
+define('EDIT_GLOBALINC_FILE', 'Edit global.inc File');
+define('CREATE_FAVORITESINI_FILE', 'Create Favorites.ini File');
 
 function htmlInit($title) {
 	global $html;
@@ -33,7 +34,7 @@ function showGlobalIncForm($parms=null) {
 
 function showFavsIniForm() {
 	echo '<form id="nodeForm" method="post" action="/allscan/"><fieldset>' . NL
-		.'<input type=submit name="Submit" value="Create Favorites.ini File">' . NL
+		.'<input type=submit name="Submit" value="' . CREATE_FAVORITESINI_FILE . '">' . NL
 		.'</fieldset></form>' . BR;
 }
 

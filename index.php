@@ -29,7 +29,7 @@ if(!empty($nodes) && !empty($hosts)) {
 
 	// Handle form submits
 	$parms = getRequestParms();
-	if(isset($parms['Submit']) && $astdb !== false) {
+	if(isset($_POST['Submit']) && $astdb !== false) {
 		processForm($parms, $msg);
 	}
 }
@@ -190,6 +190,8 @@ if(empty($favList)) {
 	$out = $html->tableOpen($hdrCols, null, 'favs', null, 'favs');
 	foreach($favList as $f) {
 		$nodeNumAttr = ['1' => 'class="nodeNum" onClick="setNodeBox(' . $f[1] . ')"'];
+		// Link name to ASL stats page for node
+		$f[2] = $html->a("http://stats.allstarlink.org/stats/" . $f[1], null, $f[2], null, 'stats');
 		$out .= $html->tableRow($f, null, null, false, $nodeNumAttr);
 	}
 	$out .= $html->tableClose();
@@ -206,9 +208,11 @@ echo cpuTemp() . ENSP . '|' . ENSP
 	.	'<input type=button class="small" value="Restart Asterisk" onClick="astrestart();">';
 
 $links = [
-	'AllScan Info & Updates' => 'https://github.com/davidgsd/AllScan',
+	'AllScan.info' => 'https://allscan.info/',
+	'AllScan Updates' => 'https://github.com/davidgsd/AllScan#allscan',
 	'AllStarLink.org' => 'https://www.allstarlink.org/',
-	'AllStarLink Forum' => 'https://community.allstarlink.org/',
+	'Keyed Nodes' => 'http://stats.allstarlink.org/stats/keyed',
+	'ASL Forum' => 'https://community.allstarlink.org/',
 	'QRZ ASL Forum' => 'https://forums.qrz.com/index.php?forums/echolink-irlp-tech-board.76/',
 	'eHam.net' => 'https://www.eham.net/'
 ];
@@ -220,7 +224,6 @@ echo $html->div(implode(ENSP . '|' . ENSP, $out), 'm5');
 asExit();
 
 // ---------------------------------------------------
-
 function processForm($parms, &$msg) {
 	global $astdb, $favsFile, $globalInc;
 	$node = $parms['node'];
@@ -302,7 +305,7 @@ function processForm($parms, &$msg) {
 				break;
 			$msg[] = "Successfully wrote $n lines to $favsFile";
 			break;
-		case "Create Favorites.ini File":
+		case CREATE_FAVORITESINI_FILE:
 			$from = 'docs/favorites.ini.sample';
 			$to = favsini;
 			if(copy($from, $to)) {

@@ -3,29 +3,27 @@ AllStar Favorites Management &amp; Scanning Web App
 
 See [screenshot.png](https://github.com/davidgsd/AllScan/blob/main/screenshot.png) for an example of the AllScan GUI. AllScan supports the following features:
 
-1. Allow Favorites to be added/deleted simply by entering the node# and clicking an 'Add Favorite' button. The favorites.ini file is then updated with the node# and name, description and location data from the ASL DB.
+1. Provides the same Connection Status monitoring features and connect/diconnect functions as Supermon & Allmon
 
-2. Show all Favorites in a table on the main page, allow the connected node to be changed to a new favorite (automatically disconnecting any currently connected node) with a single click on the GUI.
+2. Allows Favorites to be added/deleted simply by entering the node# and clicking a button. The favorites.ini file is then updated with the Node#, Name, Description and Location data from the ASL DB.
 
-3. Allow favorites to be sorted by node#, name, description, location, etc.
+3. Shows all Favorites in a table and allows favorites to be connected with a single click (optionally automatically disconnecting any currently connected nodes first).
 
-4. Allow favorites to be easily edited, deleted, and copied/pasted.
+4. Allows Favorites to be sorted by Node#, Name, Description, Location, etc.
 
-5. Allow 'Scanning' of Favorites and other nodes using ASL stats info such as Keyed status and Connected Nodes data. AllScan shows what favorites are active and have recently been active, and in a future release will allow connecting to favorites one at a time sequentially and if no activity after a configurable time then disconnecting and moving to the next.
+5. Scanning Favorites status using ASL stats info including Keyed status, Connected Node count, TxKeyed time, UpTime, and derived metrics. AllScan shows what favorites are active and have recently been active and updates this up to 30 times per minute.
 
-This essentially gives ASL the same memory management and scan capabilities that analog radios have had for decades. AllScan follows the latest web development standards and best-practices, with PHP, JavaScript, HTML, and CSS cleanly partitioned. No 3rd party frameworks or libraries are used. AllScan is mobile-friendly and optimized for ease of use on both small and large screens. AllScan works well in both PC browsers and mobile browsers, using the same UI for both.
+The above give ASL nodes similar memory management and scan capabilities that analog radios have had for decades. AllScan follows the latest web development standards and best-practices, with PHP, JavaScript, HTML, and CSS cleanly partitioned. No 3rd party frameworks or libraries are used. AllScan is mobile-friendly and optimized for ease of use on both small and large screens. AllScan works well in both PC browsers and mobile browsers, using the same UI for both.
 
-AllScan is currently Beta software. It supports showing detailed node status, supporting connect, disconnect and other common commands, supporting one-click add/delete of favorites to favorites.ini, showing the Favorites list and color-coded ASL stats, and allowing the Favorties Table to be sorted by any column.
+AllScan supports multiple locations of the favorites.ini file, giving priority to the allscan folder, or secondarily using the ../supermon folder. Multiple favorites files can be used and easily switched between. If no favorites.ini file is found AllScan will ask if you'd like to create the file, and if so will copy docs/favorites.ini.sample file to ./favorites.ini, which has a small list of nodes to get you started. (AllMon's controlpanel.ini file may also be supported at some point.)
 
-AllScan supports multiple locations of the favorites.ini file, giving priority to the allscan folder, or secondarily using the ../supermon folder. Multiple sets of favorites can be used and easily switched between. If no favorites.ini file is found AllScan will ask if you'd like to create the file, and if so will copy docs/favorites.ini.sample file to ./favorites.ini, which has a small list of nodes to get you started. (AllMon's controlpanel.ini file may also be supported at some point.)
-
-Prior to installing AllScan it is recommended that you have a working install of SuperMon or AllMon2. AllScan can automatically read their config files and thereby need no additional configuration. AllScan is very easy-to-use and can be downloaded and installed in minutes. Currently AllScan supports favorites.ini entries that refer to connecting nodes eg. 'cmd[] = "rpt cmd %node% ilink 3 [node#]"' but will also support other types of commands at some point. The code also saves a backup copy to favorites.ini.bak in case of any issue.
+Prior to installing AllScan it is recommended that you have a working install of SuperMon or AllMon2. AllScan can automatically read their config files and thereby need no additional configuration. AllScan is very easy-to-use and can be downloaded and installed in minutes. Currently AllScan supports favorites.ini entries that refer to connecting to nodes eg. 'cmd[] = "rpt cmd %node% ilink 3 [node#]"' but may also support other types of commands at some point. AllScan also saves a backup copy to favorites.ini.bak in case of any issue.
 
 As AllScan receives stats data from the ASL stats server it updates the Favorites Table rows with color coded details showing the following:
 
 Color codes for '#' column:
 * Dark Green: Node Active (registered and reporting to AllStarLink Network)
-* Medium Green: Node Active, Web-Transceiver enabled (node may be more likely to accept connections)
+* Medium Green: Node Active, Web-Transceiver enabled (may be more likely to accept connections)
 * Red: Node is Keyed (transmitting audio to the AllStarLink Network)
 
 (Note: The ASL stats data is not always accurate. Some active keyed nodes may not show as Keyed. This is not an issue in AllScan. The remote node may not be reporting that information or may only report it at certain intervals. It may be possible in a future release to get the keyed status more reliably from another ASL stats API/page, or to connect to nodes in Local Monitor mode.)
@@ -34,16 +32,12 @@ Color codes for '#' column:
 
 'LCnt' column: The reported number of Connected Links (ie. user nodes, hubs, bridges, or other links).
 
-ASL's stats APIs are limited to 30 requests/minute per IP Address. AllScan currently defaults to one stats request per 2.5 seconds but will reduce that frequency if over limit http code (eg. 429) or other http error codes are received during API requests.
+ASL's stats APIs are limited to 30 requests/minute per IP Address. AllScan uses a dynamic request timing algorithm to prevent exceeding this limit, even if multiple web clients are using AllScan on a node.
 
 # Install
-Ideally you should be using a recent (2021 or later) 2.0 Beta version of the ASL Distribution (available [here](http://downloads.allstarlink.org/index.php?b=ASL_Images_Beta)), and you should have AllMon2 or Supermon properly configured and working. If you have Supermon already working, AllScan will then work right away with no additional configuration needed, and will use the favorites.ini file in the supermon directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon. Make sure you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. Supermon is easy to set up and has some nice maintenance/debug features.
+Ideally you should be using a recent (2021 or later) 2.0 Beta version of the ASL Distribution (available [here](http://downloads.allstarlink.org/index.php?b=ASL_Images_Beta)), and you should have AllMon2 or Supermon properly configured and working. Most testing is on ASL 2.0 but AllScan is known to also work well on HamVOIP and pre-2.0 ASL releases. If you have Supermon already working, AllScan will need no additional configuration and will use the favorites.ini file in the supermon directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon. Confirm you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. Supermon is easy to set up and has some nice maintenance/debug features. For example it allows you to edit the text in the favorites.ini file in your browser, so for example you could add notes there of weekly Net times. AllScan will use the ../supermon/global.inc file automatically if global.inc is not present in the allscan folder. If you do not have Supermon installed or its global.inc file cannot be read AllScan will prompt you to enter your Call, Location and Node Title and save to global.inc.
 
-AllScan will use the ../supermon/global.inc file automatically if global.inc is not present in the allscan folder. If you do not have Supermon installed or its global.inc file cannot be read AllScan will prompt you to enter your Call, Location and Node Title and save to global.inc.
-
-You will need SSH access to your node and should have basic familiarity with Linux. This has been tested on AllStarLink 2.0 Beta with Supermon 7, but should also work fine with HamVOIP and pre-2.0 ASL releases.
-
-Once you are logged in by SSH to your node run the following commands:
+You will need SSH access to your node and should have basic familiarity with Linux. Log into your node with SSH and run the following commands*:
 
 	cd /var/www/html
 	mkdir allscan; sudo chmod 775 allscan
@@ -56,12 +50,12 @@ Once you are logged in by SSH to your node run the following commands:
 	# Below needed only if you do not have php-curl installed and get ASL stats errors
 	sudo apt-get install php-curl; sudo service apache2 restart
 
-Now open a browser and go to your node's IP address followed by /allscan/ eg. `http://192.168.1.23/allscan/`, and bookmark that URL. You should see a Connection Status table showing your Node number(s), Call Sign and Location, a control form where you can enter node numbers and use the Connect, Disconnect, etc. buttons, and a Favorites table with at least a few favorites listed. If any of these are not showing check your global.inc file and make sure it's properly configured.
+Now open a browser and go to your node's IP address followed by /allscan/ eg. `http://192.168.1.23/allscan/`, and bookmark that URL. You should see a Connection Status table showing your Node number(s), Call Sign and Location, a control form where you can enter node numbers and use the Connect, Disconnect, etc. buttons, and a Favorites table with at least a few favorites listed.
 
-Note for HamVOIP nodes: The web server folder may be /srv/http/ instead of /var/www/html/, and the web server group name may be http instead of www-data.
+*Note for HamVOIP nodes: The web server folder may be /srv/http/ instead of /var/www/html/, and the web server group name may be http instead of www-data.
 
 # Update
-The update process is similar to the install process with exception that you don't need to create the allscan directory and should make a backup copy of it. Log into your node with SSH and run the following commands:
+The update process is similar to the install process with exception that you don't need to create the allscan directory and should make a backup copy of it. Log into your node with SSH and run the following commands*:
 
 	cd /var/www/html
 
@@ -82,16 +76,16 @@ The update process is similar to the install process with exception that you don
 
 Now open a browser and go to your node's IP address followed by /allscan/, and **be sure to force a full reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.
 
-Note for HamVOIP nodes: The web server folder may be /srv/http/ instead of /var/www/html/, and the web server group name may be http instead of www-data.
+*Note for HamVOIP nodes: The web server folder may be /srv/http/ instead of /var/www/html/, and the web server group name may be http instead of www-data.
 
 # Notes
-SECURITY NOTE: User login support has not yet been implemented. If your node webserver is publicly accessible you might want to set up password protection on the /allscan/ directory. If you don't, someone could potentially edit your favorites or connect/disconnect remote nodes, though that's about all they could do. In the next couple weeks a login system will be implemented in AllScan. If you're using your node only on your local home network and do not have an external port mapped in your internet router to port 80 on your node then having a login and password is generally not necessary, but can still be enabled easily with a few simple steps to enable Apache directory authentication, such as described in this [article](https://www.digitalocean.com/community/tutorials/how-to-set-up-password-authentication-with-apache-on-ubuntu-20-04)
+SECURITY NOTE: User login support has not yet been implemented. If your node webserver is publicly accessible you might want to set up password protection on the /allscan/ directory. If you don't, someone could potentially edit your favorites or connect/disconnect remote nodes, though that's about all they could do. In the next couple weeks a login system will be implemented in AllScan. If you're using your node only on your local home network and do not have an external port mapped in your internet router to port 80 on your node then having a login and password is generally not necessary, but can still be enabled easily with a few simple steps such as described in this [article](https://www.digitalocean.com/community/tutorials/how-to-set-up-password-authentication-with-apache-on-ubuntu-20-04)
 
 # Node Notes
 If you do not have a node or if your node is out-of-date, noisy, or unreliable, check out the following post: [How To Build a High-Quality Full-Duplex AllStar Node for Under $200](https://forums.qrz.com/index.php?threads/how-to-build-a-professional-grade-full-duplex-allstar-node-for-under-200.839842/).
 
 # Troubleshooting / FAQs
-If you get a permissions error when trying to Add a Favorite in AllScan, check that the /var/www/html/allscan and supermon dirs have 775 permissions and www-data group, and that the favorites.ini file exists in one or both of directories and has 664 permissions and www-data as the group. These settings should already be that way if your Supermon install is properly working, otherwise it would not be able to edit and save the favorites.ini file. As a test you can go into Supermon, click the Configuration Editor button and try adding a blank line to favorites.ini and see if it saves OK. If not, there is something improperly configured with the Supermon install. The following commands should correct those settings:
+If you get a permissions error when trying to Add a Favorite in AllScan, check that the /var/www/html/allscan and supermon dirs have 775 permissions and www-data group, and that the favorites.ini file exists in one or both of directories and has 664 permissions and www-data as the group. These settings should already be that way if your Supermon install is properly working, or it would not be able to edit and save the favorites.ini file. As a test you can go into Supermon, click the Configuration Editor button and try adding a blank line to favorites.ini and see if it saves OK. If not, there is something improperly configured with the Supermon install. The following commands should correct those settings:
 
 	cd /var/www/html/supermon/
 	sudo touch favorites.ini
@@ -112,6 +106,9 @@ If you have any questions email chc_media at yahoo dot com. Also see [AllScan.in
 5. Additional stats/scan features
 
 # Release Notes
+**v0.34 2022-12-21**<br>
+Optimize stats request timing to more quickly populate the favorites table after loading and then go to a reduced request rate over time, to reduces the chance of the stats request limit (30 per minute) being exceeded if there are multiple AllScan web clients on a node. Link favorite Names to the ASL stats page for the remote node.
+
 **v0.33 2022-12-20**<br>
 Add default global.inc file docs/global.inc.sample and give user option to configure and save this to ./global.inc if file was not found in . or ../supermon/. Documentation updates.
 
@@ -146,4 +143,4 @@ Enable sortable columns on Favorites Table. GUI Updates.
 Initial Commit.
 
 # Thanks
-Thanks to all ASL Developers. Thanks to KK6QMS for being the first Beta tester, and K6ATC for help in verifying AllScan works on HamVOIP.
+Thanks to all ASL Developers. Thanks to KK6QMS for being the first Beta tester, and N6ATC for help in verifying AllScan works on HamVOIP.

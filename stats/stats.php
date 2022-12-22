@@ -31,14 +31,11 @@ foreach($nodes as $n) {
 		continue;
 	}
 	$error = '';
+	$retcode = 0;
 	$url = "http://stats.allstarlink.org/api/stats/$n";
-	if(function_exists('curl_init')) {
-		$data = doWebRequest($url, null, $error);
-	} else {
-		$data = file_get_contents($url);
-	}
+	$data = doWebRequest($url, null, $error, $retcode);
 	if(!$data) {
-		sendData(['status' => "ASL API response failed for Node $n. Error=$error"], 'stats');
+		sendData(['status' => "ASL stats $error", 'retcode' => $retcode], 'stats');
 		break;
 	}
 	$resp = json_decode($data);
@@ -79,57 +76,51 @@ function parseStats($resp, $time) {
 	return $s;
 }
 
-function doWebRequest($url, $parms=null, &$error) {
-	$ch = curl_init();
-	$timeout = 10;
-	$def = [
-        CURLOPT_URL => $url,
-        CURLOPT_RETURNTRANSFER => true,
-		CURLOPT_CONNECTTIMEOUT => $timeout,
-        CURLOPT_TIMEOUT => $timeout,
-    ];
-    curl_setopt_array($ch, $def);
-	curl_setopt($ch, CURLOPT_GET, true);
-	if($parms !== null) {
-		//curl_setopt($ch, CURLOPT_GET, true);
-		/* $p = [];
-		foreach($parms as $k=>$v)
-			$p[] = "$k=$v";
-		curl_setopt($ch, CURLOPT_POSTFIELDS, implode('&', $p)); */
-	}
-	$result = curl_exec($ch);
-	if(!$result) {
-		$errno = curl_errno($ch);
-		if($errno == 28) {
-			$error = "Network response timeout";
-		} else {
-			$err = curl_error($ch);
-			if($err)
-				$error = "HTTP Error: $err";
-			else
-				$error = "Unknown HTTP error";
+function doWebRequest($url, $parms=null, &$error, &$retcode) {
+	//$httpCodes = [400 => 'Timeout', 403 => 'Forbidden', 404 => 'Error', 429 => 'Too Many Requests'];
+	if(function_exists('curl_init')) {
+		$ch = curl_init();
+		$timeout = 10;
+		$def = [
+			CURLOPT_URL => $url,
+			CURLOPT_RETURNTRANSFER => true,
+			CURLOPT_CONNECTTIMEOUT => $timeout,
+			CURLOPT_TIMEOUT => $timeout,
+		];
+		curl_setopt_array($ch, $def);
+		if($parms !== null) {
+			curl_setopt($ch, CURLOPT_POST, true);
+			$p = [];
+			foreach($parms as $k=>$v)
+				$p[] = "$k=$v";
+			curl_setopt($ch, CURLOPT_POSTFIELDS, implode('&', $p));
 		}
-		curl_close($ch);
-		return null;
-	}
-	$intRetCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-	curl_close($ch);
-	if($intRetCode != 200) {
-		if($intRetCode == 400) {
-			$error = "ASL HTTP return code 400 (Timeout).";
-		} elseif($intRetCode == 403) {
-			$error = "ASL HTTP return code 403.";
-		} else {
-			$rc = ($intRetCode == 404) ? '404 (Error)' : $intRetCode;
-			$error = "ASL HTTP return code $rc";
-		}
-		/* if($intRetCode != 400) {
-			p("Request URL: $url");
-			if($parms) {
-				msg("Parms:");
-				varDumpClean($parms);
+		$result = curl_exec($ch);
+		if(!$result) {
+			$errno = curl_errno($ch);
+			if($errno == 28) {
+				$error = "Network response timeout";
+			} else {
+				$err = curl_error($ch);
+				if($err)
+					$error = "HTTP Error: $err";
+				else
+					$error = "Unknown HTTP error";
 			}
-		} */
+			curl_close($ch);
+			return null;
+		}
+		$retcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		curl_close($ch);
+	} else {
+		ini_set('default_socket_timeout', 10);
+		$result = @file_get_contents($url);
+		preg_match('/([0-9])\d+/', $http_response_header[0], $matches);
+		$retcode = intval($matches[0]);
+	}
+	if($retcode != 200) {
+		//$txt = array_key_exists($rc, $httpCodes) ? "$rc ($httpCodes[$rc])" : $rc;
+		$error = "HTTP return code $retcode";
 		return null;
 	}
 	return $result;

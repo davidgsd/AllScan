@@ -2,7 +2,7 @@ var apiDir='/allscan/astapi/';
 var statsDir='/allscan/stats/';
 var source, xh, hb;
 var rldRetries=0, rldTmr;
-var statsState=0, statsIdx=0, xhs, statsTmr, ftbl;
+var statsState=0, statsIdx=0, statsReqCnt=0, favsCnt=0, xhs, statsTmr, ftbl;
 
 function initEventStream(url) {
 	if(typeof(EventSource) === 'undefined') {
@@ -47,19 +47,19 @@ function getStats() {
 				if(node >= 2000 && node < 2000000)
 					rnodes[r] = ftbl.rows[r+1].cells[1].innerHTML;
 			}
-			var cnt = rnodes.length;
-			if(cnt == 0) {
+			favsCnt = rnodes.length;
+			if(favsCnt == 0) {
 				//statsTmr = setTimeout(getStats, 15000);
 				return;
 			}
-			if(statsIdx >= cnt)
+			if(statsIdx >= favsCnt)
 				statsIdx=0;
 			var node = rnodes[statsIdx];
 			//statMsg('Requesting ASL Stats for ' + node + '...');
 			//var parms = 'node=' + rnodes.join(',');
 			var parms = 'node=' + node;
 			xhttpStatsInit(statsDir + 'stats.php', parms);
-			statsIdx++;
+			statsReqCnt++;
 			break;
 	}
 	// statsTmr = setTimeout(getStats, 60000);
@@ -78,12 +78,13 @@ function handleStatsResponse() {
 			var resp = JSON.parse(xhs.responseText);
 			// Data structure: event=stats; status=LogMsg; stats=statsStruct
 			var e = resp.event;
-			scanMsg(resp.data.status);
 			if(resp.data.stats === undefined) {
-				statMsg('No stats response, will retry in 60 Seconds...');
-				statsTmr = setTimeout(getStats, 60000);
+				if(resp.data.retcode != 429)
+					scanMsg(resp.data.status + '. Will retry in 15 Seconds...');
+				statsTmr = setTimeout(getStats, 15000);
 				return;
 			}
+			statsIdx++;
 			var s = resp.data.stats;
 			var row;
 			// Update the favs table. Node keyed=maroon background, active=green, show #connections column
@@ -97,6 +98,7 @@ function handleStatsResponse() {
 				// Colors: Tx=maroon Busy=0-50% green LinkCnt:0-50 blue
 				// Cols #:Tx/Act/NotAct LCnt:linkCnt (Blue 0-50) Bsy%:busyPct (Green 0-50)
 				var c0 = cells[0];
+				scanMsg(c0.innerHTML + ': ' + resp.data.status);
 				if(s.keyed == 1)
 					c0.className = 'tColor';
 				else if(s.active == 1)
@@ -118,12 +120,26 @@ function handleStatsResponse() {
 				lcnt.innerHTML = s.linkCnt;
 				lcnt.style.backgroundColor = (s.linkCnt > 3) ? 'hsl(240,40%,'+blue+'%)' : 'transparent';
 			}
-			statsTmr = setTimeout(getStats, 2500);
+			statsTmr = setTimeout(getStats, calcReqIntvl());
 		} else {
-			statMsg('Error response from server: ' + xhs.status);
+			statMsg('/stats/ HTTP error ' + xhs.status + '. Retrying in 60 seconds...');
 			statsTmr = setTimeout(getStats, 60000);
 		}
 	}
+}
+function calcReqIntvl() {
+	// Do initial stats requests quickly to populate Favs table then reduce request rate so if multiple
+	// clients are using the node the ASL stats request limit (30/min) will be less likely to be exceeded
+	var t = 1000;
+	if(statsReqCnt > 9000)
+		t = 10000; // 6/min after 12hrs
+	else if(statsReqCnt > 4000)
+		t = 6000; // 10/min after 4hrs
+	else if(statsReqCnt > 1200)
+		t = 4000; // 15/min after 1hr
+	else if(statsReqCnt > favsCnt || statsReqCnt > 25)
+		t = 3000; // 20/min after initial scan
+	return t;
 }
 
 function handleEventSourceError(event) {
