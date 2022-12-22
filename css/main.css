@@ -149,10 +149,10 @@ width:6em;
 }
 #statmsg {
 display:inline-block;
-margin:3px;
+margin:2px;
 min-width:460px;
 max-width:750px;
-height:4.4em;
+height:4.5em;
 font-size:0.9em;
 line-height:1.2;
 overflow-y:scroll;
@@ -164,6 +164,7 @@ color:#999;
 margin:0.25em;
 font-size:0.9em;
 line-height:1.2;
+font-family:"Lucida Console",Courier,monospace;
 }
 
 table {

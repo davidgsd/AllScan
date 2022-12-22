@@ -40,6 +40,11 @@ foreach($nodes as $n) {
 	}
 	$resp = json_decode($data);
 	$s = parseStats($resp, $time);
+	if(!isset($s->node)) {
+		$s->node = $n;
+		$s->active = $s->keyed = 0;
+		$s->busyPct = $s->linkCnt = $s->txtime = '-';
+	}
 	$time = $s->timeAgo;
 	// Data structure: event=stats; status=LogMsg; stats=statsStruct
 	$msg = "$n: Tx=$s->keyed Act=$s->active $s->timeAgo LCnt=$s->linkCnt Rx%=$s->busyPct TxTm=$s->txtime WT=$s->wt";

@@ -49,7 +49,6 @@ function getStats() {
 			}
 			favsCnt = rnodes.length;
 			if(favsCnt == 0) {
-				//statsTmr = setTimeout(getStats, 15000);
 				return;
 			}
 			if(statsIdx >= favsCnt)
@@ -74,7 +73,7 @@ function xhttpStatsInit(url, parms) {
 function handleStatsResponse() {
 	if(xhs.readyState === 4) {
 		if(xhs.status === 200) {
-			//statMsg('statsResponse: ' + xhs.responseText);
+			// statMsg('statsResponse: ' + xhs.responseText);
 			var resp = JSON.parse(xhs.responseText);
 			// Data structure: event=stats; status=LogMsg; stats=statsStruct
 			var e = resp.event;
@@ -163,7 +162,7 @@ function handleOfflineEvent() {
 	}
 }
 function reloadPage() {
-	// Verify location valid before reloading
+	// Verify location before reload
 	if(rldRetries == 0)
 		statMsg('Verifying node is accessible...');
 	var request = new XMLHttpRequest();

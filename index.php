@@ -31,6 +31,7 @@ if(!empty($nodes) && !empty($hosts)) {
 	$parms = getRequestParms();
 	if(isset($_POST['Submit']) && $astdb !== false) {
 		processForm($parms, $msg);
+		unset($_POST, $parms);
 	}
 }
 
@@ -47,7 +48,7 @@ if($globalInc) {
 // Output header
 echo 	"<body$onLoad>" . NL
 	.	'<header>' . NL
-	.	$html->a('/allscan/', null, 'AllScan', 'logo') . " <small>$AllScanVersion</small>" . ENSP
+	.	$html->a(getScriptName(), null, 'AllScan', 'logo') . " <small>$AllScanVersion</small>" . ENSP
 	.	$html->a('#', null, $title, 'title') . ENSP
 	.	'<span id="hb"><img src="AllScan.png" width=16 height=16 alt="*"></span>' . NL
 	.	'</header>' . NL . BR;
@@ -192,6 +193,10 @@ if(empty($favList)) {
 		$nodeNumAttr = ['1' => 'class="nodeNum" onClick="setNodeBox(' . $f[1] . ')"'];
 		// Link name to ASL stats page for node
 		$f[2] = $html->a("http://stats.allstarlink.org/stats/" . $f[1], null, $f[2], null, 'stats');
+		if($f[3] == '')
+			$f[3] = '-';
+		if($f[4] == '')
+			$f[4] = '-';
 		$out .= $html->tableRow($f, null, null, false, $nodeNumAttr);
 	}
 	$out .= $html->tableClose();

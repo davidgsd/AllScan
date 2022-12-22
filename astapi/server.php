@@ -98,7 +98,7 @@ while(1) {
 			// Array key of remote_nodes is not node number to prevent javascript (for in) sorting
 			$current[$node]['remote_nodes'][$i]['node'] = $arr['node'];
 			$current[$node]['remote_nodes'][$i]['info'] = $arr['info'];
-			$current[$node]['remote_nodes'][$i]['link'] = $arr['link'];
+			$current[$node]['remote_nodes'][$i]['link'] = ucwords(strtolower($arr['link']));
 			$current[$node]['remote_nodes'][$i]['ip'] = $arr['ip'];
 			$current[$node]['remote_nodes'][$i]['direction'] = $arr['direction'];
 			$current[$node]['remote_nodes'][$i]['keyed'] = $arr['keyed'];
