@@ -14,7 +14,7 @@ $autodisc = (trim(strip_tags($_POST['autodisc'])) === 'true');
 if(!preg_match("/^\d+$/", $localnode) || !$localnode)
     die("Invalid local node number\n");
 
-if(!preg_match("/^\d+$/", $remotenode) || !$remotenode)
+if(!preg_match("/^\d+$/", $remotenode) || (!$remotenode && $button !== 'disconnect'))
     die("Invalid remote node number\n");
 
 // Load allmon.ini
@@ -36,7 +36,7 @@ if($ami->login($fp, $cfg[$localnode]['user'], $cfg[$localnode]['passwd']) === fa
 switch($button) {
 	case 'connect':
 		if($autodisc) {
-			echo "Disconnect all nodes...";
+			echo "Disconnect all nodes from $localnode...";
 			$resp = $ami->command($fp, "rpt cmd $localnode ilink 6 0");
 			echo $resp . BR;
 			usleep(500000);
@@ -68,8 +68,13 @@ switch($button) {
 		}
 		break;
 	case 'disconnect':
-		$ilink = 11;
-		echo "Disconnect $remotenode from $localnode...";
+		if($remotenode === '0') {
+			$ilink = 6;
+			echo "Disconnect all nodes from $localnode...";
+		} else {
+			$ilink = 11;
+			echo "Disconnect $remotenode from $localnode...";
+		}
 		break;
 }
 

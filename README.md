@@ -1,19 +1,13 @@
 # AllScan
 AllStar Favorites Management &amp; Scanning Web App
 
-See [screenshot.png](https://github.com/davidgsd/AllScan/blob/main/screenshot.png) for an example of the AllScan GUI. AllScan supports the following features:
+See [screenshot.png](https://github.com/davidgsd/AllScan/blob/main/screenshot.png) for an example of the AllScan GUI. AllScan provides advanced Favorites Management features and ASL Stats integration, along with the connection monitoring and control functions of AllMon/Supermon. 
+* Favorites can be added/deleted simply by entering the node# and clicking a button. The favorites.ini file is then updated with the Node#, Name, Description and Location data from the ASL DB.
+* Shows all Favorites in a table and allows favorites to be connected with a single click (optionally automatically disconnecting any currently connected nodes first).
+* Allows Favorites to be sorted by Node#, Name, Description, Location, etc.
+* Favorites status 'scanning' using ASL stats info including Keyed status, Connected Node count, TxKeyed time, UpTime, and derived metrics. AllScan shows what favorites are active and have recently been active and updates this up to 30 times per minute.
 
-1. Provides the same Connection Status monitoring features and connect/diconnect functions as Supermon & Allmon
-
-2. Allows Favorites to be added/deleted simply by entering the node# and clicking a button. The favorites.ini file is then updated with the Node#, Name, Description and Location data from the ASL DB.
-
-3. Shows all Favorites in a table and allows favorites to be connected with a single click (optionally automatically disconnecting any currently connected nodes first).
-
-4. Allows Favorites to be sorted by Node#, Name, Description, Location, etc.
-
-5. Scanning Favorites status using ASL stats info including Keyed status, Connected Node count, TxKeyed time, UpTime, and derived metrics. AllScan shows what favorites are active and have recently been active and updates this up to 30 times per minute.
-
-The above give ASL nodes similar memory management and scan capabilities that analog radios have had for decades. AllScan follows the latest web development standards and best-practices, with PHP, JavaScript, HTML, and CSS cleanly partitioned. No 3rd party frameworks or libraries are used. AllScan is mobile-friendly and optimized for ease of use on both small and large screens. AllScan works well in both PC browsers and mobile browsers, using the same UI for both.
+The above gives ASL nodes similar memory management and scan capabilities that analog radios have had for decades. AllScan follows the latest web development standards and best-practices, with PHP, JavaScript, HTML, and CSS cleanly partitioned. No 3rd party frameworks or libraries are used. AllScan is mobile-friendly and optimized for ease of use on both small and large screens. AllScan works well in both PC browsers and mobile browsers, using the same UI for both.
 
 AllScan supports multiple locations of the favorites.ini file, giving priority to the allscan folder, or secondarily using the ../supermon folder. Multiple favorites files can be used and easily switched between. If no favorites.ini file is found AllScan will ask if you'd like to create the file, and if so will copy docs/favorites.ini.sample file to ./favorites.ini, which has a small list of nodes to get you started. (AllMon's controlpanel.ini file may also be supported at some point.)
 
@@ -103,19 +97,18 @@ If you have any questions email chc_media at yahoo dot com. Also see [AllScan.in
 # Road Map
 1. Additional refinements to existing features
 2. Implement user authentication system supporting multiple users with Read-only, Limited, or Full permissions and full control over login durations. Estimated completion: Jan. 5
-3. Add support for EchoLink nodes. Estimated completion: Jan. 12
-4. Other features that are highly requested or that seem like a good fit
-5. Additional stats/scan features
+3. Other features that are highly requested or that seem like a good fit
+4. Additional stats/scan features
 
 # Release Notes
 **v0.36 2022-12-22**<br>
 Properly handle case of invalid node number in the favorites file. Download ASTDB file if not found in allscan, allmon or supermon locations. Reload page on event-stream error if location.href is available. Update install/update notes.
 
 **v0.35 2022-12-21**<br>
-Optimize stats request timing to more quickly populate the favorites table after page load, then go to a reduced request rate over time, to reduce the chance of the ASL stats request limit (30 per minute) being exceeded if there are multiple AllScan web clients on a node. Link Favorites table Names text to the ASL stats page for the node. Update JS reload function to prevent POST data being resubmitted after page reload. Minor optimizations.
+Optimize stats request timing to more quickly populate the favorites table after page load, then go to a reduced request rate over time, to reduce the chance of the ASL stats request limit (30 per minute) being exceeded if there are multiple AllScan web clients on a node. Link Favorites table Names text to the ASL stats page. Update JS reload function to prevent POST data being resubmitted after page reload. Minor optimizations.
 
 **v0.33 2022-12-20**<br>
-Add default global.inc file docs/global.inc.sample and give user option to configure and save this to ./global.inc if file was not found in . or ../supermon/. Documentation updates. GUI optimizations. Add default favorites file docs/favorites.ini.sample and give user option to copy this to ./favorites.ini if file was not found in . or ../supermon/. Use PHP cURL lib for ASL Stats data download if present. Move ASL stats output messages to p tag above Status Messages box.
+Add default global.inc file docs/global.inc.sample and give user option to configure and save this to ./global.inc if file was not found in . or ../supermon/. Documentation updates. GUI optimizations. Add default favorites file docs/favorites.ini.sample and give user option to copy this to ./favorites.ini if file was not found in . or ../supermon/. Use PHP cURL lib if present for ASL Stats requests.
 
 **v0.3 2022-12-19**<br>
 Implement ASL Stats functions, color coding of Favorites Table and new 'Rx%' and 'LCnt' columns. ASL APIs are limited to 30 requests/minute per IP Address. AllScan defaults to one stats request per 2.5 seconds but will reduce that frequency if over limit http code eg. 429 or another error is encountered during an API request. Improve handling of page reload logic after browser JS online event when node is not accessible. Enable automatic reading of astdb.txt file from allscan's directory or from ../supermon/ or /var/log/asterisk/. Enable automatic reading of allmon.ini file from allscan's directory or from /etc/asterisk/, ../supermon/, or ../allmon/allmon.ini.php. Show detailed messages on any issues found when trying to read the file.
@@ -139,4 +132,4 @@ Enable sortable columns on Favorites Table. GUI Updates.
 Initial Commit.
 
 # Thanks
-Thanks to all ASL Developers. Thanks to KK6QMS for being the first Beta tester, and N6ATC for help in verifying AllScan works on HamVOIP.
+Thanks to all ASL Developers. Thanks to KK6QMS for help in Beta testing, and N6ATC for help in verifying AllScan works on HamVOIP.
