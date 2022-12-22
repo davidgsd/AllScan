@@ -1,5 +1,5 @@
 <?php
-$AllScanVersion = "v0.35";
+$AllScanVersion = "v0.36";
 require_once('Html.php');
 require_once('logUtils.php');
 
@@ -67,8 +67,8 @@ function readAllmonCfg() {
 
 // Read AstDB file, looking in all commonly used locations
 function readAstDb(&$msg) {
-	// Check for file in our directory and if not found look in the asterisk, supermon and allmon2 dirs
-	// If it exists in more than one place use the newest
+	// Check for file in our directory and in the allmon/supermon locations
+	// If exists in more than one place use the newest. Download it if not found
 	$file = ['astdb.txt', '../supermon/astdb.txt', '/var/log/asterisk/astdb.txt'];
 	$mtime = [0, 0, 0];
 	foreach($file as $i => $f) {
@@ -81,10 +81,13 @@ function readAstDb(&$msg) {
 	if(!reset($mtime)) {
 		$msg[] = "No astdb.txt file found. Check that you have AllMon2 or Supermon properly installed, "
 			.	"and a cron job or other mechanism set up to periodically update the file.";
-		return false;
+		if(!downloadAstDb($msg))
+			return false;
+		$file = 'astdb.txt';
+	} else {
+		$keys = array_keys($mtime);
+		$file = $file[$keys[0]];
 	}
-	$keys = array_keys($mtime);
-	$file = $file[$keys[0]];
 	$msg[] = "Reading $file...";
 	$rows = readFileLines($file, $msg);
 	if(!$rows) {
@@ -133,6 +136,22 @@ function readAstDb2() {
 	}
 	unset($rows);
 	return $astdb;
+}
+
+function downloadAstDb(&$msg) {
+	$url = 'http://allmondb.allstarlink.org/';
+	$data = @file_get_contents($url);
+	if($data !== false) {
+		$file = 'astdb.txt';
+		if(file_put_contents($file, $data)) {
+			$msg[] = "Retrieved and saved $file OK";
+			return true;
+		} 
+		$msg[] = error("Error saving ./$file. Check directory permissions.");
+	} else {
+		$msg[] = error("Error retrieving $url.");
+	}
+	return false;
 }
 
 function escapeXmlKey($key) {

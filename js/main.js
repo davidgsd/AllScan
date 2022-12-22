@@ -31,7 +31,7 @@ function initEventStream(url) {
 	// Call initAslApi() who will read in nodes in the favorites list and do various API requests to get their 
 	// current status eg. last heard, num connected nodes, last keyed, etc.
 	ftbl = document.getElementById('favs');
-	setTimeout(getStats, 250);
+	statsTmr = setTimeout(getStats, 250);
 }
 
 function getStats() {
@@ -61,7 +61,6 @@ function getStats() {
 			statsReqCnt++;
 			break;
 	}
-	// statsTmr = setTimeout(getStats, 60000);
 }
 function xhttpStatsInit(url, parms) {
 	xhs = new XMLHttpRequest();
@@ -78,22 +77,29 @@ function handleStatsResponse() {
 			// Data structure: event=stats; status=LogMsg; stats=statsStruct
 			var e = resp.event;
 			if(resp.data.stats === undefined) {
-				if(resp.data.retcode != 429)
+				if(resp.data.retcode == 404) {
+					scanMsg('ASL Stats 404 response for node '+resp.data.node+'. Check node number.');
+					statsIdx++;
+					statsTmr = setTimeout(getStats, calcReqIntvl());
+					return;
+				}
+				if(resp.data.retcode != 429) {
 					scanMsg(resp.data.status + '. Will retry in 15 Seconds...');
+					statsIdx++;
+				}
 				statsTmr = setTimeout(getStats, 15000);
 				return;
 			}
 			statsIdx++;
 			var s = resp.data.stats;
 			var row;
-			// Update the favs table. Node keyed=maroon background, active=green, show #connections column
+			// Update favs table
 			for(var r=0, n=ftbl.rows.length-1; r < n; r++) {
 				//for(var c=0, m=ftbl.rows[r].cells.length; c < m; c++) {
 				var cells = ftbl.rows[r+1].cells;
 				var node = cells[1].innerHTML;
 				if(node != s.node)
 					continue;
-				// Tx=$s->keyed Act=$s->active $s->timeAgo LCnt=$s->linkCnt Bsy%=$s->busyPct TxTm=$s->txtime WT=$s->wt
 				// Colors: Tx=maroon Busy=0-50% green LinkCnt:0-50 blue
 				// Cols #:Tx/Act/NotAct LCnt:linkCnt (Blue 0-50) Bsy%:busyPct (Green 0-50)
 				var c0 = cells[0];
@@ -147,7 +153,8 @@ function handleEventSourceError(event) {
 	var msg = (event === '{"isTrusted":true}') ? 'Check internet/LAN connections and power to node' : event;
 	msg = 'Event Source error: ' + msg;
 	statMsg(msg);
-	//console.log(msg);
+	statMsg('Reloading in 15 Seconds...');
+	rldTmr = setTimeout(reloadPage, 15000);
 }
 
 function handleOnlineEvent() {
@@ -162,11 +169,11 @@ function handleOfflineEvent() {
 	}
 }
 function reloadPage() {
-	// Verify location before reload
+	// Verify node is accessible before reloading
 	if(rldRetries == 0)
 		statMsg('Verifying node is accessible...');
 	var request = new XMLHttpRequest();
-	request.open('GET', window.location, true);
+	request.open('GET', window.location.href, true);
 	request.onreadystatechange = function() {
 		if(request.status == 200) {
 			request.abort();

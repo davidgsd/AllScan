@@ -39,16 +39,18 @@ Ideally you should be using a recent (2021 or later) 2.0 Beta version of the ASL
 
 You will need SSH access to your node and should have basic familiarity with Linux. Log into your node with SSH and run the following commands*:
 
+	sudo su # if you are not already logged in as root user
 	cd /var/www/html
-	mkdir allscan; sudo chmod 775 allscan
-	sudo chgrp www-data allscan # If www-data not defined replace with web server's group name
+
+	mkdir allscan; chmod 775 allscan; chgrp www-data allscan
+
 	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
 	unzip main.zip; rm main.zip
 	cp -rf AllScan-main/* allscan/
-	rmdir AllScan-main
+	rm -rf AllScan-main
 
 	# Below needed only if you do not have php-curl installed and get ASL stats errors
-	sudo apt-get install php-curl; sudo service apache2 restart
+	apt-get install php-curl; service apache2 restart
 
 Now open a browser and go to your node's IP address followed by /allscan/ eg. `http://192.168.1.23/allscan/`, and bookmark that URL. You should see a Connection Status table showing your Node number(s), Call Sign and Location, a control form where you can enter node numbers and use the Connect, Disconnect, etc. buttons, and a Favorites table with at least a few favorites listed.
 
@@ -57,11 +59,11 @@ Now open a browser and go to your node's IP address followed by /allscan/ eg. `h
 # Update
 The update process is similar to the install process with exception that you don't need to create the allscan directory and should make a backup copy of it. Log into your node with SSH and run the following commands*:
 
+	sudo su # if you are not already logged in as root user
 	cd /var/www/html
 
 	# If the allscan dir does not have 775 permissions or the web server group name run the following
-	sudo chmod 775 allscan
-	sudo chgrp www-data allscan # If www-data not defined replace with web server's group name
+	chmod 775 allscan; chgrp www-data allscan
 
 	# Make a backup copy of your existing allscan folder (optional but recommended)
 	cp -a allscan allscan-old
@@ -69,10 +71,10 @@ The update process is similar to the install process with exception that you don
 	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
 	unzip main.zip; rm main.zip
 	cp -rf AllScan-main/* allscan/
-	rmdir AllScan-main
+	rm -rf AllScan-main
 
 	# Below needed only if you do not have php-curl installed and get ASL stats errors
-	sudo apt-get install php-curl; sudo service apache2 restart
+	apt-get install php-curl; service apache2 restart
 
 Now open a browser and go to your node's IP address followed by /allscan/, and **be sure to force a full reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.
 
@@ -106,26 +108,17 @@ If you have any questions email chc_media at yahoo dot com. Also see [AllScan.in
 5. Additional stats/scan features
 
 # Release Notes
-**v0.35 2022-12-21**<br>
-Minor optimizations.
+**v0.36 2022-12-22**<br>
+Properly handle case of invalid node number in the favorites file. Download ASTDB file if not found in allscan, allmon or supermon locations. Reload page on event-stream error if location.href is available. Update install/update notes.
 
-**v0.34 2022-12-21**<br>
-Optimize stats request timing to more quickly populate the favorites table after page load, then go to a reduced request rate over time, to reduce the chance of the ASL stats request limit (30 per minute) being exceeded if there are multiple AllScan web clients on a node. Link Favorites table Names text to the ASL stats page for the node. Update JS reload function to prevent POST data being resubmitted after page reload.
+**v0.35 2022-12-21**<br>
+Optimize stats request timing to more quickly populate the favorites table after page load, then go to a reduced request rate over time, to reduce the chance of the ASL stats request limit (30 per minute) being exceeded if there are multiple AllScan web clients on a node. Link Favorites table Names text to the ASL stats page for the node. Update JS reload function to prevent POST data being resubmitted after page reload. Minor optimizations.
 
 **v0.33 2022-12-20**<br>
-Add default global.inc file docs/global.inc.sample and give user option to configure and save this to ./global.inc if file was not found in . or ../supermon/. Documentation updates.
-
-**v0.32 2022-12-20**<br>
-GUI optimizations. Add default favorites file docs/favorites.ini.sample and give user option to copy this to ./favorites.ini if file was not found in . or ../supermon/.
-
-**v0.31 2022-12-20**<br>
-Use PHP cURL lib for ASL Stats data download if present. Move ASL stats output messages to p tag above Status Messages box.
+Add default global.inc file docs/global.inc.sample and give user option to configure and save this to ./global.inc if file was not found in . or ../supermon/. Documentation updates. GUI optimizations. Add default favorites file docs/favorites.ini.sample and give user option to copy this to ./favorites.ini if file was not found in . or ../supermon/. Use PHP cURL lib for ASL Stats data download if present. Move ASL stats output messages to p tag above Status Messages box.
 
 **v0.3 2022-12-19**<br>
-Implement ASL Stats functions, color coding of Favorites Table and new 'Rx%' and 'LCnt' columns. ASL APIs are limited to 30 requests/minute per IP Address. AllScan defaults to one stats request per 2.5 seconds but will reduce that frequency if over limit http code eg. 429 or another error is encountered during an API request. Improve handling of page reload logic after browser JS online event when node is not accessible.
-
-**v0.25 2022-12-19**<br>
-Enable automatic reading of astdb.txt file from allscan's directory or from ../supermon/ or /var/log/asterisk/. Enable automatic reading of allmon.ini file from allscan's directory or from /etc/asterisk/, ../supermon/, or ../allmon/allmon.ini.php. Provide detailed messages about any issues found when trying to read the file.
+Implement ASL Stats functions, color coding of Favorites Table and new 'Rx%' and 'LCnt' columns. ASL APIs are limited to 30 requests/minute per IP Address. AllScan defaults to one stats request per 2.5 seconds but will reduce that frequency if over limit http code eg. 429 or another error is encountered during an API request. Improve handling of page reload logic after browser JS online event when node is not accessible. Enable automatic reading of astdb.txt file from allscan's directory or from ../supermon/ or /var/log/asterisk/. Enable automatic reading of allmon.ini file from allscan's directory or from /etc/asterisk/, ../supermon/, or ../allmon/allmon.ini.php. Show detailed messages on any issues found when trying to read the file.
 
 **v0.23 2022-12-18**<br>
 When JS online event is received, reload page after 2 Sec delay, to automatically restart server event-stream connection after PC/browser was asleep or offline. Add print of astdb.txt file Last Update time.

@@ -148,12 +148,12 @@ if(!$favsFile) {
 $favList = [];
 foreach($favs as $n => $f) {
 	list($x, $call, $desc, $loc) = array_key_exists($f->node, $astdb) ?
-			$astdb[$f->node] : [$n, '-', 'Not in ASL DB', '-'];
+			$astdb[$f->node] : [$n, '-', '[Not in ASL DB]', '[Check Node Number]'];
 	$name = str_replace([$f->node, $call, $desc, $loc, ' ,'], ' ', $f->label);
 	$name = trim(str_replace('  ', ' ', $name), " .,;\n\r\t\v\x00");
 	if(!$name)
 		$name = $call;
-	elseif(strpos($name, $call) === false)
+	elseif(strpos($name, $call) === false && $call !== '-')
 		$name = $call . ' ' . $name;
 	$favList[] = [$n, $f->node, $name, $desc, $loc, NBSP, NBSP];
 }
@@ -214,7 +214,7 @@ echo cpuTemp() . ENSP . '|' . ENSP
 
 $links = [
 	'AllScan.info' => 'https://allscan.info/',
-	'AllScan Updates' => 'https://github.com/davidgsd/AllScan#allscan',
+	'Updates' => 'https://github.com/davidgsd/AllScan#allscan',
 	'AllStarLink.org' => 'https://www.allstarlink.org/',
 	'Keyed Nodes' => 'http://stats.allstarlink.org/stats/keyed',
 	'ASL Forum' => 'https://community.allstarlink.org/',

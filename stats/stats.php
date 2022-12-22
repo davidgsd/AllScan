@@ -35,7 +35,7 @@ foreach($nodes as $n) {
 	$url = "http://stats.allstarlink.org/api/stats/$n";
 	$data = doWebRequest($url, null, $error, $retcode);
 	if(!$data) {
-		sendData(['status' => "ASL stats $error", 'retcode' => $retcode], 'stats');
+		sendData(['status' => "ASL stats $error", 'node' => $n, 'retcode' => $retcode], 'stats');
 		break;
 	}
 	$resp = json_decode($data);
