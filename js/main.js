@@ -171,7 +171,8 @@ function reloadPage() {
 	request.onreadystatechange = function() {
 		if(request.status == 200) {
 			request.abort();
-			window.location.reload();
+			// .assign & href prevents POST data resubmit
+			window.location.assign(window.location.href);
 		} else if(rldRetries < 8) { // Try again after a delay
 			rldRetries++;
 			var s = request.status > 0 ? ' (stat=' + request.status + ')' : '';
