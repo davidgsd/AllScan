@@ -132,7 +132,7 @@ if(!$favsFile) {
 			if(!$c) {
 				unset($favsCfg['cmd'][$i], $favsCfg['label'][$i]);
 			} else {
-				if(preg_match('/[0-9]{4,6}/', $c, $m) == 1)
+				if(preg_match('/[0-9]{4,7}/', $c, $m) == 1)
 					$favs[$i] = (object)['node'=>$m[0], 'label'=>$favsCfg['label'][$i], 'cmd'=>$c];
 				else
 					$favcmds[$i] = (object)['label'=>$favsCfg['label'][$i], 'cmd'=>$c];

@@ -13,7 +13,7 @@ AllScan supports multiple locations of the favorites.ini file, giving priority t
 
 Prior to installing AllScan it is recommended that you have a working install of SuperMon or AllMon2. AllScan can automatically read their config files and thereby need no additional configuration. AllScan is very easy-to-use and can be downloaded and installed in minutes. Currently AllScan supports favorites.ini entries that refer to connecting to nodes eg. 'cmd[] = "rpt cmd %node% ilink 3 [node#]"' but may also support other types of commands in the future. AllScan saves a backup copy to favorites.ini.bak in case of any issue.
 
-As AllScan receives stats data from the ASL stats server it updates the Favorites Table rows with color coded details showing the following:
+As AllScan receives data from the ASL stats server it updates the Favorites Table rows with color coded details showing the following:
 
 Color codes for '#' column:
 * Dark Green: Node Active (registered and reporting to AllStarLink Network)
@@ -101,6 +101,9 @@ If you have any questions email chc_media at yahoo dot com. Also see [AllScan.in
 4. Additional stats/scan features
 
 # Release Notes
+**v0.37 2022-12-23**<br>
+Support 7-digit (EchoLink) node numbers when reading in favorites.ini.
+
 **v0.36 2022-12-22**<br>
 Properly handle case of invalid node number in the favorites file. Download ASTDB file if not found in allscan, allmon or supermon locations. Reload page on event-stream error if location.href is available. Update install/update notes.
 
@@ -111,16 +114,16 @@ Optimize stats request timing to more quickly populate the favorites table after
 Add default global.inc file docs/global.inc.sample and give user option to configure and save this to ./global.inc if file was not found in . or ../supermon/. Documentation updates. GUI optimizations. Add default favorites file docs/favorites.ini.sample and give user option to copy this to ./favorites.ini if file was not found in . or ../supermon/. Use PHP cURL lib if present for ASL Stats requests.
 
 **v0.3 2022-12-19**<br>
-Implement ASL Stats functions, color coding of Favorites Table and new 'Rx%' and 'LCnt' columns. ASL APIs are limited to 30 requests/minute per IP Address. AllScan defaults to one stats request per 2.5 seconds but will reduce that frequency if over limit http code eg. 429 or another error is encountered during an API request. Improve handling of page reload logic after browser JS online event when node is not accessible. Enable automatic reading of astdb.txt file from allscan's directory or from ../supermon/ or /var/log/asterisk/. Enable automatic reading of allmon.ini file from allscan's directory or from /etc/asterisk/, ../supermon/, or ../allmon/allmon.ini.php. Show detailed messages on any issues found when trying to read the file.
+Implement ASL Stats functions, color coding of Favorites Table and new 'Rx%' and 'LCnt' columns. Improve handling of page reload logic after browser JS online event when node is not accessible. Enable automatic reading of astdb.txt file from allscan's directory or from ../supermon/ or /var/log/asterisk/. Enable automatic reading of allmon.ini file from allscan's directory or from /etc/asterisk/, ../supermon/, or ../allmon/allmon.ini.php. Show detailed messages on any issues found when trying to read various files.
 
 **v0.23 2022-12-18**<br>
-When JS online event is received, reload page after 2 Sec delay, to automatically restart server event-stream connection after PC/browser was asleep or offline. Add print of astdb.txt file Last Update time.
+When JS online event is received, reload page after 2 Sec delay, to automatically restart server event-stream connection after PC/browser was asleep or offline. Add print of astdb.txt file Last Update times.
 
 **v0.22 2022-12-17**<br>
 CSS optimizations. Add Asterisk Restart button. Improvements to log messages.
 
 **v0.21 2022-12-16**<br>
-Support Disconnect before Connect feature. This sends AMI an 'rpt cmd ilink 6' (Disconnect all links) command and waits 500mS before executing a Connect request, if 'Disconnect before Connect' checkbox is checked (default val = checked) and nodes are connected. To have the default for this checkbox be unchecked, set a url parm of autodisc=0. Disable PHP notices. Change Node text input field to a number field, and make the font size larger to make use of the field more mobile-friendly. Check for online/offline JS events.
+Support Disconnect before Connect feature. This sends AMI an 'rpt cmd ilink 6' (Disconnect all links) command and waits 500mS before executing a Connect request, if 'Disconnect before Connect' checkbox is checked (default val = checked) and nodes are connected. To have the default for this checkbox be unchecked, set a url parm of autodisc=0.
 
 **v0.2 2022-12-15**<br>
 Add Asterisk API. Code refactoring. Add Message Stats div, set up JS functions to output detailed status and error messages during all event processing. Add info links and CPU temp display.
