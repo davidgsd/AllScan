@@ -102,7 +102,7 @@ If you have any questions email chc_media at yahoo dot com. Also see [AllScan.in
 
 # Release Notes
 **v0.37 2022-12-23**<br>
-Support 7-digit (EchoLink) node numbers when reading in favorites.ini.
+Support 7-digit (EchoLink) node numbers when reading in favorites.ini. Fix issue where stats request scanning would stop once it reached an EchoLink node number in the Favorites Table.
 
 **v0.36 2022-12-22**<br>
 Properly handle case of invalid node number in the favorites file. Download ASTDB file if not found in allscan, allmon or supermon locations. Reload page on event-stream error if location.href is available. Update install/update notes.

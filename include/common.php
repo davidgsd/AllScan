@@ -1,5 +1,5 @@
 <?php
-$AllScanVersion = "v0.36";
+$AllScanVersion = "v0.37";
 require_once('Html.php');
 require_once('logUtils.php');
 

@@ -41,11 +41,11 @@ function getStats() {
 	switch(statsState) {
 		case 0: // init
 			// Parse favorites table for node numbers
-			for(var r=0, n=ftbl.rows.length-1; r < n; r++) {
+			for(var r=1, i=0; r < ftbl.rows.length; r++) {
 				//for(var c=0, m=ftbl.rows[r].cells.length; c < m; c++) {
-				node = ftbl.rows[r+1].cells[1].innerHTML
-				if(node >= 2000 && node < 2000000)
-					rnodes[r] = ftbl.rows[r+1].cells[1].innerHTML;
+				node = ftbl.rows[r].cells[1].innerHTML
+				if(node >= 2000 && node < 3000000) // Skip EchoLink / invalid node#s
+					rnodes[i++] = ftbl.rows[r].cells[1].innerHTML;
 			}
 			favsCnt = rnodes.length;
 			if(favsCnt == 0) {

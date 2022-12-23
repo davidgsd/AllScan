@@ -147,8 +147,14 @@ if(!$favsFile) {
 // Combine favs node, label data with astdb data into favList
 $favList = [];
 foreach($favs as $n => $f) {
-	list($x, $call, $desc, $loc) = array_key_exists($f->node, $astdb) ?
-			$astdb[$f->node] : [$n, '-', '[Not in ASL DB]', '[Check Node Number]'];
+	if(array_key_exists($f->node, $astdb)) {
+		list($x, $call, $desc, $loc) = $astdb[$f->node];
+	} else {
+		if($f->node < 3000000)
+			list($x, $call, $desc, $loc) = [$n, '-', '[Not in ASL DB]', '[Check Node Number]'];
+		else
+			list($x, $call, $desc, $loc) = [$n, '-', '[EchoLink Node]', '-'];
+	}
 	$name = str_replace([$f->node, $call, $desc, $loc, ' ,'], ' ', $f->label);
 	$name = trim(str_replace('  ', ' ', $name), " .,;\n\r\t\v\x00");
 	if(!$name)
