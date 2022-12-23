@@ -69,11 +69,11 @@ $remNode = (isset($parms['node']) && validDbID($parms['node']) && strlen($parms[
 <div class="twrap">
 <table class="grid" id="table_<?php echo $node ?>">
 <thead>
-<tr><th colspan="7"><i><?php echo $title2 ?></i></th></tr>
-<tr><th>&nbsp;&nbsp;Node&nbsp;&nbsp;</th><th>Node Info</th><th>Received</th><th>Link</th><th>Dir</th><th>Connected</th><th>Mode</th></tr>
+<tr><th colspan="6"><i><?php echo $title2 ?></i></th></tr>
+<tr><th>&nbsp;&nbsp;Node&nbsp;&nbsp;</th><th>Node Info</th><th>Received</th><th>Dir</th><th>Connected</th><th>Mode</th></tr>
 </thead>
 <tbody>
-<tr><td colspan="7">Waiting...</td></tr>
+<tr><td colspan="6">Waiting...</td></tr>
 </tbody>
 </table>
 </div><br>

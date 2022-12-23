@@ -218,10 +218,10 @@ function handleConnectionEvent(event) {
 	if(!data.node)
 		return;
 	tableID = 'table_' + data.node;
-	//$('#' + tableID + ' tbody:first').html('<tr><td colspan="7">' + data.status + '</td></tr>');
+	//$('#' + tableID + ' tbody:first').html('<tr><td colspan="6">' + data.status + '</td></tr>');
 	const cstbl = document.getElementById(tableID);
 	var tbody0 = cstbl.getElementsByTagName('tbody')[0];
-	tbody0.innerHTML = '<tr><td colspan="7">' + data.status + '</td></tr>';
+	tbody0.innerHTML = '<tr><td colspan="6">' + data.status + '</td></tr>';
 }
 function handleNodesEvent(event) {
 	var tabledata = JSON.parse(event.data);
@@ -240,14 +240,14 @@ function handleNodesEvent(event) {
 		if(cos_keyed == 0) {
 			if(tx_keyed == 0)
 				tablehtml += '<tr class="gColor"><td colspan="1">' + localNode +
-					'</td><td colspan="1">Idle</td><td colspan="5"></td></tr>';
+					'</td><td colspan="1">Idle</td><td colspan="4"></td></tr>';
 			else
 				tablehtml += '<tr class="tColor"><td colspan="1">' + localNode +
-					'</td><td colspan="1">PTT-Keyed</td><td colspan="5"></td></tr>';
+					'</td><td colspan="1">PTT-Keyed</td><td colspan="4"></td></tr>';
 		} else {
 			if(tx_keyed == 0)
 				tablehtml += '<tr class="lColor"><td colspan="1">' + localNode +
-					'</td><td colspan="1">COS-Detected</td><td colspan="5"></td></tr>';
+					'</td><td colspan="1">COS-Detected</td><td colspan="4"></td></tr>';
 			else
 				tablehtml += '<tr class="bColor"><td colspan="1">' + localNode +
 					'</td><td colspan="2">COS-Detected, PTT-Keyed</td><td colspan="4"></td></tr>';
@@ -255,7 +255,7 @@ function handleNodesEvent(event) {
 		for(row in tabledata[localNode].remote_nodes) {
 			var rowdata = tabledata[localNode].remote_nodes[row];
 			if(rowdata.info === 'NO CONNECTION') {
-				tablehtml += '<tr><td colspan="7">No Connections</td></tr>';
+				tablehtml += '<tr><td colspan="6">No Connections</td></tr>';
 			} else {
 				nodeNum = rowdata.node;
 				if(nodeNum != 1) {
@@ -278,7 +278,8 @@ function handleNodesEvent(event) {
 						tablehtml += '<td>' + rowdata.ip + '</td>';
 					}
 					tablehtml += '<td id="lkey' + row + '">' + rowdata.last_keyed + '</td>';
-					tablehtml += '<td>' + rowdata.link + '</td>';
+					// Link col is redundant. Connected col value makes clear if Link is Connecting/Established
+					// tablehtml += '<td>' + rowdata.link + '</td>';
 					tablehtml += '<td>' + rowdata.direction + '</td>';
 					tablehtml += '<td id="elap' + row +'">' +
 						rowdata.elapsed + '</td>';
@@ -298,7 +299,7 @@ function handleNodesEvent(event) {
 		}
 		// Display Count
 		if(total_nodes > 1) {
-			tablehtml += '<tr><td colspan="7">' + total_nodes + ' nodes connected</td></tr>';
+			tablehtml += '<tr><td colspan="6">' + total_nodes + ' nodes connected</td></tr>';
 		}
 		// $('#table_' + localNode + ' tbody:first').html(tablehtml);
 		const cstbl = document.getElementById('table_' + localNode);
