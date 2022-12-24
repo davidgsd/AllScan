@@ -331,7 +331,7 @@ function processForm($parms, &$msg) {
 		case CREATE_GLOBALINC_FILE:
 			$from = 'docs/global.inc.sample';
 			$file = file_get_contents($from);
-			if($file === false)  {
+			if($file === false) {
 				$msg[] = error("$from not found");
 				break;
 			}

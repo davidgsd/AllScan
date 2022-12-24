@@ -12,10 +12,10 @@ $perm = (trim(strip_tags($_POST['perm'])) === 'true');
 $autodisc = (trim(strip_tags($_POST['autodisc'])) === 'true');
 
 if(!preg_match("/^\d+$/", $localnode) || !$localnode)
-    die("Invalid local node number\n");
+	die("Invalid local node number\n");
 
 if(!preg_match("/^\d+$/", $remotenode) || (!$remotenode && $button !== 'disconnect'))
-    die("Invalid remote node number\n");
+	die("Invalid remote node number\n");
 
 // Load allmon.ini
 $cfg = readAllmonCfg();

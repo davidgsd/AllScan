@@ -49,7 +49,7 @@ function readAllmonIni(&$msg, &$hosts) {
 	return false;
 }
 
-// Below called by astapi files, which should only happen if controller file eg. index.php already called 
+// Below called by astapi files, which should only happen if controller file eg. index.php already called
 // readAllmonIni() above which confirms there is a valid file available
 function readAllmonCfg() {
 	// Check for file in our directory and if not found look in the asterisk, supermon and allmon2 dirs
@@ -108,7 +108,7 @@ function readAstDb(&$msg) {
 	return $astdb;
 }
 
-// Below called by astapi files, which should only happen if controller file eg. index.php already called 
+// Below called by astapi files, which should only happen if controller file eg. index.php already called
 // readAllmonIni() above which confirms there is a valid file available
 function readAstDb2() {
 	// Check for file in our directory and if not found look in the asterisk, supermon and allmon2 dirs
@@ -146,7 +146,7 @@ function downloadAstDb(&$msg) {
 		if(file_put_contents($file, $data)) {
 			$msg[] = "Retrieved and saved $file OK";
 			return true;
-		} 
+		}
 		$msg[] = error("Error saving ./$file. Check directory permissions.");
 	} else {
 		$msg[] = error("Error retrieving $url.");
@@ -168,22 +168,22 @@ function arrayToXml($array, &$xml, $nType) {
 	foreach($array as $key => $value) {
 		if(is_object($value))
 			$value = (array)$value;
-        if(is_array($value)) {
-            if(is_numeric($key)) {
+		if(is_array($value)) {
+			if(is_numeric($key)) {
 				$subnode = $xml->addChild($nType);
 				$subnode->addAttribute('id', $key);
 				arrayToXml($value, $subnode, $nType);
-            } else {
+			} else {
 				$key = escapeXmlKey($key);
-                $subnode = $xml->addChild($key);
-                arrayToXml($value, $subnode, $nType);
-            }
-        } else {
+				$subnode = $xml->addChild($key);
+				arrayToXml($value, $subnode, $nType);
+			}
+		} else {
 			$key = escapeXmlKey($key);
 			$value = escapeXmlValue($value);
 			$xml->addChild($key, $value);
-        }
-    }
+		}
+	}
 }
 
 function outputXmlFile($data, $filename=null) {
