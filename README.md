@@ -20,7 +20,7 @@ Color codes for '#' column:
 * Medium Green: Node Active, Web-Transceiver enabled (may be more likely to accept connections)
 * Red: Node is Keyed (transmitting audio to the AllStarLink Network)
 
-(Note: The ASL stats data is not always accurate. Some active keyed nodes may not show as Keyed. This is not an issue in AllScan. The remote node may not be reporting that information or may only report it at certain intervals. It may be possible in a future release to get the keyed status more reliably from another ASL stats API/page, or to connect to nodes in Local Monitor mode.)
+(Note: The ASL stats data is not always accurate. Some active keyed nodes may not show as Keyed. This is not an issue in AllScan. The remote node may not be reporting that information or may only report it at certain intervals. Future releases may be able to get the keyed status more reliably using other ASL stats APIs/pages or other mechanisms.)
 
 'Rx%' column: The remote node's reported TxTime divided by its Uptime, provides a general indication of how busy the node tends to be.
 
@@ -101,6 +101,9 @@ If you have any questions email chc_media at yahoo dot com. Also see [AllScan.in
 4. Additional stats/scan features
 
 # Release Notes
+**v0.38 2022-12-24**<br>
+For EchoLink nodes don't link node Name text to ASL stats page. Revise Green/Yellow CPU Temp range threshold from 120 to 130 °F.
+
 **v0.37 2022-12-23**<br>
 Support 7-digit (EchoLink) node numbers when reading in favorites.ini. Fix issue where stats request scanning would stop once it reached an EchoLink node number in the Favorites Table.
 
@@ -133,6 +136,10 @@ Enable sortable columns on Favorites Table. GUI Updates.
 
 **v0.1 2022-12-13**<br>
 Initial Commit.
+
+# FAQs
+Q: What is the blinking icon for?<br>
+A: AllScan's blinking 'lighting bolt' icon is a status indicator similar the 'spinny' in supermon or the blinking asterisk ('*') in allmon, which toggles on/off as each Connection Status event message is received from the node (ie. from AllScan's astapi/server.php file who reads status info from a socket connection to Asterisk on the node and then forwards that data every 500mS to AllScan's JavaScript in the browser.) If it stops blinking that means there is a communication issue between the browser and your node.
 
 # Thanks
 Thanks to all ASL Developers. Thanks to KK6QMS for help in Beta testing, and N6ATC for help in verifying AllScan works on HamVOIP.

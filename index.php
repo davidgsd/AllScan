@@ -132,7 +132,7 @@ if(!$favsFile) {
 			if(!$c) {
 				unset($favsCfg['cmd'][$i], $favsCfg['label'][$i]);
 			} else {
-				if(preg_match('/[0-9]{4,7}/', $c, $m) == 1)
+				if(preg_match('/[0-9]{4,8}/', $c, $m) == 1)
 					$favs[$i] = (object)['node'=>$m[0], 'label'=>$favsCfg['label'][$i], 'cmd'=>$c];
 				else
 					$favcmds[$i] = (object)['label'=>$favsCfg['label'][$i], 'cmd'=>$c];
@@ -198,7 +198,8 @@ if(empty($favList)) {
 	foreach($favList as $f) {
 		$nodeNumAttr = ['1' => 'class="nodeNum" onClick="setNodeBox(' . $f[1] . ')"'];
 		// Link name to ASL stats page for node
-		$f[2] = $html->a("http://stats.allstarlink.org/stats/" . $f[1], null, $f[2], null, 'stats');
+		if($f[1] >= 2000 && $f[1] < 3000000)
+			$f[2] = $html->a("http://stats.allstarlink.org/stats/" . $f[1], null, $f[2], null, 'stats');
 		if($f[3] == '')
 			$f[3] = '-';
 		if($f[4] == '')
