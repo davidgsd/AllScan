@@ -1,13 +1,12 @@
 # AllScan
 AllStar Favorites Management &amp; Scanning Web App
 
-See [screenshot.png](https://github.com/davidgsd/AllScan/blob/main/screenshot.png) for an example of the AllScan GUI. AllScan is a free and open-source web app that provides Favorites Management features, AllStarLink Statistics integration, and connection monitoring and control functions.
-* Favorites can be added/deleted simply by entering the node# and clicking a button. The favorites.ini file is then updated with the Node#, Name, Description and Location data from the ASL DB.
-* Shows your favorites in a table and allows favorites to be connected with a single click (optionally automatically disconnecting any currently connected nodes first).
-* Allows the Favorites Table to be sorted by Node#, Name, Description, Location, etc.
-* Continually scans the status of each favorite using ASL's stats API data including Keyed status, Connected Node count, TxKeyed time, UpTime, and derived metrics, and shows what favorites are active and have recently been active.
+See [screenshot.png](https://github.com/davidgsd/AllScan/blob/main/screenshot.png) for an example of the AllScan GUI. AllScan is a free and open-source web app that provides Favorites Management features, AllStarLink Stats integration, and connection monitoring and control functions.
+* Favorites can be added/deleted simply by entering the node# and clicking a button. The favorites.ini file is then updated with the Node#, Name, Description and Location data from the ASL database.
+* Shows your favorites in a table and allows favorites to be connected with a single click (optionally automatically disconnecting any currently connected nodes first). Allows the Favorites Table to be sorted by Node#, Name, Description, Location, etc.
+* Continually scans the status of each favorite using ASL's Stats API data including Keyed status, Connected Node count, TxKeyed time, UpTime, and derived metrics, showing which favorites are active and have recently been active.
 
-These features now finally enable AllStar nodes to have similar memory management and scan capabilities that analog radios have had for decades. AllScan is mobile-friendly and optimized for ease of use on both small and large screens. AllScan follows the latest web development standards and best-practices, with PHP, JavaScript, HTML, and CSS cleanly partitioned. AllScan is mobile-friendly and optimized for ease-of-use on both small and large screens.
+These features finally give AllStar nodes similar memory management and scan capabilities that analog radios have had for decades. AllScan is mobile-friendly and optimized for ease of use on both small and large screens. AllScan follows the latest web development standards, with PHP, JavaScript, HTML, and CSS cleanly partitioned, runs on both ASL and HamVOIP, and is very easy to install, configure, and update.
 
 AllScan supports multiple locations of the favorites.ini file, giving priority to the allscan folder or secondarily using the ../supermon folder. Multiple favorites files can be used and easily switched between. If no favorites.ini file is found AllScan will ask if you'd like to create the file and if so will copy the docs/favorites.ini.sample file to ./favorites.ini, which has a small list of nodes to get you started. (AllMon's controlpanel.ini file may also be supported at some point.)
 
@@ -28,7 +27,19 @@ Color codes for '#' column:
 
 ASL's stats APIs are limited to 30 requests/minute per IP Address. AllScan uses a dynamic request timing algorithm to prevent exceeding this limit, even if multiple web clients are using AllScan on a node.
 
-# Install
+# Automatic Install / Update
+The AllScan Install/Update script automatically checks all system configuration details, changes to the web server root folder, checks if AllScan is already Installed and if so what version, and if not installed or a newer version is available will prompt you to continue with the Install/Update. Just enter 'y' and seconds later the install/update will be complete. If you prefer to install manually see the Manual Install / Update sections below.
+
+To run the Automated Installer/Updater you will need SSH access to your node. Log into your node with SSH and run the following commands:
+
+	cd ~
+	wget 'https://raw.githubusercontent.com/davidgsd/AllScan/main/AllScanInstallUpdate.php'
+	chmod 755 AllScanInstallUpdate.php
+	sudo ./AllScanInstallUpdate.php
+
+The installer/Updater will provide detailed status messages on each step of the process.
+
+# Manual Install
 Ideally you should be using a recent (2021 or later) 2.0 Beta version of the ASL Distribution (available [here](http://downloads.allstarlink.org/index.php?b=ASL_Images_Beta)), and you should have AllMon2 or Supermon properly configured and working. Most testing has been done on ASL 2.0 but AllScan has been confirmed to be fully working on HamVOIP and pre-2.0 ASL releases. If you have Supermon already working, AllScan will need no additional configuration and will use the favorites.ini file in the supermon directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon. Confirm you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. Supermon is easy to set up and has some nice maintenance/debug features. For example it allows you to edit the text in the favorites.ini file in your browser, so for example you could add notes there of weekly Net times. AllScan will use the ../supermon/global.inc file automatically if global.inc is not present in the allscan folder. If you do not have Supermon installed or its global.inc file cannot be read AllScan will prompt you to enter your Call, Location and Node Title and save to global.inc.
 
 You will need SSH access to your node and should have basic familiarity with Linux. Log into your node with SSH and run the following commands*:
@@ -50,7 +61,7 @@ Now open a browser and go to your node's IP address followed by /allscan/ eg. `h
 
 *Note for HamVOIP nodes: The web server folder may be /srv/http/ instead of /var/www/html/, and the web server group name may be http instead of www-data.
 
-# Update
+# Manual Update
 The update process is similar to the install process with exception that you don't need to create the allscan directory and should make a backup copy of it. Log into your node with SSH and run the following commands*:
 
 	sudo su # if you are not already logged in as root user

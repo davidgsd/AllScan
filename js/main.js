@@ -239,17 +239,17 @@ function handleNodesEvent(event) {
 		}
 		if(cos_keyed == 0) {
 			if(tx_keyed == 0)
-				tablehtml += '<tr class="gColor"><td colspan="1">' + localNode +
-					'</td><td colspan="1">Idle</td><td colspan="4"></td></tr>';
+				tablehtml += '<tr class="gColor"><td>' + localNode +
+					'</td><td>Idle</td><td colspan="4"></td></tr>';
 			else
-				tablehtml += '<tr class="tColor"><td colspan="1">' + localNode +
-					'</td><td colspan="1">PTT-Keyed</td><td colspan="4"></td></tr>';
+				tablehtml += '<tr class="tColor"><td>' + localNode +
+					'</td><td>PTT-Keyed</td><td colspan="4"></td></tr>';
 		} else {
 			if(tx_keyed == 0)
-				tablehtml += '<tr class="lColor"><td colspan="1">' + localNode +
-					'</td><td colspan="1">COS-Detected</td><td colspan="4"></td></tr>';
+				tablehtml += '<tr class="lColor"><td>' + localNode +
+					'</td><td>COS-Detected</td><td colspan="4"></td></tr>';
 			else
-				tablehtml += '<tr class="bColor"><td colspan="1">' + localNode +
+				tablehtml += '<tr class="bColor"><td>' + localNode +
 					'</td><td colspan="2">COS-Detected, PTT-Keyed</td><td colspan="4"></td></tr>';
 		}
 		for(row in tabledata[localNode].remote_nodes) {
