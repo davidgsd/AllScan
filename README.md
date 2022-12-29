@@ -32,7 +32,7 @@ Ideally you should be using a recent (2021 or later) 2.0 Beta version of the ASL
 
 If you have Supermon already working, AllScan will need no additional configuration and will use the favorites.ini file in the supermon directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon. Confirm you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. Supermon is easy to set up and has some nice maintenance/debug features. For example it allows you to edit the text in the favorites.ini file in your browser, so for example you could add notes there of weekly Net times.
 
-AllScan will use the ../supermon/global.inc file automatically if global.inc is not present in the allscan folder. If you do not have Supermon installed or its global.inc file cannot be read AllScan will prompt you to enter your Call, Location and Node Title and save to global.inc. If you use Supermon2 instead of Supermon, or for whatever reason want to put your global.inc or favorites.ini files in some other folder, just make symbolic links to those locations. For example to use the supermon2 favorites.ini do the following: 1. cd into your web root folder and then into the allscan dir. 2. "ln -s ../supermon2/favorites.ini ."
+AllScan will use the ../supermon/global.inc file automatically if global.inc is not present in the allscan folder. If you do not have Supermon installed or its global.inc file cannot be read AllScan will prompt you to enter your Call, Location and Node Title and save to global.inc. If you use Supermon2 instead of Supermon, or for whatever reason want to put your global.inc or favorites.ini files in some other folder, just make symbolic links to those locations. For example to use the supermon2 favorites.ini do the following: 1. cd into your web root folder and then into the allscan dir. 2. `ln -s ../supermon2/favorites.ini .`
 
 # Automatic Install / Update
 The AllScan Install/Update script automatically checks all system configuration details, changes to the web server root folder, checks if AllScan is already Installed and if so what version, and if not installed or a newer version is available will prompt you to continue with the Install/Update. Just enter 'y' and seconds later the install/update will be complete. If you prefer to install manually see the Manual Install / Update sections below.
@@ -44,7 +44,7 @@ To run the Automated Installer/Updater you will need SSH access to your node. Lo
 	chmod 755 AllScanInstallUpdate.php
 	sudo ./AllScanInstallUpdate.php
 
-The Install/Update script will provide detailed status messages on each step of the process. Once the update/install is complete it is recommended to delete the script ("rm AllScanInstallUpdate.php"). Then the next time you want to do an update just run the above commands again.
+The Install/Update script will provide detailed status messages on each step of the process. Once the update/install is complete it is recommended to delete the script (`rm AllScanInstallUpdate.php`). Then the next time you want to do an update just run the above commands again.
 
 Now open a browser and go to your node's IP address followed by /allscan/, and if you just did an update be sure to force a full reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button, so your browser will load the updated JavaScript and CSS files.
 
@@ -119,6 +119,9 @@ If you have any questions email chc_media at yahoo dot com. Also see [AllScan.in
 4. Additional stats/scan features
 
 # Release Notes
+**v0.39 2022-12-28**<br>
+Minor optimizations. Add API to eventually support stats caching and additional stats features. Update CPU temp data once per minute.
+
 **v0.38 2022-12-24**<br>
 For EchoLink nodes don't link node Name text to ASL stats page. Revise Green/Yellow CPU Temp range threshold from 120 to 130 °F.
 

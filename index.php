@@ -216,16 +216,16 @@ $msg = implode(BR, $msg);
 echo "<div id=\"statmsg\">$msg</div>" . BR;
 
 // Show CPU Temp & Info/Update Links
-echo cpuTemp() . ENSP . '|' . ENSP
+echo '<span id="cputemp">' .  cpuTemp() . '</span>' . ENSP . '|' . ENSP
 	.	'<input type=button class="small" value="Restart Asterisk" onClick="astrestart();">';
 
 $links = [
 	'AllScan.info' => 'https://allscan.info/',
 	'Updates' => 'https://github.com/davidgsd/AllScan#allscan',
 	'AllStarLink.org' => 'https://www.allstarlink.org/',
-	'Keyed Nodes' => 'http://stats.allstarlink.org/stats/keyed',
-	'ASL Forum' => 'https://community.allstarlink.org/',
-	'QRZ ASL Forum' => 'https://forums.qrz.com/index.php?forums/echolink-irlp-tech-board.76/',
+	'Keyed&nbsp;Nodes' => 'http://stats.allstarlink.org/stats/keyed',
+	'ASL&nbsp;Forum' => 'https://community.allstarlink.org/',
+	'QRZ&nbsp;ASL&nbsp;Forum' => 'https://forums.qrz.com/index.php?forums/echolink-irlp-tech-board.76/',
 	'eHam.net' => 'https://www.eham.net/'
 ];
 $out = [];

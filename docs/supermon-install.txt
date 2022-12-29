@@ -16,11 +16,17 @@ hash
 supermonASL_fresh_install
 
 * Edit the allmon.ini and global.inc files to match your system settings, name, callsign, etc.
-  They are located in /var/www/html/supermon/
+  They are located in /var/www/html/supermon/ (or /srv/http/ on HamVOIP)
 
 * Setup the Supermon .htpasswd file in the /var/www/html/supermon/ directory.
-  (If necessary do a web search on how to set up apache .htaccess password authentication.
-  You will not be able to log into Supermon until you do this.)
+  You will not be able to log into Supermon until you do this. Run the following commands in
+  the supermon directory:
+  # Note: [username] = User name under your node stanza in allmon.ini (default is 'admin')
+  # For first user:
+  sudo htpasswd -c .htpasswd [username]
+  # Then enter the password that the user should enter into their browser to log in
+  # For any additional users:
+  sudo htpasswd .htpasswd [username]
 
 * Add the following line to your root user crontab:
 0 3 * * * (/var/www/html/supermon/astdb.php cron)

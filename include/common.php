@@ -1,7 +1,9 @@
 <?php
-$AllScanVersion = "v0.38";
+$AllScanVersion = "v0.39";
 require_once('Html.php');
 require_once('logUtils.php');
+// API functions
+define('GET_CPU_TEMP', 'getCpuTemp');
 
 function msg($txt, $class=null) {
 	global $html;

@@ -1,6 +1,7 @@
-var apiDir='/allscan/astapi/';
+var aslApiDir='/allscan/astapi/';
 var statsDir='/allscan/stats/';
-var source, xh, hb;
+var apiDir='/allscan/api/';
+var source, xh, hbcnt=0, xha, cputemp;
 var rldRetries=0, rldTmr;
 var statsState=0, statsIdx=0, statsReqCnt=0, favsCnt=0, xhs, statsTmr, ftbl;
 
@@ -10,7 +11,7 @@ function initEventStream(url) {
 		return;
 	}
 	// Start SSE
-	source = new EventSource(apiDir + url);
+	source = new EventSource(aslApiDir + url);
 	source.onerror = handleEventSourceError;
 	hb = document.getElementById('hb');
 	window.addEventListener('beforeunload', function() { source.close(); });
@@ -28,10 +29,11 @@ function initEventStream(url) {
 	window.addEventListener('offline', handleOfflineEvent);
 	// Call a test function...
 	//setTimeout(handleOnlineEvent, 5000);
-	// Call initAslApi() who will read in nodes in the favorites list and do various API requests to get their 
+	// Call initAslApi() who will read in nodes in the favorites list and do various API requests to get their
 	// current status eg. last heard, num connected nodes, last keyed, etc.
 	ftbl = document.getElementById('favs');
 	statsTmr = setTimeout(getStats, 250);
+	cputemp = document.getElementById('cputemp');
 }
 
 function getStats() {
@@ -127,7 +129,7 @@ function handleStatsResponse() {
 			}
 			statsTmr = setTimeout(getStats, calcReqIntvl());
 		} else {
-			statMsg('/stats/ HTTP error ' + xhs.status + '. Retrying in 60 seconds...');
+			statMsg('/stats/ HTTP error ' + xhs.status + '. Retrying in 60 Secs...');
 			statsTmr = setTimeout(getStats, 60000);
 		}
 	}
@@ -186,7 +188,8 @@ function reloadPage() {
 			statMsg(`Node unreachable${s}, will retry in ${t} Secs...`);
 			rldTmr = setTimeout(reloadPage, t * 1000);
 		} else {
-			statMsg('Node unreachable. Check internet/LAN connections and power to node.');
+			statMsg('Node unreachable. Check internet/LAN connections and power to node. Retrying in 60 Secs...');
+			rldTmr = setTimeout(reloadPage, 60000);
 		}
 	};
 	request.send();
@@ -330,6 +333,36 @@ function handleNodetimesEvent(event) {
 		}
 	}
 	hb.style.visibility = (hb.style.visibility == 'visible') ? "hidden" : "visible";
+	// Update CPU Temp once per ~minute
+	if(++hbcnt % 120 == 0)
+		xhttpApiInit('f=getCpuTemp');
+}
+
+function xhttpApiInit(parms) {
+	xha = new XMLHttpRequest();
+	xha.onreadystatechange = handleApiResponse;
+	xha.open('POST', apiDir, true);
+	xha.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	xha.send(parms);
+}
+function handleApiResponse() {
+	if(xha.readyState === 4) {
+		if(xha.status === 200) {
+			// statMsg('statsResponse: ' + xha.responseText);
+			var resp = JSON.parse(xha.responseText);
+			// Data structure: event=API function (getCpuTemp); status=LogMsg; data=result
+			var e = resp.event;
+			if(resp.data === undefined) {
+				statMsg('API function' + e + ': No data.');
+				return;
+			}
+			var s = resp.data;
+			// Update cputemp span
+			cputemp.innerHTML = s.data;
+		} else {
+			statMsg('/api/ HTTP error ' + xha.status + '.');
+		}
+	}
 }
 
 function connectNode(button) {
@@ -346,7 +379,7 @@ function connectNode(button) {
 	if(conncnt < 1)
 		autodisc = false;
 	parms = 'remotenode='+remoteNode + '&perm='+perm + '&button='+button + '&localnode='+localNode + '&autodisc='+autodisc;
-	xhttpSend(apiDir + 'connect.php', parms);
+	xhttpSend(aslApiDir + 'connect.php', parms);
 }
 function disconnectNode() {
 	var localNode = document.getElementById('localnode').value;
@@ -357,15 +390,15 @@ function disconnectNode() {
 	}
 	var perm = document.getElementById('permanent').checked;
 	parms = 'remotenode='+remoteNode + '&perm='+perm + '&button=disconnect' + '&localnode='+localNode;
-	xhttpSend(apiDir + 'connect.php', parms);
+	xhttpSend(aslApiDir + 'connect.php', parms);
 }
 function astrestart() {
 	var localNode = document.getElementById('localnode').value;
 	parms = 'localnode='+localNode;
-	xhttpSend(apiDir + 'restart.php', parms);
+	xhttpSend(aslApiDir + 'restart.php', parms);
 	// Reload page
 	statMsg("Reloading in 500mS...");
-	setTimeout(function() { window.location.reload(); }, 500);
+	setTimeout(function() { window.location.assign(window.location.href); }, 500);
 }
 function xhttpSend(url, parms) {
 	xh = new XMLHttpRequest();
