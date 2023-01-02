@@ -127,6 +127,21 @@ if(!file_exists($fname))
 $s = 'AllScan-main/*';
 `cp -rf $s $asdir/; rm -rf AllScan-main`;
 
+$smdir = 'supermon';
+if(is_dir($smdir)) {
+	// Verify supermon folder favorites.ini and favorites.ini.bak are writeable by web server
+	$favsini = 'favorites.ini';
+	$favsbak = $favsini . '.bak';
+	msg("Confirming supermon $favsini and $favsbak are writeable by web server");
+	chdir($smdir);
+	`touch $favsini $favsbak`;
+	`chmod 664 $favsini $favsbak; chmod 775 .`;
+	`chgrp $group $favsini $favsbak .`;
+	chdir('..');
+} else {
+	msg("No $smdir/ directory found. Supermon is not required but is recommended.");
+}
+
 msg("Install/Update Complete.");
 
 // Show URLs where AllScan can be accessed and other notes

@@ -8,6 +8,7 @@ htmlInit('AllScan - AllStarLink Favorites Management & Scanning Web App');
 define('favsini', 'favorites.ini');
 define('smfavsini', '../supermon/favorites.ini');
 $favsFile = file_exists(favsini) ? favsini : (file_exists(smfavsini) ? smfavsini : null);
+//$favsFile = checkFileLocs([favsini, '../supermon/favorites.ini', ists(smfavsini) ? smfavsini : null);
 
 define('globalinc', 'global.inc');
 define('smglobalinc', '../supermon/global.inc');
@@ -15,6 +16,7 @@ $globalInc = file_exists(globalinc) ? globalinc : (file_exists(smglobalinc) ? sm
 
 // Load node and host definitions
 $hosts = [];
+
 $msg = [];
 $nodes = readAllmonIni($msg, $hosts);
 if(!empty($nodes) && !empty($hosts)) {
@@ -215,9 +217,14 @@ echo "<p id=\"scanmsg\"></p>";
 $msg = implode(BR, $msg);
 echo "<div id=\"statmsg\">$msg</div>" . BR;
 
-// Show CPU Temp & Info/Update Links
-echo '<span id="cputemp">' .  cpuTemp() . '</span>' . ENSP . '|' . ENSP
-	.	'<input type=button class="small" value="Restart Asterisk" onClick="astrestart();">';
+$sep = ENSP . '|' . ENSP;
+// Show CPU Temp if available
+if(($ct = cpuTemp()))
+	echo '<span id="cputemp">' . $ct . '</span>' . $sep;
+
+// Show function buttons and Links
+echo $html->linkButton('Restart Asterisk', null, 'small', null, 'astrestart();');
+	// . $sep . $html->linkButton('Manage Users', null, 'small', null, '');
 
 $links = [
 	'AllScan.info' => 'https://allscan.info/',
@@ -231,7 +238,7 @@ $links = [
 $out = [];
 foreach($links as $title => $url)
 	$out[] = $html->a($url, null, $title, null, '_blank');
-echo $html->div(implode(ENSP . '|' . ENSP, $out), 'm5');
+echo $html->div(implode($sep, $out), 'm5');
 
 asExit();
 

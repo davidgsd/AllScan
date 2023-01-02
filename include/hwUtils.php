@@ -14,6 +14,8 @@ function cpuTemp() {
 				break;
 		}
 	}
+	if(!$ct)
+		return '';
 	$ct /= 1000.0;
 	$ft = round($ct * 1.8 + 32);
 	$ct = round($ct);

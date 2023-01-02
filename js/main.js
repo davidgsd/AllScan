@@ -1,4 +1,4 @@
-var aslApiDir='/allscan/astapi/';
+var astApiDir='/allscan/astapi/';
 var statsDir='/allscan/stats/';
 var apiDir='/allscan/api/';
 var source, xh, hbcnt=0, xha, cputemp;
@@ -11,7 +11,7 @@ function initEventStream(url) {
 		return;
 	}
 	// Start SSE
-	source = new EventSource(aslApiDir + url);
+	source = new EventSource(astApiDir + url);
 	source.onerror = handleEventSourceError;
 	hb = document.getElementById('hb');
 	window.addEventListener('beforeunload', function() { source.close(); });
@@ -334,7 +334,7 @@ function handleNodetimesEvent(event) {
 	}
 	hb.style.visibility = (hb.style.visibility == 'visible') ? "hidden" : "visible";
 	// Update CPU Temp once per ~minute
-	if(++hbcnt % 120 == 0)
+	if(cputemp && ++hbcnt % 120 == 0)
 		xhttpApiInit('f=getCpuTemp');
 }
 
@@ -358,7 +358,8 @@ function handleApiResponse() {
 			}
 			var s = resp.data;
 			// Update cputemp span
-			cputemp.innerHTML = s.data;
+			if(cputemp)
+				cputemp.innerHTML = s.data;
 		} else {
 			statMsg('/api/ HTTP error ' + xha.status + '.');
 		}
@@ -379,7 +380,7 @@ function connectNode(button) {
 	if(conncnt < 1)
 		autodisc = false;
 	parms = 'remotenode='+remoteNode + '&perm='+perm + '&button='+button + '&localnode='+localNode + '&autodisc='+autodisc;
-	xhttpSend(aslApiDir + 'connect.php', parms);
+	xhttpSend(astApiDir + 'connect.php', parms);
 }
 function disconnectNode() {
 	var localNode = document.getElementById('localnode').value;
@@ -390,12 +391,12 @@ function disconnectNode() {
 	}
 	var perm = document.getElementById('permanent').checked;
 	parms = 'remotenode='+remoteNode + '&perm='+perm + '&button=disconnect' + '&localnode='+localNode;
-	xhttpSend(aslApiDir + 'connect.php', parms);
+	xhttpSend(astApiDir + 'connect.php', parms);
 }
 function astrestart() {
 	var localNode = document.getElementById('localnode').value;
 	parms = 'localnode='+localNode;
-	xhttpSend(aslApiDir + 'restart.php', parms);
+	xhttpSend(astApiDir + 'restart.php', parms);
 	// Reload page
 	statMsg("Reloading in 500mS...");
 	setTimeout(function() { window.location.assign(window.location.href); }, 500);

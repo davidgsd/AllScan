@@ -1,5 +1,7 @@
 Supermon Install / Update Instructions - Supermon 7.2+ (ASL version) - Nov. 27, 2022
 
+Note: For ASL distributions only. For HamVOIP instructions see Supermon Groups.io page.
+
 ---------------------------------------------------------------
 
 FRESH-INSTALL

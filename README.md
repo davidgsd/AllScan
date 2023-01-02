@@ -96,16 +96,20 @@ Now open a browser and go to your node's IP address followed by /allscan/, and *
 SECURITY NOTE: User login support has not yet been implemented. If your node webserver is publicly accessible you might want to set up password protection on the /allscan/ directory. If you don't, someone could potentially edit your favorites or connect/disconnect remote nodes, though that's about all they could do. In the next couple weeks a login system will be implemented in AllScan. If you're using your node only on your local home network and do not have an external port mapped in your internet router to port 80 on your node then having a login and password is generally not necessary, but can still be enabled easily with a few simple steps such as described in this [article](https://www.digitalocean.com/community/tutorials/how-to-set-up-password-authentication-with-apache-on-ubuntu-20-04).
 
 # Node Notes
-If you do not have a node or if your node is out-of-date, noisy, or unreliable, check out the following post: [How To Build a High-Quality Full-Duplex AllStar Node for Under $200](https://forums.qrz.com/index.php?threads/how-to-build-a-professional-grade-full-duplex-allstar-node-for-under-200.839842/).
+If you do not have a node or if your node is out-of-date, noisy, or unreliable, check out the following thorough and extensive article by AllScan's author NR9V: [How To Build a High-Quality Full-Duplex AllStar Node for Under $200](https://allscan.info/docs/diy-node.php).
 
 # Troubleshooting / FAQs
-If you get a permissions error when trying to Add a Favorite in AllScan, check that the /var/www/html/allscan and supermon dirs have 775 permissions and www-data group, and that the favorites.ini file exists in one or both of directories and has 664 permissions and www-data as the group. These settings should already be that way if your Supermon install is properly working, or it would not be able to edit and save the favorites.ini file. As a test you can go into Supermon, click the Configuration Editor button and try adding a blank line to favorites.ini and see if it saves OK. If not, there is something improperly configured with the Supermon install. The following commands should correct those settings:
+If you get a permissions error when trying to Add a Favorite, check that the /var/www/html/allscan and supermon dirs have 775 permissions and www-data group, and that the favorites.ini file exists in one or both of directories and has 664 permissions and www-data as the group. These settings should already be that way if your Supermon install is properly working, or it would not be able to edit and save the favorites.ini file. As a test you can go into Supermon, click the Configuration Editor button and try adding a blank line to favorites.ini and see if it saves OK. If not, there is something improperly configured with the Supermon install. The following commands should correct those settings:
 
-	cd /var/www/html/supermon/
-	sudo touch favorites.ini
-	sudo chmod 664 favorites.ini
+	cd /var/www/html || cd /srv/http # Change to www root folder, works for ASL and HamVOIP
+	cd supermon
+	sudo touch favorites.ini favorites.ini.bak
+	sudo chmod 664 favorites.ini favorites.ini.bak
 	sudo chmod 775 .
-	sudo chgrp www-data favorites.ini .
+	# For ASL set group to www-data
+	sudo chgrp www-data favorites.ini favorites.ini.bak .
+	# else for HamVOIP set group to http
+	# sudo chgrp http favorites.ini favorites.ini.bak .
 
 If you keep your favorites.ini file in the allscan directory and see error messages when writing the file from allscan, run the same steps as above but in the /var/www/html/allscan/ folder.
 
@@ -119,6 +123,9 @@ If you have any questions email chc_media at yahoo dot com. Also see [AllScan.in
 4. Additional stats/scan features
 
 # Release Notes
+**v0.4 2022-01-02**<br>
+Only show CPU Temp if data is available. Reduce favs table CSS cell padding from 4 to 3 px. Update InstallUpdate script to verify favorites.ini file in supermon dir is writeable by web server if dir exists. Readme updates.
+
 **v0.39 2022-12-28**<br>
 Minor optimizations. Add API to eventually support stats caching and additional stats features. Update CPU temp data once per minute.
 
