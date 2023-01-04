@@ -39,4 +39,6 @@ You will need SSH access to your node and should have basic familiarity with Lin
 	# Restart web server
 	service apache2 restart
 	
-Now open a browser and go to your node's IP address followed by /allscan/, and **be sure to force a full reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.
+Now open a browser and go to your node's IP address followed by /allscan/, and be sure to add a bookmark in your browser.
+
+If you did an update, **be sure to force a browser reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.
