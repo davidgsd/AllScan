@@ -32,10 +32,12 @@ Ideally you should be using a recent (2021 or later) 2.0 Beta version of the ASL
 
 If you have Supermon already working, AllScan will need no additional configuration and will use the favorites.ini file in the supermon directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon. Confirm you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. Supermon is easy to set up and has some nice maintenance/debug features. For example it allows you to edit the text in the favorites.ini file in your browser, so for example you could add notes there of weekly Net times.
 
-AllScan will use the ../supermon/global.inc file automatically if global.inc is not present in the allscan folder. If you do not have Supermon installed or its global.inc file cannot be read AllScan will prompt you to enter your Call, Location and Node Title and save to global.inc. If you use Supermon2 instead of Supermon, or for whatever reason want to put your global.inc or favorites.ini files in some other folder, just make symbolic links to those locations. For example to use the supermon2 favorites.ini do the following: 1. cd into your web root folder and then into the allscan dir. 2. `ln -s ../supermon2/favorites.ini .`
+AllScan will use the ../supermon/global.inc file automatically if global.inc is not present in the allscan folder. If you do not have Supermon installed or its global.inc file cannot be read AllScan will prompt you to enter your Call, Location and Node Title and save to global.inc. 
+
+If you use Supermon2 instead of Supermon, or want to put your global.inc or favorites.ini files in some other folder, you can make symbolic links to those locations. For example to use the supermon2 favorites.ini do the following: 1. "cd /var/www/html/allscan" 2. "ln -s ../supermon2/favorites.ini ."
 
 # Automatic Install / Update
-The AllScan Install/Update script automatically checks all system configuration details, changes to the web server root folder, checks if AllScan is already Installed and if so what version, and if not installed or a newer version is available will prompt you to continue with the Install/Update. Just enter 'y' and seconds later the install/update will be complete. If you prefer to install manually see the Manual Install / Update sections below.
+The AllScan Install/Update script automatically checks all system configuration details, changes to the web server root folder, checks if AllScan is already Installed and if so what version, and if not installed or a newer version is available will prompt you to continue with the Install/Update. Just enter 'y' and seconds later the install/update will be complete. If you prefer to install/update manually see [manualInstallUpdate.md](https://github.com/davidgsd/AllScan/blob/main/docs/manualInstallUpdate.md).
 
 To run the Automated Installer/Updater you will need SSH access to your node. Log into your node and run the following commands:
 
@@ -48,60 +50,16 @@ The Install/Update script will provide detailed status messages on each step of 
 
 Now open a browser and go to your node's IP address followed by /allscan/, and if you just did an update be sure to force a full reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button, so your browser will load the updated JavaScript and CSS files.
 
-# Manual Install
-You will need SSH access to your node and should have basic familiarity with Linux. Log into your node and run the following commands*:
-
-	sudo su # if you are not already logged in as root user
-	cd /var/www/html
-
-	mkdir allscan; chmod 775 allscan; chgrp www-data allscan
-
-	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
-	unzip main.zip; rm main.zip
-	cp -rf AllScan-main/* allscan/
-	rm -rf AllScan-main
-
-	# Below needed only if you do not have php-curl installed and get ASL stats errors
-	apt-get install php-curl; service apache2 restart
-
-Now open a browser and go to your node's IP address followed by /allscan/ eg. `http://192.168.1.23/allscan/`, and bookmark that URL. You should see a Connection Status table showing your Node number(s), Call Sign and Location, a control form where you can enter node numbers and use the Connect, Disconnect, etc. buttons, and a Favorites table with at least a few favorites listed.
-
-*Note for HamVOIP nodes: The web server folder may be /srv/http/ instead of /var/www/html/, and the web server group name may be http instead of www-data.
-
-# Manual Update
-The update process is similar to the install process with exception that you don't need to create the allscan directory and should make a backup copy of it. Log into your node and run the following commands*:
-
-	sudo su # if you are not already logged in as root user
-	cd /var/www/html
-
-	# If the allscan dir does not have 775 permissions or the web server group name run the following
-	chmod 775 allscan; chgrp www-data allscan
-
-	# Make a backup copy of your existing allscan folder (optional but recommended)
-	cp -a allscan allscan-old
-
-	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
-	unzip main.zip; rm main.zip
-	cp -rf AllScan-main/* allscan/
-	rm -rf AllScan-main
-
-	# Below needed only if you do not have php-curl installed and get ASL stats errors
-	apt-get install php-curl; service apache2 restart
-
-Now open a browser and go to your node's IP address followed by /allscan/, and **be sure to force a full reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.
-
-*Note for HamVOIP nodes: The web server folder may be /srv/http/ instead of /var/www/html/, and the web server group name may be http instead of www-data.
-
 # Notes
-SECURITY NOTE: User login support has not yet been implemented. If your node webserver is publicly accessible you might want to set up password protection on the /allscan/ directory. If you don't, someone could potentially edit your favorites or connect/disconnect remote nodes, though that's about all they could do. In the next couple weeks a login system will be implemented in AllScan. If you're using your node only on your local home network and do not have an external port mapped in your internet router to port 80 on your node then having a login and password is generally not necessary, but can still be enabled easily with a few simple steps such as described in this [article](https://www.digitalocean.com/community/tutorials/how-to-set-up-password-authentication-with-apache-on-ubuntu-20-04).
+SECURITY NOTE: User login support has not yet been implemented but will be completed in the next few days. If your node webserver is publicly accessible you might want to set up password protection on the /allscan/ directory. If you don't, someone could potentially edit your favorites or connect/disconnect remote nodes, though that's about all they could do. If you're using your node only on your local home network and do not have an external port mapped in your internet router to port 80 on your node then having a login and password is generally not necessary, but can still be enabled easily with a few simple steps such as described in this [article](https://www.digitalocean.com/community/tutorials/how-to-set-up-password-authentication-with-apache-on-ubuntu-20-04).
 
 # Node Notes
-If you do not have a node or if your node is out-of-date, noisy, or unreliable, check out the following thorough and extensive article by AllScan's author NR9V: [How To Build a High-Quality Full-Duplex AllStar Node for Under $200](https://allscan.info/docs/diy-node.php).
+If you do not have a node or if your node is out-of-date, noisy, or unreliable, check out the following article by AllScan's author NR9V: [How To Build a High-Quality Full-Duplex AllStar Node for Under $200](https://allscan.info/docs/diy-node.php).
 
 # Troubleshooting / FAQs
 If you get a permissions error when trying to Add a Favorite, check that the /var/www/html/allscan and supermon dirs have 775 permissions and www-data group, and that the favorites.ini file exists in one or both of directories and has 664 permissions and www-data as the group. These settings should already be that way if your Supermon install is properly working, or it would not be able to edit and save the favorites.ini file. As a test you can go into Supermon, click the Configuration Editor button and try adding a blank line to favorites.ini and see if it saves OK. If not, there is something improperly configured with the Supermon install. The following commands should correct those settings:
 
-	cd /var/www/html || cd /srv/http # Change to www root folder, works for ASL and HamVOIP
+	cd /var/www/html || cd /srv/http # Change to www root folder (works on ASL and HamVOIP)
 	cd supermon
 	sudo touch favorites.ini favorites.ini.bak
 	sudo chmod 664 favorites.ini favorites.ini.bak

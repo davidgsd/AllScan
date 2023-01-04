@@ -117,6 +117,27 @@ if(is_dir($asdir)) {
 if(!chgrp($asdir, $group))
 	errExit('chgrp failed');
 
+// Confirm /etc/allscan dir exists and is writeable by web server
+$asdbdir = '/etc/allscan';
+if(!is_dir($asdbdir)) {
+	msg("Creating $asdbdir dir with 0775 permissions and $group group");
+	if(!mkdir($asdbdir, 0775))
+		errExit('mkdir failed');
+} else {
+	msg("Verifying $asdbdir dir has 0775 permissions and $group group");
+	if(!chmod($asdbdir, 0775))
+		errExit('chmod failed');
+	// Backup DB
+	$dbfile = $asdbdir . '/allscan.db';
+	if(file_exists("$asdbdir.db")) {
+		if(!$ver)
+			$ver = 'bak';
+		copy($dbfile, "$dbfile.$ver");
+	}
+}
+if(!chgrp($asdbdir, $group))
+	errExit('chgrp failed');
+
 $fname = 'main.zip';
 $url = 'https://github.com/davidgsd/AllScan/archive/refs/heads/' . $fname;
 `wget $url`;
@@ -127,9 +148,9 @@ if(!file_exists($fname))
 $s = 'AllScan-main/*';
 `cp -rf $s $asdir/; rm -rf AllScan-main`;
 
+// Verify supermon folder favorites.ini and favorites.ini.bak are writeable by web server
 $smdir = 'supermon';
 if(is_dir($smdir)) {
-	// Verify supermon folder favorites.ini and favorites.ini.bak are writeable by web server
 	$favsini = 'favorites.ini';
 	$favsbak = $favsini . '.bak';
 	msg("Confirming supermon $favsini and $favsbak are writeable by web server");
@@ -141,6 +162,16 @@ if(is_dir($smdir)) {
 } else {
 	msg("No $smdir/ directory found. Supermon is not required but is recommended.");
 }
+
+// Confirm necessary php extensions are installed
+msg("Checking PHP extension versions...");
+`apt-get install -y php-sqlite3 php-curl`;
+
+msg("Restarting web server...");
+if($group === 'www-data')
+	`service apache2 restart`;
+else
+	`systemctl restart lighttpd`;
 
 msg("Install/Update Complete.");
 
