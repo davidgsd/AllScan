@@ -255,16 +255,16 @@ function handleNodesEvent(event) {
 				tablehtml += '<tr class="gColor"><td>' + localNode + '</td><td>Idle</td><td colspan="4"></td></tr>';
 			} else {
 				tablehtml += '<tr class="tColor"><td>' + localNode + '</td><td>PTT-Keyed</td><td colspan="4"></td></tr>';
-				pgTitlePrefix = '(PTT) ';
+				pgTitlePrefix = '\u{1F534} '; // Red Circle
 			}
 		} else {
 			if(tx_keyed == 0) {
 				tablehtml += '<tr class="lColor"><td>' + localNode + '</td><td>COS-Detected</td><td colspan="4"></td></tr>';
-				pgTitlePrefix = '(COS) ';
+				pgTitlePrefix = '\u{1F7E2} '; // Green Circle
 			} else {
 				tablehtml += '<tr class="bColor"><td>' + localNode +
 					'</td><td colspan="2">COS-Detected, PTT-Keyed</td><td colspan="4"></td></tr>';
-				pgTitlePrefix = '(COS&PTT) ';
+				pgTitlePrefix = '\u{1F7E1} '; // Orange Circle
 			}
 		}
 		for(row in tabledata[localNode].remote_nodes) {

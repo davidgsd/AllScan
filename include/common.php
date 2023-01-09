@@ -67,7 +67,7 @@ function htmlInit($title) {
 
 function pageInit($onload='') {
 	global $html, $AllScanVersion, $urlbase, $globalInc, $title, $title2;
-	htmlInit('AllScan - AllStarLink Favorites Management & Scanning Web App');
+	htmlInit('AllScan - AllStarLink Favorites Management & Scanning');
 	// Load Title cfgs. Do this after htmlInit() as global.inc may cause whitespace to be output
 	$globalInc = file_exists(globalinc) ? globalinc : (file_exists(smglobalinc) ? smglobalinc : null);
 	if($globalInc) {
