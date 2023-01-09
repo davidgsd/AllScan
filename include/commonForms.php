@@ -17,9 +17,11 @@ function htmlForm($form, $horizontal=false) {
 		$form->method = 'post';
 	if(!isset($form->id))
 		$form->id = null;
+	if(!isset($form->class))
+		$form->class = null;
 	if(!isset($form->target))
 		$form->target = null;
-	$out = $html->formOpen($form->url, $form->method, $form->id, null, $form->target);
+	$out = $html->formOpen($form->url, $form->method, $form->id, $form->class, $form->target);
 	if(isset($form->fieldsetLegend))
 		$out .= $html->fieldsetOpen($form->fieldsetLegend);
 	if(isset($form->hdr))

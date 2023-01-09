@@ -53,11 +53,11 @@ margin:0;
 input[type=number] {
 -moz-appearance:textfield;
 }
-select {
+/* select {
 margin:0px 4px;
 padding:0px 4px;
 border:0px;
-}
+} */
 ul, ol {
 padding:0;
 margin:0 0.5em 0 1.5em;
@@ -86,6 +86,9 @@ border-radius:10px;
 fieldset legend {
 font-size:16px;
 color:hsl(180,75%,50%);
+}
+form.left {
+text-align:left;
 }
 form + h2 {
 margin-top:3px;
@@ -161,7 +164,7 @@ color:#aaa;
 }
 #scanmsg {
 color:#999;
-margin:2px;
+margin:2px auto;
 font-size:0.9em;
 line-height:1.2;
 font-family:"Lucida Console",Courier,monospace;
@@ -271,6 +274,17 @@ border-radius:12px;
 
 label, input[type=button].small, input[type=submit].small {
 font-size:11px;
+}
+
+p {
+max-width:80%;
+margin:0.5em auto;
+font-size:13px;
+}
+ul, ol {
+max-width:80%;
+margin:0.5em auto;
+font-size:13px;
 }
 
 a.menu {

@@ -1,23 +1,21 @@
 <?php
-require_once("include/common.php");
-require_once("include/viewUtils.php");
-require_once("include/hwUtils.php");
+require_once('include/common.php');
+require_once('include/viewUtils.php');
+require_once('include/hwUtils.php');
+require_once('include/DB.php');
+require_once('include/dbUtils.php');
+require_once('user/UserModel.php');
+require_once('user/UserView.php');
+require_once('cfg/CfgModel.php');
 $html = new Html();
-htmlInit('AllScan - AllStarLink Favorites Management & Scanning Web App');
+$msg = [];
 
-define('favsini', 'favorites.ini');
-define('smfavsini', '../supermon/favorites.ini');
-$favsFile = file_exists(favsini) ? favsini : (file_exists(smfavsini) ? smfavsini : null);
-//$favsFile = checkFileLocs([favsini, '../supermon/favorites.ini', ists(smfavsini) ? smfavsini : null);
-
-define('globalinc', 'global.inc');
-define('smglobalinc', '../supermon/global.inc');
-$globalInc = file_exists(globalinc) ? globalinc : (file_exists(smglobalinc) ? smglobalinc : null);
+// Init base cfgs (exits on error)
+asInit($msg);
 
 // Load node and host definitions
 $hosts = [];
-
-$msg = [];
+$onLoad = '';
 $nodes = readAllmonIni($msg, $hosts);
 if(!empty($nodes) && !empty($hosts)) {
 	$node = $nodes[0];
@@ -37,23 +35,8 @@ if(!empty($nodes) && !empty($hosts)) {
 	}
 }
 
-// Load Title cfgs
-if($globalInc) {
-	include($globalInc);
-	$title = $CALL . ' ' . $LOCATION;
-	$title2 = $TITLE2 . ' - ' . $title;
-} else {
-	$title = '[CALL] [LOCATION]';
-	$title2 = '[TITLE2] - ' . $title;
-}
-
-// Output header
-echo 	"<body$onLoad>" . NL
-	.	'<header>' . NL
-	.	$html->a(getScriptName(), null, 'AllScan', 'logo') . " <small>$AllScanVersion</small>" . ENSP
-	.	$html->a('#', null, $title, 'title') . ENSP
-	.	'<span id="hb"><img src="AllScan.png" width=16 height=16 alt="*"></span>' . NL
-	.	'</header>' . NL . BR;
+// Output headers
+pageInit($onLoad);
 
 if(!isset($node) || $astdb === false)
 	asExit(implode(BR, $msg));
@@ -103,6 +86,7 @@ $remNode = (isset($parms['node']) && validDbID($parms['node']) && strlen($parms[
 <?php
 h2('Favorites');
 // Read in favorites.ini
+$favsFile = file_exists(favsini) ? favsini : (file_exists(smfavsini) ? smfavsini : null);
 $favs = [];
 $favcmds = [];
 if(!$favsFile) {
@@ -158,7 +142,8 @@ foreach($favs as $n => $f) {
 			list($x, $call, $desc, $loc) = [$n, '-', '[EchoLink Node]', '-'];
 	}
 	$name = str_replace([$f->node, $call, $desc, $loc, ' ,'], ' ', $f->label);
-	$name = trim(str_replace('  ', ' ', $name), " .,;\n\r\t\v\x00");
+	foreach(['call', 'name', 'desc', 'loc'] as $var)
+		$$var = trim(str_replace('  ', ' ', $$var), " .,;\n\r\t\v\x00");
 	if(!$name)
 		$name = $call;
 	elseif(strpos($name, $call) === false && $call !== '-')

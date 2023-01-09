@@ -112,16 +112,16 @@ function iframe($url, $class=null, $text='') {
 	return $out;
 }
 // FORMS
-function formOpen($scriptName=null, $method='post', $name=null, $class=null, $target=null) {
+function formOpen($scriptName=null, $method='post', $id=null, $class=null, $target=null) {
 	if(!$scriptName)
 		$scriptName = getScriptName();
-	if($name)
-		$name = " name=\"$name\"";
+	if($id)
+		$id = " id=\"$id\"";
 	if($class)
 		$class = " class=\"$class\"";
 	if($target)
 		$target = " target=\"$target\"";
-	return "<form$target action=\"$scriptName\"$name method=\"$method\" ".
+	return "<form$target action=\"$scriptName\"$id method=\"$method\" ".
 		"enctype=\"multipart/form-data\"$class AUTOCOMPLETE=\"off\">\n";
 }
 function textField($name, $label, $len=null, $val=null, $class=null, $readonly=null) {
@@ -146,12 +146,12 @@ function passwordField($name, $label, $len=null, $val=null, $class=null) {
 	$out = strlen($label) ? ("<label for=\"$id\">" . htmlspecial($label) . "</label>\n") : '';
 	$out .= "<input type=password name=\"$name\"";
 	if($len)
-		$out .= " size=\"$size\" maxlength=\"$len\" AUTOCOMPLETE=\"off\"";
+		$out .= " size=\"$size\" maxlength=\"$len\"";
 	if($class !== null && strlen($class))
 		$out .= " class=\"$class\"";
 	if($val)
 		$out .= " value=\"" . htmlattr($val) . '"';
-	$out .= ">\n";
+	$out .= " AUTOCOMPLETE=\"off\">\n";
 	return $out;
 }
 function checkbox($name, $label, $isChecked=false, $class=null) {

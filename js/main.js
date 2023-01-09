@@ -3,7 +3,8 @@ var statsDir='/allscan/stats/';
 var apiDir='/allscan/api/';
 var source, xh, hbcnt=0, xha, cputemp;
 var rldRetries=0, rldTmr;
-var statsState=0, statsIdx=0, statsReqCnt=0, favsCnt=0, xhs, statsTmr, ftbl;
+var statsState=0, statsIdx=0, statsReqCnt=0;
+var favsCnt=0, xhs, statsTmr, ftbl, pgTitle;
 
 function initEventStream(url) {
 	if(typeof(EventSource) === 'undefined') {
@@ -14,6 +15,7 @@ function initEventStream(url) {
 	source = new EventSource(astApiDir + url);
 	source.onerror = handleEventSourceError;
 	hb = document.getElementById('hb');
+	pgTitle = document.title;
 	window.addEventListener('beforeunload', function() { source.close(); });
 	// Handle node data, update whole Conn Status table
 	source.addEventListener('nodes', handleNodesEvent, false);
@@ -169,6 +171,9 @@ function handleOfflineEvent() {
 	if(rldTmr !== undefined) {
 		clearTimeout(rldTmr);
 	}
+	if(statsTmr !== undefined) {
+		clearTimeout(statsTmr);
+	}
 }
 function reloadPage() {
 	// Verify node is accessible before reloading
@@ -181,15 +186,19 @@ function reloadPage() {
 			request.abort();
 			// .assign & href prevents POST data resubmit
 			window.location.assign(window.location.href);
-		} else if(rldRetries < 8) { // Try again after a delay
+		} else {
 			rldRetries++;
 			var s = request.status > 0 ? ' (stat=' + request.status + ')' : '';
-			var t = 2 + rldRetries;
-			statMsg(`Node unreachable${s}, will retry in ${t} Secs...`);
-			rldTmr = setTimeout(reloadPage, t * 1000);
-		} else {
-			statMsg('Node unreachable. Check internet/LAN connections and power to node. Retrying in 60 Secs...');
-			rldTmr = setTimeout(reloadPage, 60000);
+			if(rldRetries < 8) { // Try again after a delay
+				var t = 2 + rldRetries;
+				statMsg(`Node unreachable${s}, will retry in ${t} Secs...`);
+				rldTmr = setTimeout(reloadPage, t * 1000);
+			} else if(rldRetries < 23) {
+				statMsg(`Node unreachable${s}. Check internet/LAN connections and power to node. Retrying in 60 Secs...`);
+				rldTmr = setTimeout(reloadPage, 60000);
+			} else {
+				statMsg('Node unreachable. Retries exceeded. Reload this page when node is online.');
+			}
 		}
 	};
 	request.send();
@@ -233,6 +242,7 @@ function handleNodesEvent(event) {
 		var total_nodes = 0;
 		var cos_keyed = 0;
 		var tx_keyed = 0;
+		var pgTitlePrefix = '';
 		for(row in tabledata[localNode].remote_nodes) {
 			var rowdata = tabledata[localNode].remote_nodes[row];
 			if(rowdata.cos_keyed == 1)
@@ -241,19 +251,21 @@ function handleNodesEvent(event) {
 				tx_keyed = 1;
 		}
 		if(cos_keyed == 0) {
-			if(tx_keyed == 0)
-				tablehtml += '<tr class="gColor"><td>' + localNode +
-					'</td><td>Idle</td><td colspan="4"></td></tr>';
-			else
-				tablehtml += '<tr class="tColor"><td>' + localNode +
-					'</td><td>PTT-Keyed</td><td colspan="4"></td></tr>';
+			if(tx_keyed == 0) {
+				tablehtml += '<tr class="gColor"><td>' + localNode + '</td><td>Idle</td><td colspan="4"></td></tr>';
+			} else {
+				tablehtml += '<tr class="tColor"><td>' + localNode + '</td><td>PTT-Keyed</td><td colspan="4"></td></tr>';
+				pgTitlePrefix = '(PTT) ';
+			}
 		} else {
-			if(tx_keyed == 0)
-				tablehtml += '<tr class="lColor"><td>' + localNode +
-					'</td><td>COS-Detected</td><td colspan="4"></td></tr>';
-			else
+			if(tx_keyed == 0) {
+				tablehtml += '<tr class="lColor"><td>' + localNode + '</td><td>COS-Detected</td><td colspan="4"></td></tr>';
+				pgTitlePrefix = '(COS) ';
+			} else {
 				tablehtml += '<tr class="bColor"><td>' + localNode +
 					'</td><td colspan="2">COS-Detected, PTT-Keyed</td><td colspan="4"></td></tr>';
+				pgTitlePrefix = '(COS&PTT) ';
+			}
 		}
 		for(row in tabledata[localNode].remote_nodes) {
 			var rowdata = tabledata[localNode].remote_nodes[row];
@@ -310,6 +322,7 @@ function handleNodesEvent(event) {
 		const conncnt = document.getElementById('conncnt');
 		tbody0.innerHTML = tablehtml;
 		conncnt.value = total_nodes;
+		document.title = pgTitlePrefix + pgTitle;
 	}
 }
 function handleNodetimesEvent(event) {

@@ -1,9 +1,91 @@
 <?php
-$AllScanVersion = "v0.40";
+$AllScanVersion = "v0.41";
 require_once('Html.php');
 require_once('logUtils.php');
+require_once('timeUtils.php');
 // API functions
 define('GET_CPU_TEMP', 'getCpuTemp');
+
+/*	AllScan can be installed in any top level folder within the www server root folder. allscan/ is the default,
+	additional copies can be installed in other test/version-specific/backup dirs.
+	This enables servers with multiple nodes to have separate allscan installs for each, eg. allscan567890/, ...
+	Each install requires its own DB file in /etc/allscan/. Examples:
+	Install Dir				DB File name
+	wwwroot/allscan/		/etc/allscan/allscan.db			(default)
+	wwwroot/allscan-test/	/etc/allscan/allscan-test.db
+	wwwroot/				/etc/allscan/.db
+	If you copy/move/backup an allscan install, eg. `cp -a allscan allscan-bak`, you should also copy the DB file:
+	`cp /etc/allscan/allscan.db /etc/allscan/allscan-bak.db`
+*/
+// File System Cfgs - initialized in asInit() before dbInit() can be called
+$wwwroot = '';	// eg. var/www/html
+$asdir = '';	// eg. allscan
+$subdir = '';	// eg. '' or user
+$relpath = '';	// eg. allscan or allscan/user
+$urlbase = '';	// eg. /allscan (prepended to http paths eg. <img src=\"$urlbase/AllScan.png\">)
+// Title cfgs (read from global.inc/DB)
+$title = '';
+$title2 = '';
+// ASL/AllMon/Supermon Files
+define('globalinc', 'global.inc');
+define('smglobalinc', '../supermon/global.inc');
+$globalInc = '';
+define('favsini', 'favorites.ini');
+define('smfavsini', '../supermon/favorites.ini');
+$favsFile = '';
+//$favsFile = checkFileLocs([favsini, '../supermon/favorites.ini', ists(smfavsini) ? smfavsini : null);
+
+function asInit(&$msg) {
+	global $wwwroot, $asdir, $subdir, $relpath, $urlbase;
+	$dir = __DIR__;
+	$wwwroot = strpos($dir, '/var/www/html/') === 0 ? '/var/www/html' : '/srv/http';
+	if(!is_dir($wwwroot)) {
+		pageInit();
+		asExit("Unable to determine wwwroot: /var/www/html/ and /srv/http/ not found or unreadable");
+	}
+	$relpath = $asdir = str_replace("$wwwroot/", '', $dir);
+	if($asdir && strpos($asdir, '/')) {
+		$dirs = explode('/', $asdir);
+		$asdir = array_shift($dirs);
+		$subdir = implode('/', $dirs);
+	}
+	$urlbase = $asdir ? "/$asdir" : '';
+	$msg[] = "wwwroot=$wwwroot, asdir=$asdir, subdir=$subdir, relpath=$relpath";
+	// Default install results: wwwroot=/var/www/html/, asdir=allscan, subdir=, relpath=allscan
+	// If in an allscan subdir (eg. user), same as above but subdir=user, relpath=allscan/user
+}
+
+function htmlInit($title) {
+	global $html, $urlbase;
+	echo $html->htmlOpen($title)
+		.	"<link href=\"$urlbase/css/main.css\" rel=\"stylesheet\" type=\"text/css\">" . NL
+		.	"<link href=\"$urlbase/favicon.ico\" rel=\"icon\" type=\"image/x-icon\">" . NL
+		.	'<meta name="viewport" content="width=device-width, initial-scale=0.6">' . NL
+		.	"<script src=\"$urlbase/js/main.js\"></script>" . NL
+		.	'</head>' . NL;
+}
+
+function pageInit($onload='') {
+	global $html, $AllScanVersion, $urlbase, $globalInc, $title, $title2;
+	htmlInit('AllScan - AllStarLink Favorites Management & Scanning Web App');
+	// Load Title cfgs. Do this after htmlInit() as global.inc may cause whitespace to be output
+	$globalInc = file_exists(globalinc) ? globalinc : (file_exists(smglobalinc) ? smglobalinc : null);
+	if($globalInc) {
+		include($globalInc);
+		$title = $CALL . ' ' . $LOCATION;
+		$title2 = $TITLE2 . ' - ' . $title;
+	} else {
+		$title = '[CALL] [LOCATION]';
+		$title2 = '[TITLE2] - ' . $title;
+	}
+	// Output header
+	echo 	"<body$onload>" . NL
+		.	'<header>' . NL
+		.	$html->a("$urlbase/", null, 'AllScan', 'logo') . " <small>$AllScanVersion</small>" . ENSP
+		.	$html->a(getScriptName(), null, $title, 'title') . ENSP
+		.	"<span id=\"hb\"><img src=\"$urlbase/AllScan.png\" width=16 height=16 alt=\"*\"></span>" . NL
+		.	'</header>' . NL . BR;
+}
 
 function msg($txt, $class=null) {
 	global $html;
@@ -218,11 +300,13 @@ function csvToArray($csv) {
 }
 
 function error($s) {
-	return "<span class=\"error\">$s</span>";
+	global $html;
+	if(isset($html))
+		return $html->span($s, 'error') . BR;
+	return "ERROR: $s\n";
 }
 function errMsg($msg, $logToFile=false) {
-	global $html;
-	echo $html->pre($msg, 'error');
+	echo error($msg);
 	if($logToFile)
 		logErr($msg);
 }
@@ -373,6 +457,14 @@ function writeFileLines($fname, $f, &$msg) {
 	return true;
 }
 
+// Verify INT fields in an object have a numeric value, set to '0' if not.
+function checkIntVals(&$o, $k) {
+	foreach($k as $p) {
+		if(!isset($o->$p) || !is_numeric($o->$p))
+			$o->$p = '0';
+	}
+}
+
 // Escape commas with double quotes, newlines with space, convert objects to arrays
 function escapeCsv($data) {
 	if(is_array($data)) {
@@ -403,8 +495,7 @@ function outputCsvHeader($filename) {
 function asExit($errMsg=null) {
 	if($errMsg)
 		errMsg($errMsg);
-	$out = '</body>' . NL;
-	$out .= '</html>' . NL;
-	echo $out;
+	echo '</body>' . NL
+		.'</html>' . NL;
 	exit();
 }

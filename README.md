@@ -48,7 +48,7 @@ Log into your node by SSH and run the following commands:
 
 The Install/Update script will provide detailed status messages on each step of the process. Once the update/install is complete it is recommended to delete the script ("rm AllScanInstallUpdate.php"). Then the next time you want to do an update just run the above commands again.
 
-Now open a browser and go to your node's IP address followed by /allscan/, eg. http://192.168.1.23/allscan/ and be sure to add a bookmark in your browser.
+Now open a browser and go to your node's IP address followed by /allscan/, eg. `http://192.168.1.23/allscan/` and be sure to add a bookmark in your browser.
 
 If you did an update, **be sure to force a browser reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.
 
@@ -78,13 +78,19 @@ If you keep your favorites.ini file in the allscan directory and see error messa
 # Contact
 If you have any questions email chc_media at yahoo dot com. Also see [AllScan.info](https://AllScan.info). 73, NR9V
 
+# Support / Donations
+I have received many Thank You's and inquiries/offers for a cup of coffee or other small donation which are much appreciated, but for now I ask that any contributions you can spare be directed to AllStarLink.org, who have put in many years of work maintaining the free & open-source AllStar ecosystem, and who have a lot of overhead expenses. ASL probably needs your support more than I do. See [this link](https://donorbox.org/allstarlink-donations?amount=24&default_interval=a&utm_campaign=donate_4&utm_source=allscan) to donate to Allstarlink Inc. But if in addition to supporting ASL you did also want to contribute to AllScan feel free to send anything by paypal or venmo to chc_media at yahoo dot com. Even $1 does help cover web server expenses.
+
 # Road Map
-1. Additional refinements to existing features
-2. Implement user authentication system supporting multiple users with Read-only, Limited, or Full permissions and full control over login durations. Estimated completion: Jan. 5
+1. Implement user authentication system supporting multiple users with Read-only, Read/Modify, Full, or Admin permissions and full control over user accounts, all managed within the web GUI. Estimated completion: Jan. 10
+2. Additional refinements to existing features
 3. Other features that are highly requested or that seem like a good fit
 4. Additional stats/scan features
 
 # Release Notes
+**v0.41 2022-01-08**<br>
+JavaScript optimizations. Update page Title with node PTT/COS status to allow status to be seen when browser tab is not active. Initial checkin of functions supporting base configs, SQLite3 DB and config management, and user authentication and account management (these functions are not yet tied into the main controller file).
+
 **v0.4 2022-01-02**<br>
 Only show CPU Temp if data is available. Reduce favs table CSS cell padding from 4 to 3 px. Update InstallUpdate script to verify favorites.ini file in supermon dir is writeable by web server if dir exists. Readme updates.
 

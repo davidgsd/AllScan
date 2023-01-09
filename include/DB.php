@@ -1,6 +1,6 @@
 <?php 
 // DB.php class
-// Author: David Gleason
+// Author: David Gleason - AllScan.info
 require_once('DataSource.php');
 
 class DB {
@@ -10,8 +10,7 @@ private $dataSrc = null;
 private $dbName;
 public  $error; // Set to a text message upon error
 
-// constructor
-function DB($dbName) {
+function __construct($dbName) {
 	$this->dbName = $dbName;
 }
 
@@ -27,51 +26,6 @@ function init() {
 	return $this->connected;
 }
 
-function getRecordCount($table, $where=null) {
-	if(!$this->init())
-		return null;
-    $query = "SELECT COUNT(*) FROM `$table`";
-	if($where)
-		$query .= " WHERE $where";
-	$result = $this->dataSrc->getRecordSet($query);
-	if(!$result) {
-		$this->error = $this->dataSrc->error;
-		return null;
-	}
-	$row = $result->fetch_row();
-	if(!$row)
-		return null;
-	return $row[0];
-}
-function getMaxFieldVal($table, $field, $where=null) {
-	if(!$this->init())
-		return null;
-    $query = "SELECT MAX(`$field`) FROM `$table`";
-	if($where)
-		$query .= " WHERE $where";
-	$result = $this->dataSrc->getRecordSet($query);
-	if(!$result) {
-		$this->error = $this->dataSrc->error;
-		return null;
-	}
-	$row = $result->fetch_row();
-	if(!$row)
-		return null;
-	return $row[0];
-}
-function getDistinctFieldList($table, $field, $where=null, $orderBy=null) {
-	$select = "DISTINCT `$field`";
-	if($orderBy === null)
-		$orderBy = "`$field` ASC";
-	$rows = $this->getRecords($table, $where, $orderBy, null, $select);
-	if($rows === null)
-		return null;
-	$list = [];
-	foreach($rows as $li) {
-		$list[$li->$field] = $li->$field;
-	}
-	return $list;
-}
 function getRecords($table, $where=null, $orderBy=null, $limit=null, $select='*',
 					$join=null, $groupBy=null) {
 	if(!$this->init())
@@ -93,16 +47,76 @@ function getRecords($table, $where=null, $orderBy=null, $limit=null, $select='*'
 		return null;
 	}
 	$rows = [];
-	while(($row = $result->fetch_object())) {
+	while(($row = $this->fetchObject($result))) {
 		$rows[] = $row;
 	}
 	return $rows;
+}
+function fetchObject($res) {
+	$row = $res->fetchArray(SQLITE3_ASSOC);
+	return empty($row) ? null : (object)$row;
 }
 function getRecord($table, $where=null, $orderBy=null, $select='*', $join=null) {
 	$row = $this->getRecords($table, $where, $orderBy, 1, $select, $join);
 	if(empty($row))
 		return null;
 	return $row[0];
+}
+
+function getRecordCount($table, $where=null) {
+	if(!$this->init())
+		return null;
+    $query = "SELECT COUNT(*) AS cnt FROM `$table`";
+	if($where)
+		$query .= " WHERE $where";
+	$result = $this->dataSrc->getRecordSet($query);
+	if(!$result) {
+		$this->error = $this->dataSrc->error;
+		return null;
+	}
+	$row = $this->fetchObject($result);
+	if(!$row)
+		return null;
+	return $row->cnt;
+}
+function getMaxFieldVal($table, $field, $where=null) {
+	if(!$this->init())
+		return null;
+    $query = "SELECT MAX(`$field`) AS max FROM `$table`";
+	if($where)
+		$query .= " WHERE $where";
+	$result = $this->dataSrc->getRecordSet($query);
+	if(!$result) {
+		$this->error = $this->dataSrc->error;
+		return null;
+	}
+	$row = $this->fetchObject($result);
+	if(!$row)
+		return null;
+	return $row->max;
+}
+function getDistinctFieldList($table, $field, $where=null, $orderBy=null) {
+	$select = "DISTINCT `$field`";
+	if($orderBy === null)
+		$orderBy = "`$field` ASC";
+	$rows = $this->getRecords($table, $where, $orderBy, null, $select);
+	if($rows === null)
+		return null;
+	$list = [];
+	foreach($rows as $li) {
+		$list[$li->$field] = $li->$field;
+	}
+	return $list;
+}
+
+function exec($sql) {
+	if(!$this->init())
+		return null;
+	if(!$this->dataSrc->exec($sql)) {
+		$this->error = $this->dataSrc->error;
+		return false;
+	}
+	return true;
 }
 // Returns id of the new object or null on error
 // (Check retval with '=== null' in case a new table's first id is 0)
@@ -143,19 +157,67 @@ function deleteRows($table, $where) {
 		$this->error = $this->dataSrc->error;
 	return $result;
 }
-function getRecordSet($strSql) {
+function getRecordSet($sql) {
 	if(!$this->init())
 		return null;
-	$result = $this->dataSrc->getRecordSet($strSql);
-	if($this->dataSrc->error)
+	$result = $this->dataSrc->getRecordSet($sql);
+	if($this->dataSrc->error) {
 		$this->error = $this->dataSrc->error;
-	return $result;
+		return null;
+	}
+	$rows = [];
+	while(($row = $this->fetchObject($result))) {
+		$rows[] = $row;
+	}
+	return $rows;
 }
 
-function getLastQueryCount() {
+function getTableList($colName=null) {
+	$rows = $this->getRecordSet("SELECT name FROM sqlite_master WHERE type='table'");
+	if($this->error)
+		return null;
+	$a = [];
+	foreach($rows as $r) {
+		// If colName set, check if table contains specified col and return only those tables
+		if($colName) {
+			$colList = $this->getColList($r->name);
+			if($this->error)
+				return null;
+			if(!in_array($colName, $colList))
+				continue;
+		}
+		$a[] = $r->name;
+	}
+	return $a;
+}
+function getColList($table) {
+	$rows = $this->getRecordSet("SELECT name FROM PRAGMA_TABLE_INFO('$table')");
+	if($this->error)
+		return null;
+	$a = [];
+	foreach($rows as $r)
+		$a[] = $r->name;
+	return $a;
+}
+
+function getValCount($table, $col, $val) {
+	$where = "`$col`='$val'";
+	$select = "COUNT(*)";
+	$res = $this->getRecord($table, $where, $select);
+	if($this->error)
+		return null;
+	return $res;
+}
+
+/* function getLastQueryCount() {
 	if(!$this->init())
 		return null;
 	return $this->dataSrc->getLastQueryCount();
+} */
+function getRowsAffected() {
+	if(!$this->init())
+		return null;
+	return $this->dataSrc->getRowsAffected();
 }
 function getLastInsertId() {
 	if(!$this->init())
@@ -170,12 +232,17 @@ function unquoteSqlFunctions($vals) {
 	return $vals;
 }
 
+function close() {
+	if($this->connected) {
+		$this->dataSrc->closeDb();
+		$this->connected = false;
+	}
+	if($this->dataSrc)
+		unset($this->dataSrc);
+}
+
 function __destruct() {
-	if(!$this->dataSrc)
-		return;
-	$this->dataSrc->closeDb();
-	unset($this->dataSrc);
-	$this->connected = false;
+	$this->close();
 }
 
 }
