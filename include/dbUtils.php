@@ -76,24 +76,6 @@ function checkTables($db, &$msg) {
 	if($db->error)
 		initErrExit($msg);
 	return $cnt;
-
-	/*
-	if(empty($users)) {
-		$msg[] = "No users defined in DB";
-		$user = (object)['name'=>'Admin', 'pass'=>'allstarlink', 'email'=>'', 'location'=>'', 'nodenums'=>'',
-					'permission'=>PERMISSION_ADMIN, 'timezone_id'=>'0'];
-		if(!$userModel->add($user)) {
-			if(!isset($db->error))
-				$db->error = $userModel->error;
-			return false;
-		}
-		$msg[] = "\"$user->name\" user created with pass \"$user->pass\".";
-	} else {
-		$cnt = count($users);
-		$msg[] = "$cnt users read from DB";
-	}
-	return true;
-	*/
 }
 
 $createUserSql = 'CREATE TABLE user (

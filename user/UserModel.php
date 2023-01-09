@@ -191,6 +191,7 @@ function validate($u) {
 
 // Process login form submission
 function validateLogin($name, $pass, $remember) {
+	global $userModel;
 	usleep(rand(20000,500000)); // Prevent response time hack
 	if(!$this->validateName($name)) {
 		return false;

@@ -88,8 +88,8 @@ I have received many Thank You's and inquiries/offers for a cup of coffee or oth
 4. Additional stats/scan features
 
 # Release Notes
-**v0.41 2022-01-08**<br>
-JavaScript optimizations. Update page Title with node PTT/COS status to allow status to be seen when browser tab is not active. Initial checkin of functions supporting base configs, SQLite3 DB and config management, and user authentication and account management (these functions are not yet tied into the main controller file).
+**v0.42 2022-01-08**<br>
+JavaScript optimizations. Update page Title with node PTT/COS status to allow status to be seen when browser tab is not active. Initial checkin of functions supporting base configs, SQLite3 DB and config management, and user authentication and account management (these functions are not yet all integrated into the main controller file).
 
 **v0.4 2022-01-02**<br>
 Only show CPU Temp if data is available. Reduce favs table CSS cell padding from 4 to 3 px. Update InstallUpdate script to verify favorites.ini file in supermon dir is writeable by web server if dir exists. Readme updates.
@@ -98,16 +98,10 @@ Only show CPU Temp if data is available. Reduce favs table CSS cell padding from
 Minor optimizations. Add API to eventually support stats caching and additional stats features. Update CPU temp data once per minute.
 
 **v0.38 2022-12-24**<br>
-For EchoLink nodes don't link node Name text to ASL stats page. Revise Green/Yellow CPU Temp range threshold from 120 to 130 °F.
-
-**v0.37 2022-12-23**<br>
-Support 7-digit (EchoLink) node numbers when reading in favorites.ini. Fix issue where stats request scanning would stop once it reached an EchoLink node number in the Favorites Table.
-
-**v0.36 2022-12-22**<br>
-Properly handle case of invalid node number in the favorites file. Download ASTDB file if not found in allscan, allmon or supermon locations. Reload page on event-stream error if location.href is available. Update install/update notes.
+For EchoLink nodes don't link node Name text to ASL stats page. Revise Green/Yellow CPU Temp range threshold from 120 to 130 °F. Support 7-digit (EchoLink) node numbers when reading in favorites.ini. Fix issue where stats request scanning would stop once it reached an EchoLink node number in the Favorites Table. Properly handle case of invalid node number in favorites file. Download ASTDB file if not found in allscan, allmon or supermon locations. Reload page on event-stream error if location.href is available.
 
 **v0.35 2022-12-21**<br>
-Optimize stats request timing to more quickly populate the favorites table after page load, then go to a reduced request rate over time, to reduce the chance of the ASL stats request limit (30 per minute) being exceeded if there are multiple AllScan web clients on a node. Link Favorites table Names text to the ASL stats page. Update JS reload function to prevent POST data being resubmitted after page reload. Minor optimizations.
+Optimize stats request timing to more quickly populate the favorites table after page load, then go to a reduced request rate over time, to reduce the chance of the ASL stats request limit (30 per minute) being exceeded if there are multiple AllScan web clients on a node. Link Favorites table Names text to the ASL stats page. Update JS reload function to prevent POST data being resubmitted after page reload.
 
 **v0.33 2022-12-20**<br>
 Add default global.inc file docs/global.inc.sample and give user option to configure and save this to ./global.inc if file was not found in . or ../supermon/. Documentation updates. GUI optimizations. Add default favorites file docs/favorites.ini.sample and give user option to copy this to ./favorites.ini if file was not found in . or ../supermon/. Use PHP cURL lib if present for ASL Stats requests.
@@ -116,10 +110,7 @@ Add default global.inc file docs/global.inc.sample and give user option to confi
 Implement ASL Stats functions, color coding of Favorites Table and new 'Rx%' and 'LCnt' columns. Improve handling of page reload logic after browser JS online event when node is not accessible. Enable automatic reading of astdb.txt file from allscan's directory or from ../supermon/ or /var/log/asterisk/. Enable automatic reading of allmon.ini file from allscan's directory or from /etc/asterisk/, ../supermon/, or ../allmon/allmon.ini.php. Show detailed messages on any issues found when trying to read various files.
 
 **v0.23 2022-12-18**<br>
-When JS online event is received, reload page after 2 Sec delay, to automatically restart server event-stream connection after PC/browser was asleep or offline. Add print of astdb.txt file Last Update times.
-
-**v0.22 2022-12-17**<br>
-CSS optimizations. Add Asterisk Restart button. Improvements to log messages.
+When JS online event is received, reload page after 2 Sec delay, to automatically restart server event-stream connection after PC/browser was asleep or offline. Add print of astdb.txt file Last Update times. CSS optimizations. Add Asterisk Restart button. Improvements to log messages.
 
 **v0.21 2022-12-16**<br>
 Support Disconnect before Connect feature. This sends AMI an 'rpt cmd ilink 6' (Disconnect all links) command and waits 500mS before executing a Connect request, if 'Disconnect before Connect' checkbox is checked (default val = checked) and nodes are connected. To have the default for this checkbox be unchecked, set a url parm of autodisc=0.

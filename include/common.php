@@ -1,5 +1,5 @@
 <?php
-$AllScanVersion = "v0.41";
+$AllScanVersion = "v0.42";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -37,13 +37,9 @@ $favsFile = '';
 
 function asInit(&$msg) {
 	global $wwwroot, $asdir, $subdir, $relpath, $urlbase;
-	$dir = __DIR__;
-	$wwwroot = strpos($dir, '/var/www/html/') === 0 ? '/var/www/html' : '/srv/http';
-	if(!is_dir($wwwroot)) {
-		pageInit();
-		asExit("Unable to determine wwwroot: /var/www/html/ and /srv/http/ not found or unreadable");
-	}
-	$relpath = $asdir = str_replace("$wwwroot/", '', $dir);
+	$wwwroot = $_SERVER['DOCUMENT_ROOT'];
+	$path = pathinfo($_SERVER['SCRIPT_NAME']);
+	$relpath = $asdir = substr($path['dirname'], 1);
 	if($asdir && strpos($asdir, '/')) {
 		$dirs = explode('/', $asdir);
 		$asdir = array_shift($dirs);
@@ -52,7 +48,7 @@ function asInit(&$msg) {
 	$urlbase = $asdir ? "/$asdir" : '';
 	$msg[] = "wwwroot=$wwwroot, asdir=$asdir, subdir=$subdir, relpath=$relpath";
 	// Default install results: wwwroot=/var/www/html/, asdir=allscan, subdir=, relpath=allscan
-	// If in an allscan subdir (eg. user), same as above but subdir=user, relpath=allscan/user
+	// Or if in an allscan subdir eg. user: same as above but subdir=user, relpath=allscan/user
 }
 
 function htmlInit($title) {
@@ -66,10 +62,18 @@ function htmlInit($title) {
 }
 
 function pageInit($onload='') {
-	global $html, $AllScanVersion, $urlbase, $globalInc, $title, $title2;
+	global $html, $AllScanVersion, $urlbase, $subdir, $globalInc, $title, $title2;
 	htmlInit('AllScan - AllStarLink Favorites Management & Scanning');
-	// Load Title cfgs. Do this after htmlInit() as global.inc may cause whitespace to be output
-	$globalInc = file_exists(globalinc) ? globalinc : (file_exists(smglobalinc) ? smglobalinc : null);
+	// Load Title cfgs. Do this after htmlInit() - global.inc may cause whitespace to be output
+	$locs = [globalinc, smglobalinc];
+	foreach($locs as $loc) {
+		if($subdir)
+			$loc = "../$loc";
+		if(file_exists($loc)) {
+			$globalInc = $loc;
+			break;
+		}
+	}
 	if($globalInc) {
 		include($globalInc);
 		$title = $CALL . ' ' . $LOCATION;

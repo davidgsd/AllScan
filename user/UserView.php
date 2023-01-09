@@ -9,7 +9,7 @@ class UserView {
 function showUsers($users, $nameHtml, $emailHtml, $locHtml, $llHtml, $nodenumsHtml, $permHtml, $tzHtml) {
 	global $user, $html, $userModel, $timezoneDef;
 	$hdrCols = [$nameHtml, $emailHtml, $locHtml, $llHtml, $nodenumsHtml, $permHtml, $tzHtml];
-	$out = $html->tableOpen($hdrCols, null, 'results', null);
+	$out = $html->tableOpen($hdrCols, null, 'favs', null);
 	$nullVal = '-';
 	foreach($users as $u) {
 		if(isset($u->last_login) && $u->last_login) {
@@ -20,7 +20,7 @@ function showUsers($users, $nameHtml, $emailHtml, $locHtml, $llHtml, $nodenumsHt
 		$loc = $u->location ? $u->location : $nullVal;
 		$nn = $u->nodenums ? $u->nodenums : $nullVal;
 		$perm = $userModel->getPermissionName($u->permission);
-		$row = [$u->name, $u->email, $loc, $lastLogin, $nn,	$perm, $timezoneDef[$tzid]];
+		$row = [$u->name, $u->email, $loc, $lastLogin, $nn, $perm, $timezoneDef[$u->timezone_id]];
 		$out .= $html->tableRow($row, null);
 	}
 	$out .= $html->tableClose();

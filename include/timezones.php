@@ -1,8 +1,8 @@
 <?php
+// From pecl.php.net/get/timezonedb minus 'Other'/redundant zones (php.net/manual/en/timezones.others.php)
+// Do not modify - DB user table timezone_id values would then no longer be correct
 $timezoneDef = [
 '[Default]',
-// DO NOT MODIFY WITHOUT ALSO UPDATING user.users table timezone_id VALUES!
-// Below from pecl.php.net/get/timezonedb minus 'Other' and redundant zones (php.net/manual/en/timezones.others.php)
 'Africa/Abidjan',
 'Africa/Accra',
 'Africa/Addis_Ababa',
