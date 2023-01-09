@@ -27,6 +27,8 @@ if(!empty($nodes) && !empty($hosts)) {
 	if($astdb !== false)
 		$onLoad = " onLoad=\"initEventStream('server.php?nodes=$node')\"";
 
+	$favsFile = file_exists(favsini) ? favsini : (file_exists(smfavsini) ? smfavsini : null);
+
 	// Handle form submits
 	$parms = getRequestParms();
 	if(isset($_POST['Submit']) && $astdb !== false) {
@@ -86,7 +88,6 @@ $remNode = (isset($parms['node']) && validDbID($parms['node']) && strlen($parms[
 <?php
 h2('Favorites');
 // Read in favorites.ini
-$favsFile = file_exists(favsini) ? favsini : (file_exists(smfavsini) ? smfavsini : null);
 $favs = [];
 $favcmds = [];
 if(!$favsFile) {

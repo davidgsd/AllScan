@@ -4,8 +4,6 @@ define('CREATE_GLOBALINC_FILE', 'Create global.inc File');
 define('EDIT_GLOBALINC_FILE', 'Edit global.inc File');
 define('CREATE_FAVORITESINI_FILE', 'Create Favorites.ini File');
 
-// AllScan should be able be installed to dirs other than /allscan/, including to multiple dirs with different cfgs for different nodes on a server. This gives a lot of flexibility and supports multiple independent nodes on one server. This requires that the main index file detect its dir path when first init'ing and opening the DB in a corresponding subdir of etc/allscan/. The base web path then gets saved in the DB and all script files reference that base path in any urls, file IO, redirects, etc.
-
 function showGlobalIncForm($parms=null) {
 	$form = new stdClass();
 	$form->id = 'editGlobalIncForm';

@@ -341,15 +341,4 @@ function checkDbError($method, $extraTxt='') {
 	return false;
 }
 
-function getCountryList() {
-	$list = $this->db->getRecords('country', null, 'name');
-	$this->checkDbError(__METHOD__);
-	if(!_count($list))
-		return null;
-	$listByCode = [];
-	foreach($list as $l)
-		$listByCode[$l->code] = $l->name;
-	return $listByCode;
-}
-
 }

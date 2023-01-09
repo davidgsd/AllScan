@@ -22,7 +22,7 @@ $wwwroot = '';	// eg. var/www/html
 $asdir = '';	// eg. allscan
 $subdir = '';	// eg. '' or user
 $relpath = '';	// eg. allscan or allscan/user
-$urlbase = '';	// eg. /allscan (prepended to http paths eg. <img src=\"$urlbase/AllScan.png\">)
+$urlbase = '';	// eg. /allscan (prepended to url paths eg. <img src=\"$urlbase/AllScan.png\">)
 // Title cfgs (read from global.inc/DB)
 $title = '';
 $title2 = '';

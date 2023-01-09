@@ -18,7 +18,7 @@ function connectToDb($dbName) {
 	}
 	// Wait up to 2 secs for DB file to be unlocked if in use by another client
 	if(!$this->db->busyTimeout(2000)) {
-		$this->setError('setBusyTimout');
+		$this->setError('setBusyTimeout');
 		return false;
 	}
 	return true;

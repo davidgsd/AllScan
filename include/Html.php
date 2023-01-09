@@ -428,17 +428,6 @@ function escape($txt, $escFunc=null) {
 function hr($width="100%") {
 	return "<hr width=\"$width\">\n";
 }
-function arrow($which) {
-	switch($which) {
-		case "up":   $url="/images/icons/ua.gif"; break;
-		case "prev": $url="/images/icons/la.gif"; break;
-		case "down": $url="/images/icons/da.gif"; break;
-		default: $url="/images/icons/ra.gif"; break;
-	}
-	$which = htmlspecial($which);
-	$out = "<img src=\"$url\" alt=\"$which\">";
-	return $out;
-}
 
 function audio($url, $class=null, $preload=false, $center=false) {
 	$class = $class ? " class=\"$class\"" : '';
@@ -464,8 +453,7 @@ function cleanHtml($var) {
 	} elseif(is_object($var)) {
 		$var = (object)$this->cleanHtml((array)$var);
 	} elseif($var) {
-		$var = str_replace('<br>', ' ', $var);
-		$var = str_replace('&nbsp;', ' ', $var);
+		$var = str_replace(['<br>', '&nbsp;'], ' ', $var);
 		$var = str_replace('&deg;', 'deg', $var);
 		$var = str_replace('&amp;', '&', $var);
 	}
