@@ -1,8 +1,16 @@
 <?php
-$AllScanVersion = "v0.42";
+// AllScan main includes & common functions
+// Author: David Gleason - AllScan.info
+$AllScanVersion = "v0.45";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
+require_once('viewUtils.php');
+require_once('dbUtils.php');
+require_once('DB.php');
+require_once('UserModel.php');
+require_once('CfgModel.php');
+
 // API functions
 define('GET_CPU_TEMP', 'getCpuTemp');
 
@@ -61,13 +69,15 @@ function htmlInit($title) {
 		.	'</head>' . NL;
 }
 
-function pageInit($onload='') {
-	global $html, $AllScanVersion, $urlbase, $subdir, $globalInc, $title, $title2;
+function pageInit($onload='', $showHdrLinks=true) {
+	global $html, $AllScanVersion, $urlbase, $subdir, $globalInc, $title, $title2, $userCnt;
 	htmlInit('AllScan - AllStarLink Favorites Management & Scanning');
 	// Load Title cfgs. Do this after htmlInit() - global.inc may cause whitespace to be output
 	$locs = [globalinc, smglobalinc];
 	foreach($locs as $loc) {
 		if($subdir)
+			$loc = "../$loc";
+		if(strpos($subdir, '/'))
 			$loc = "../$loc";
 		if(file_exists($loc)) {
 			$globalInc = $loc;
@@ -83,12 +93,39 @@ function pageInit($onload='') {
 		$title2 = '[TITLE2] - ' . $title;
 	}
 	// Output header
-	echo 	"<body$onload>" . NL
-		.	'<header>' . NL
-		.	$html->a("$urlbase/", null, 'AllScan', 'logo') . " <small>$AllScanVersion</small>" . ENSP
-		.	$html->a(getScriptName(), null, $title, 'title') . ENSP
-		.	"<span id=\"hb\"><img src=\"$urlbase/AllScan.png\" width=16 height=16 alt=\"*\"></span>" . NL
-		.	'</header>' . NL . BR;
+	$hdr = $lnk = [];
+	$hdr[] = $html->a("$urlbase/", null, 'AllScan', 'logo') . " <small>$AllScanVersion</small>";
+	$lnk[] = $html->a(getScriptName(), null, $title, 'title');
+	if($showHdrLinks && $userCnt)
+		$lnk = array_merge($lnk, getHdrLinks());
+	$hdr[] = implode(' | ', $lnk);
+	$hdr[] = "<span id=\"hb\"><img src=\"$urlbase/AllScan.png\" width=16 height=16 alt=\"*\"></span>";
+	echo "<body$onload>" . NL . '<header>' . NL . implode(ENSP, $hdr) . '</header>' . NL . BR;
+}
+
+function getHdrLinks() {
+	global $html, $urlbase, $user;
+	$lnk = [];
+	if(isset($user->user_id) && validDbID($user->user_id)) {
+		// Show links to Cfg and User modules if Admin user
+		if(adminUser()) {
+			$url = "$urlbase/cfg/";
+			$title = 'Cfgs';
+			$lnk[] = ($url === getScriptName()) ? $title : $html->a($url, null, $title);
+			$url = "$urlbase/user/";
+			$title = 'Users';
+			$lnk[] = ($url === getScriptName()) ? $title : $html->a($url, null, $title);
+		}
+		// Show Settings & Logout links
+		$url = "$urlbase/user/settings/";
+		$title = 'Settings';
+		$lnk[] = ($url === getScriptName()) ? $title : $html->a($url, null, $title);
+		$lnk[] = $html->a("$urlbase/user/", ['logout'=>1], 'Logout');
+	} else {
+		// Show Login link
+		$lnk[] = $html->a("$urlbase/user/", null, 'Login');
+	}
+	return $lnk;
 }
 
 function msg($txt, $class=null) {
@@ -299,8 +336,16 @@ function arrayToObj($array, $keys) {
 	return $obj;
 }
 function csvToArray($csv) {
-	$arr = $csv ? explode(',', $csv) : [];
-	return $arr;
+	return $csv ? array_map(function($s) { return trim($s, " ;\n\r\t\v\x00"); }, explode(',', $csv)) : [];
+}
+function arrayToCsv($a) {
+	return is_array($a) ? implode(',', $a) : $a;
+}
+
+function parseIntList($s) {
+	if(!$s || preg_match_all('/(\d+)/', $s, $m) < 1)
+		return [];
+	return $m[0];
 }
 
 function error($s) {
@@ -320,7 +365,7 @@ function logErr($msg) {
 }
 function okMsg($msg) {
 	global $html;
-	echo $html->pre($msg, 'ok');
+	echo $html->p($msg, 'ok');
 }
 function varDump($var, $return=false) {
 	global $html;
@@ -494,6 +539,14 @@ function outputCsvHeader($filename) {
 	header('Content-Type: text/csv');
 	ob_clean();
 	flush();
+}
+
+// path examples: '/' for allscan root dir, 'user/' for login page, or 'test/x.php' (no leading slash)
+function redirect($path='') {
+	global $asdir;
+	$loc = $asdir ? "/$asdir/$path" : "/$path";
+	header("Location: $loc");
+	exit();
 }
 
 function asExit($errMsg=null) {

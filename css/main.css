@@ -29,6 +29,7 @@ color:#fff;
 margin:1px 4px;
 padding:2px 4px;
 border:2px;
+width:95%;
 }
 input[type=button], input[type=submit], input::file-selector-button {
 color:#fff;
@@ -282,6 +283,7 @@ margin:0.5em auto;
 font-size:13px;
 }
 ul, ol {
+display:inline-block;
 max-width:80%;
 margin:0.5em auto;
 font-size:13px;
@@ -328,6 +330,9 @@ text-align:left;
 .right {
 text-align:right;
 }
+.w600 {
+max-width:600px;
+}
 .floatright {
 position:relative;
 float:right;
@@ -345,10 +350,8 @@ margin-left:0.6em;
 margin-right:0.6em;
 max-width:800px;
 }
-pre.ok {
+.ok {
 color:#7f7;
-font-weight:bold;
-font-size:15px;
 }
 .error {
 color:#f77;

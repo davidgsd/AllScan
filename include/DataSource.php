@@ -1,5 +1,5 @@
 <?php
-// DataSource.php class for use with SQLite
+// DataSource.php class - for use with SQLite
 // Author: David Gleason - AllScan.info
 
 class DataSource {
@@ -72,8 +72,6 @@ function getLastInsertId() {
 
 function escapeString($string) {
 	$escaped = $this->db->escapeString($string);
-	if($this->db->error)
-		$this->setError(__METHOD__);
 	if(!$escaped)
 		return $string;
 	return $escaped;

@@ -22,7 +22,7 @@ function userPermission($u=null) {
 			return PERMISSION_NONE;
 		$u = $user;
 	}
-	return $u->permission;
+	return $u->permission ?? PERMISSION_NONE;
 }
 
 class UserModel {
@@ -56,6 +56,8 @@ function getUsers($where=null, $orderBy=null, $minPermission=PERMISSION_NONE) {
 		// Validate last login date
 		if($u->last_login < 1672964000) // Jan. 5, 23
 			$u->last_login = 0;
+		// Convert array parms
+		$u->nodenums = csvToArray($u->nodenums);
 	}
 	unset($u);
 	return $users;
@@ -80,13 +82,7 @@ function getUserById($user_id, $minPermission=PERMISSION_NONE) {
 	return null;
 }
 function add($u) {
-	if(!$this->validateName($u->name))
-		return null;
-	if($u->email && !$this->validateEmailAddress($u->email))
-		return null;
-	if($u->location && !$this->validateLocation($u->location))
-		return null;
-	if($u->nodenums && !$this->validateNodenums($u->nodenums))
+	if(!$this->validateFields($u))
 		return null;
 	if($u->pass) {
 		if(!$this->validatePassword($u->pass))
@@ -98,6 +94,8 @@ function add($u) {
 	}
 	$u->hash = password_hash($u->pass, PASSWORD_BCRYPT);
 	checkIntVals($u, ['timezone_id', 'last_login']);
+	// Convert arrays to csv
+	$u->nodenums = arrayToCsv($u->nodenums);
 	$cols = ['name', 'hash', 'email', 'location', 'nodenums', 'permission', 'timezone_id'];
 	$vals = [$u->name, $u->hash, $u->email, $u->location, $u->nodenums, $u->permission, $u->timezone_id];
 	$retval = $this->db->insertRow(self::TABLENAME, $cols, $vals);
@@ -107,22 +105,18 @@ function add($u) {
 function update($u) {
 	if(!validDbID($u->user_id))
 		return null;
-	if(!$this->validateName($u->name))
-		return null;
-	if($u->email && !$this->validateEmailAddress($u->email))
-		return null;
-	if($u->location && !$this->validateLocation($u->location))
-		return null;
-	if(!$this->validateNodenums($u->nodenums))
+	if(!$this->validateFields($u))
 		return null;
 	checkIntVals($u, ['timezone_id', 'last_login']);
+	// Convert arrays to csv
+	$u->nodenums = arrayToCsv($u->nodenums);
 	$cols = ['name', 'email', 'location', 'nodenums', 'permission', 'timezone_id'];
 	$vals = [$u->name, $u->email, $u->location, $u->nodenums, $u->permission, $u->timezone_id];
 	if($u->last_login) {
 		$cols[] = 'last_login';
 		$vals[] = $u->last_login;
 	}
-	if($u->pass) {
+	if(!empty($u->pass)) {
 		if($this->validatePassword($u->pass)) {
 			$cols[] = 'hash';
 			$vals[] = password_hash($u->pass, PASSWORD_BCRYPT);
@@ -134,13 +128,23 @@ function update($u) {
 	$this->checkDbError(__METHOD__);
 	return $retval;
 }
-function delete($user) {
+function validateFields($u) {
+	if(!$this->validateName($u->name))
+		return null;
+	if($u->email && !$this->validateEmailAddress($u->email))
+		return null;
+	if($u->location && !$this->validateLocation($u->location))
+		return null;
+	if(!empty($u->nodenums) && !$this->validateNodenums($u->nodenums))
+		return null;
+	return true;
+}
+function delete($u) {
 	if(!validDbID($u->user_id))
 		return null;
-	msg("Deleting from user table...");
 	$retval = $this->db->deleteRows(self::TABLENAME, "user_id=$u->user_id");
 	if($retval)
-		okMsg("OK");
+		okMsg("Deleted user OK");
 	$this->checkDbError(__METHOD__);
 	return $retval;
 }
@@ -155,7 +159,8 @@ function getCount($where=null) {
 }
 
 // Validate user login cookie. Not for processing login forms
-function validate($u) {
+function validate() {
+	$u = arrayToObj($_COOKIE, ['name', 'cpass', 'lexp']);
 	if(!isset($u->name) || !isset($u->cpass) || !$u->name || !$u->cpass)
 		return null;
 	if(!$this->validateName($u->name))
@@ -269,15 +274,15 @@ function getPermissionName($pval) {
 	return $this->permissionList[$pval];
 }
 // Below called from user settings page
-function changePassword($postArray) {
+function changePassword($post) {
 	global $user;
-	if($postArray['pass'] !== $postArray['confirm']) {
+	if($post['pass'] !== $post['confirm']) {
 		$this->error = 'Passwords do not match';
 		return false;
 	}
-	if(!$this->validatePassword($postArray['pass']))
+	if(!$this->validatePassword($post['pass']))
 		return false;
-	$user->pass = $postArray['pass'];
+	$user->pass = $post['pass'];
 	$this->update($user);
 	return !$this->checkDbError(__METHOD__);
 }
@@ -304,17 +309,17 @@ function validateLocation($loc) {
 	return true;
 }
 function validateNodenums($nodenums) {
-	$nodes = explode(' ', $nodenums);
-	foreach($nodes as $n) {
+	foreach($nodenums as $n) {
 		if($n < 1 || $n >= 5000000) {
 			$this->error = "Improperly formatted node list. '$n' is not a valid node number";
 			return false;
 		}
 	}
+	return true;
 }
 function validatePassword($p) {
 	if(!$p || strlen($p) < 6 || preg_match('/^[a-zA-Z0-9~!@#$^&*,._-]{6,16}$/', $p) != 1) {
-		$this->error = 'Invalid Password. Must be 6-16 printable ASCII characters' . $p;
+		$this->error = 'Invalid Password. Must be 6-16 printable ASCII characters';
 		return false;
 	}
 	return true;

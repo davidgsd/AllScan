@@ -1,7 +1,6 @@
 <?php
 // CfgModel.php class
 // Author: David Gleason - AllScan.info
-
 // AllScan global Configuration Parameter definitions
 // Some modules have their own DB table to store data. cfg table stores other general configs
 // For simplicty and space efficiency cfgs are stored in the cfg table by a numeric cfgID
@@ -12,13 +11,29 @@ define('favsIniLoc', 2);
 //define('', '');
 
 // Global Cfgs Default Values
-$defCfgVal = [
+$gCfgDef = [
 	publicPermission => PERMISSION_READ_ONLY,
 	favsIniLoc => ['favorites.ini', '../supermon/favorites.ini']
 ];
 
+$gCfgName = [
+	publicPermission => 'Public Permission',
+	favsIniLoc => 'Favorites.ini Locations'
+];
+
+$publicPermissionVals = [
+	PERMISSION_NONE			=> 'None (No Access)',
+	PERMISSION_READ_ONLY	=> 'Read Only',
+	PERMISSION_READ_MODIFY	=> 'Read/Modify',
+	PERMISSION_FULL			=> 'Full'];
+
+$gCfgVals = [
+	publicPermission => $publicPermissionVals,
+	favsIniLoc => null
+];
+
 // Global Cfgs structure
-$gCfg = $defCfgVal;
+$gCfg = $gCfgDef;
 // Last update time of each gCfg (unix tstamp)
 $gCfgUpdated = [];
 
@@ -29,6 +44,12 @@ function readOk() {
 	global $user, $gCfg;
 	return (isset($gCfg[publicPermission]) && $gCfg[publicPermission] >= PERMISSION_READ_ONLY)
 		|| (isset($user) && userPermission() >= PERMISSION_READ_ONLY);
+}
+
+function modifyOk() {
+	global $user, $gCfg;
+	return (isset($gCfg[publicPermission]) && $gCfg[publicPermission] >= PERMISSION_READ_MODIFY)
+		|| (isset($user) && userPermission() >= PERMISSION_READ_MODIFY);
 }
 
 function writeOk() {
@@ -63,7 +84,7 @@ function __construct($db) {
 
 // Read global cfgs from DB into $gCfg
 function readCfgs() {
-	global $gCfg, $defCfgVal;
+	global $gCfg, $gCfgDef, $gCfgUpdated;
 	$ids = implode(',', array_keys($gCfg));
 	$where = "cfg_id IN($ids)";
 	$cfgs = $this->getCfgs($where);
@@ -71,37 +92,34 @@ function readCfgs() {
 		return;
 	foreach($cfgs as $c) {
 		$k = $c->cfg_id;
-		$gCfg[$k] = is_array($defCfgVal[$k]) ? explode(',', $c->val) : $c->val;
+		$gCfg[$k] = is_array($gCfgDef[$k]) ? explode(',', $c->val) : $c->val;
 		$gCfgUpdated[$k] = $c->updated;
 	}
 }
 
 // Save global cfgs. Caller will have updated $gCfg. Loop through cfgs, compare vals to DB and Def Vals
 function saveCfgs() {
-	global $gCfg, $defCfgVal;
-	$ids = implode(',', array_keys($gCfg));
-	$where = "cfg_id IN($ids)";
+	global $gCfg, $gCfgDef, $gCfgUpdated;
+	$ids = array_keys($gCfg);
+	$where = "cfg_id IN(" . arrayToCsv($ids). ")";
 	$cfgs = $this->getCfgs($where);
 	foreach($ids as $k) {
 		// If val=DBval nothing to be done
-		$val = is_array($defCfgVal[$k]) ? implode(',', $gCfg[$k]) : $gCfg[$k];
-		$dbVal = isset($cfgs[$k]) ? (is_array($defCfgVal[$k]) ? implode(',', $cfgs[$k]) : $cfgs[$k]) : null;
+		$val = is_array($gCfgDef[$k]) ? arrayToCsv($gCfg[$k]) : $gCfg[$k];
+		$dbVal = isset($cfgs[$k]) ? (is_array($gCfgDef[$k]) ? arrayToCsv($cfgs[$k]) : $cfgs[$k]) : null;
 		if($val === $dbVal)
 			continue;
 		// If val=DefVal delete from DB, else write to DB
-		$defVal = is_array($defCfgVal[$k]) ? implode(',', $defCfgVal[$k]) : $defCfgVal[$k];
+		$defVal = is_array($gCfgDef[$k]) ? arrayToCsv($gCfgDef[$k]) : $gCfgDef[$k];
 		if($val === $defVal) {
-			$this->delete($k);
+			if($dbVal) {
+				$this->delete($k);
+				unset($gCfgUpdated[$k]);
+			}
 		} else {
 			// Add if not in DB / Update otherwise
-			$c = (object)['cfg_id'=>$k, 'val'=>$val];
-			$this->update($c, isset($cfgs[$k]));
-		}
-	}
-	if(!empty($cfgs)) {
-		foreach($cfgs as $c) {
-			$k = $c->cfg_id;
-			$gCfg[$k] = is_array($defCfgVal[$k]) ? explode(',', $c->val) : $c->val;
+			$c = (object)['cfg_id'=>$k, 'val'=>$val, 'updated'=>$gCfgUpdated[$k]];
+			$this->update($c, !isset($cfgs[$k]));
 		}
 	}
 }
@@ -115,8 +133,8 @@ private function getCfgs($where=null, $orderBy=null) {
 	$a = [];
 	foreach($cfgs as $c) {
 		// Validate update time
-		if($c->update < 1672964000 || !is_numeric($c->update))
-			$c->update = 0;
+		if($c->updated < 1672964000 || !is_numeric($c->updated))
+			$c->updated = 0;
 		$a[$c->cfg_id] = $c;
 	}
 	return $a;

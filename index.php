@@ -1,17 +1,26 @@
 <?php
+// AllScan Main controller (index.php)
+// Author: David Gleason - AllScan.info
 require_once('include/common.php');
-require_once('include/viewUtils.php');
 require_once('include/hwUtils.php');
-require_once('include/DB.php');
-require_once('include/dbUtils.php');
-require_once('user/UserModel.php');
-require_once('user/UserView.php');
-require_once('cfg/CfgModel.php');
 $html = new Html();
 $msg = [];
 
-// Init base cfgs (exits on error)
+// Init base cfgs
 asInit($msg);
+// Init DB (exits on error)
+$db = dbInit();
+// Validate/create required DB tables. Returns count of users in user table (exits on error)
+$userCnt = checkTables($db, $msg);
+if(!$userCnt)
+	redirect('user/');
+// Init gCfgs (exits on error)
+$cfgModel = new CfgModel($db);
+// Init Users module, validate user
+$userModel = new UserModel($db);
+$user =	$userModel->validate();
+if(!readOk())
+	redirect('user/');
 
 // Load node and host definitions
 $hosts = [];
@@ -50,42 +59,12 @@ if(!$globalInc) {
 
 $autodisc = !isset($parms['autodisc']) || $parms['autodisc'];
 $remNode = (isset($parms['node']) && validDbID($parms['node']) && strlen($parms['node']) < 9) ? $parms['node'] : '';
-?>
 
-<h2>Connection Status</h2>
-<div class="twrap">
-<table class="grid" id="table_<?php echo $node ?>">
-<thead>
-<tr><th colspan="6"><i><?php echo $title2 ?></i></th></tr>
-<tr><th>&nbsp;&nbsp;Node&nbsp;&nbsp;</th><th>Node Info</th><th>Received</th><th>Dir</th><th>Connected</th><th>Mode</th></tr>
-</thead>
-<tbody>
-<tr><td colspan="6">Waiting...</td></tr>
-</tbody>
-</table>
-</div><br>
+showConnStatusTable();
 
-<form id="nodeForm" method="post" action="/allscan/">
-<fieldset>
-<input type=hidden id="localnode" name="localnode" value="<?php echo $node ?>">
-<input type=hidden id="conncnt" name="conncnt" value="0">
-<label for="node">Node#</label><input type="text" inputmode="numeric" pattern="[0-9]*"
-	id="node" name="node" maxlength="8" value="<?php echo $remNode ?>">
-<input type=submit name="Submit" value="Add Favorite" class="small">
-<input type=submit name="Submit" value="Delete Favorite" class="small">
-<br>
-<input type=button value="Connect" onClick="connectNode('connect');">
-<input type=button value="Disconnect" onClick="disconnectNode();">
-<input type=button value="Monitor" onClick="connectNode('monitor');">
-<input type=button value="Local Monitor" onClick="connectNode('localmonitor');">
-<br>
-<input type=checkbox id="permanent"><label for="permanent">Permanent</label>&nbsp;
-<input type=checkbox id="autodisc"<?php if($autodisc) echo ' checked' ?>><label
-	for="autodisc">Disconnect before Connect</label>
-</fieldset>
-</form>
+if(modifyOk())
+	showNodeCtrlForm();
 
-<?php
 h2('Favorites');
 // Read in favorites.ini
 $favs = [];
@@ -209,22 +188,10 @@ if(($ct = cpuTemp()))
 	echo '<span id="cputemp">' . $ct . '</span>' . $sep;
 
 // Show function buttons and Links
-echo $html->linkButton('Restart Asterisk', null, 'small', null, 'astrestart();');
-	// . $sep . $html->linkButton('Manage Users', null, 'small', null, '');
+if(modifyOk())
+	echo $html->linkButton('Restart Asterisk', null, 'small', null, 'astrestart();');
 
-$links = [
-	'AllScan.info' => 'https://allscan.info/',
-	'Updates' => 'https://github.com/davidgsd/AllScan#allscan',
-	'AllStarLink.org' => 'https://www.allstarlink.org/',
-	'Keyed&nbsp;Nodes' => 'http://stats.allstarlink.org/stats/keyed',
-	'ASL&nbsp;Forum' => 'https://community.allstarlink.org/',
-	'QRZ&nbsp;ASL&nbsp;Forum' => 'https://forums.qrz.com/index.php?forums/echolink-irlp-tech-board.76/',
-	'eHam.net' => 'https://www.eham.net/'
-];
-$out = [];
-foreach($links as $title => $url)
-	$out[] = $html->a($url, null, $title, null, '_blank');
-echo $html->div(implode($sep, $out), 'm5');
+showFooterLinks();
 
 asExit();
 

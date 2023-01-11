@@ -18,7 +18,7 @@ function htmlForm($form, $horizontal=false) {
 	if(!isset($form->id))
 		$form->id = null;
 	if(!isset($form->class))
-		$form->class = null;
+		$form->class = 'left';
 	if(!isset($form->target))
 		$form->target = null;
 	$out = $html->formOpen($form->url, $form->method, $form->id, $form->class, $form->target);
@@ -148,7 +148,7 @@ function htmlFormGetFields($fields) {
 						$out .= $html->textField($v0, null, null, $v1);
 					break;
 				case 'r': // readonly text
-					$out .= $html->textField($v0, null, null, $v1, false, null, true);
+					$out .= $html->textField($v0, null, null, $v1, null, true);
 					break;
 				case 'p': // password
 					$out .= $html->passwordField($v0, null);

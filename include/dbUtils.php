@@ -1,7 +1,6 @@
 <?php
 // dbUtils.php
 // Author: David Gleason - AllScan.info
-
 $asdbdir = '/etc/allscan';
 $asdbfile = '';
 

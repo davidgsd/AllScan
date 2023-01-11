@@ -26,8 +26,7 @@ function init() {
 	return $this->connected;
 }
 
-function getRecords($table, $where=null, $orderBy=null, $limit=null, $select='*',
-					$join=null, $groupBy=null) {
+function getRecords($table, $where=null, $orderBy=null, $limit=null, $select='*', $join=null, $groupBy=null) {
 	if(!$this->init())
 		return null;
 	$query = "SELECT $select FROM `$table`";
@@ -143,19 +142,21 @@ function updateRow($table, $cols, $vals, $where) {
 	$parms = implode(", ", $parms); 
 	$parms = $this->unquoteSqlFunctions($parms);
 	$query = "UPDATE `$table` SET $parms WHERE $where";
-	$result = $this->dataSrc->getRecordSet($query);
-	if($this->dataSrc->error)
-		$this->error = $this->dataSrc->error . $query;
-	return $result;
+	if(!$this->dataSrc->getRecordSet($query)) {
+		$this->error = $this->dataSrc->error;
+		return null;
+	}
+	return $this->dataSrc->getRowsAffected();
 }
 function deleteRows($table, $where) {
 	if(!$this->init())
 		return null;
 	$query = "DELETE FROM `$table` WHERE $where";
-	$result = $this->dataSrc->getRecordSet($query);
-	if($this->dataSrc->error)
+	if(!$this->dataSrc->getRecordSet($query)) {
 		$this->error = $this->dataSrc->error;
-	return $result;
+		return null;
+	}
+	return $this->dataSrc->getRowsAffected();
 }
 function getRecordSet($sql) {
 	if(!$this->init())

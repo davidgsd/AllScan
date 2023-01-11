@@ -17,7 +17,7 @@ As AllScan receives data from the ASL stats server it updates the Favorites Tabl
 Color codes for '#' column:
 * Dark Green: Node Active (registered and reporting to AllStarLink Network)
 * Medium Green: Node Active, Web-Transceiver enabled (may be more likely to accept connections)
-* Red: Node is Keyed (transmitting audio to the AllStarLink Network)
+* Red: Node is Keyed (transmitting audio)
 
 (Note: The ASL stats data is not always accurate. Some active keyed nodes may not show as Keyed. This is not an issue in AllScan. The remote node may not be reporting that information or may only report it at certain intervals. Future releases may be able to get the keyed status more reliably using other ASL stats APIs/pages or other mechanisms.)
 
@@ -27,12 +27,18 @@ Color codes for '#' column:
 
 ASL's stats APIs are limited to 30 requests/minute per IP Address. AllScan uses a dynamic request timing algorithm to prevent exceeding this limit, even if multiple web clients are using AllScan on a node.
 
+As of v0.45 AllScan now implements full User Authentication, User Account Administration, Login/Logout, User Settings and Cfg Management functions. After installing or upgrading from pre-v0.45, AllScan will automatically create its Database and necessary tables, and when you first visit the allscan/ url will prompt you to create an Admin user account, with detailed usage notes. Additional screenshots:
+[init.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/init.png)
+[cfgs.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/cfgs.png)
+[users.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/users.png)
+[settings.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/settings.png)
+
 # Pre-Install Notes
 Ideally you should be using a recent (2021 or later) 2.0 Beta version of the ASL Distribution (available [here](http://downloads.allstarlink.org/index.php?b=ASL_Images_Beta)), and you should have AllMon2 or Supermon properly configured and working. AllScan works fine on HamVOIP and pre-2.0 ASL releases but ASL 2.0 is the latest open-source standard and thus will have better support.
 
 If you have Supermon already working, AllScan will need no additional configuration and will use the favorites.ini file in the supermon directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon. Confirm you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. Supermon is easy to set up and has some nice maintenance/debug features. For example it allows you to edit the text in the favorites.ini file in your browser, so for example you could add notes there of weekly Net times.
 
-AllScan will use the ../supermon/global.inc file automatically if global.inc is not present in the allscan folder. If you do not have Supermon installed or its global.inc file cannot be read AllScan will prompt you to enter your Call, Location and Node Title and save to global.inc. 
+AllScan will use the ../supermon/global.inc file automatically if global.inc is not present in the allscan folder. If you do not have Supermon installed or its global.inc file cannot be read AllScan will prompt you to enter your Call, Location and Node Title and save to global.inc.
 
 If you use Supermon2 instead of Supermon, or want to put your global.inc or favorites.ini files in some other folder, you can make symbolic links to those locations. For example to use the supermon2 favorites.ini do the following: 1. "cd /var/www/html/allscan" 2. "ln -s ../supermon2/favorites.ini ."
 
@@ -53,10 +59,10 @@ Now open a browser and go to your node's IP address followed by /allscan/, eg. `
 If you did an update, **be sure to force a browser reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.
 
 # Notes
-SECURITY NOTE: User login support has not yet been implemented but will be completed in the next few days. If your node webserver is publicly accessible you might want to set up password protection on the /allscan/ directory. If you don't, someone could potentially edit your favorites or connect/disconnect remote nodes, though that's about all they could do. If you're using your node only on your local home network and do not have an external port mapped in your internet router to port 80 on your node then having a login and password is generally not necessary, but can still be enabled easily with a few simple steps such as described in this [article](https://www.digitalocean.com/community/tutorials/how-to-set-up-password-authentication-with-apache-on-ubuntu-20-04).
+User authentication is now fully implemented as of v0.45. By default this will prevent unauthorized users from changing any settings, connecting/disconnecting nodes, or viewing any other user data. By default, public (not logged-in) users will have Read-Only access and will be able to see the Connection Status and Favorites data, but will not be able to make any changes or see any admin (ie. Cfgs / Users) pages. To change this setting, Login, click the "Cfgs" link, and edit the "Public Permission" parameter.
 
 # Node Notes
-If you do not have a node or if your node is out-of-date, noisy, or unreliable, check out the following article by AllScan's author NR9V: [How To Build a High-Quality Full-Duplex AllStar Node for Under $200](https://allscan.info/docs/diy-node.php).
+If you do not yet have a node or might like to upgrade your node, check out the following article by AllScan's author NR9V: [How To Build a High-Quality Full-Duplex AllStar Node for Under $200](https://allscan.info/docs/diy-node.php).
 
 # Troubleshooting / FAQs
 For any issues including directory/file permissions issues, it is recommended to first always run the update script. The script will check if you have the latest version of AllScan, will update your install if not, and either way it will also validate all directory and file permissions. Refer to the "Automatic Install / Update" section above and run the update script and then see if the issue was resolved.
@@ -78,16 +84,18 @@ If you keep your favorites.ini file in the allscan directory and see error messa
 # Contact
 If you have any questions email chc_media at yahoo dot com. Also see [AllScan.info](https://AllScan.info). 73, NR9V
 
-# Support / Donations
-I have received many Thank You's and inquiries/offers for a cup of coffee or other small donation which are much appreciated, but for now I ask that any contributions you can spare be directed to AllStarLink.org, who have put in many years of work maintaining the free & open-source AllStar ecosystem, and who have a lot of overhead expenses. ASL probably needs your support more than I do. See [this link](https://donorbox.org/allstarlink-donations?amount=24&default_interval=a&utm_campaign=donate_4&utm_source=allscan) to donate to Allstarlink Inc. But if in addition to supporting ASL you did also want to contribute to AllScan feel free to send anything by paypal or venmo to chc_media at yahoo dot com. Even $1 does help cover web server expenses.
+# Donations
+I have received many Thank You's and offers for a cup of coffee or other small donation, which are much appreciated, initially though I would ask that any contributions be directed to AllStarLink.org, who have put in many years of work maintaining the free & open-source ASL ecosystem, and who have a lot of overhead expenses. See [this link](https://donorbox.org/allstarlink-donations?amount=24&default_interval=a&utm_campaign=donate_4&utm_source=allscan) to donate to Allstarlink Inc. If in addition to supporting ASL you did also want to contribute to AllScan feel free to send anything by paypal or venmo to chc_media at yahoo dot com. Even $1 does help cover web server expenses and enable me to spend more time on further development. Thank you for your support, and with helping spread the word about AllScan and ASL.
 
 # Road Map
-1. Implement user authentication system supporting multiple users with Read-only, Read/Modify, Full, or Admin permissions and full control over user accounts, all managed within the web GUI. Estimated completion: Jan. 10
-2. Additional refinements to existing features
+1. Additional refinements to existing features
+2. Enhanced stats and scan features
 3. Other features that are highly requested or that seem like a good fit
-4. Additional stats/scan features
 
 # Release Notes
+**v0.45 2022-01-11**<br>
+Implement User Authentication, User Admin, Login/Logout, User Settings and Cfg Management functions. Major refactoring and additions. AllScan now defaults public (not logged-in) users to Read-Only access. This can be changed to None (no public access), Read/Modify, or to Full (no logins needed). Upon install of this version, AllScan will automatically verify the system configuration, create its Database and necessary tables, and when you first visit the allscan url it will prompt you to create an Admin user account, with detailed usage notes.
+
 **v0.42 2022-01-08**<br>
 JavaScript optimizations. Update page Title with node PTT/COS status to allow status to be seen when browser tab is not active. Initial checkin of functions supporting base configs, SQLite3 DB and config management, and user authentication and account management (these functions are not yet all integrated into the main controller file).
 
@@ -129,4 +137,4 @@ Q: What is the blinking icon for?<br>
 A: AllScan's blinking 'lighting bolt' icon is a status indicator similar the 'spinny' in supermon or the blinking asterisk ('*') in allmon, which toggles on/off as each Connection Status event message is received from the node (ie. from AllScan's astapi/server.php file who reads status info from a socket connection to Asterisk on the node and then forwards that data every 500mS to AllScan's JavaScript in the browser.) If it stops blinking that means there is a communication issue between the browser and your node.
 
 # Thanks
-Thanks to all ASL Developers. Thanks to KK6QMS for help in Beta testing, and N6ATC for help in verifying AllScan works on HamVOIP.
+Thanks to all ASL Developers. Thanks to KK6QMS and N6ATC for help in Beta testing.

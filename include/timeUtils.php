@@ -61,7 +61,7 @@ function buildTimestamp($y, $mo, $d, $h, $m, $s) { // Result is in server timezo
 		$y += 2000;
 	return date('Y-m-d H:i:s', mktime($h, $m, $s, $mo, $d, $y));
 }
-function getTimestamp($time, $tzid=null, $fmt='Y-m-d H:i:s') {
+function getTimestamp($time, $tzid=null, $fmt='Y-m-d H:i') {
 	global $timezoneDef;
 	if(is_numeric($time))
 		$time = '@' . $time;
