@@ -48,9 +48,9 @@ function showConnStatusTable() {
 }
 
 function showNodeCtrlForm() {
-	global $remNode, $autodisc;
+	global $node, $remNode, $autodisc;
 	echo '<form id="nodeForm" method="post" action="/allscan/"><fieldset>
-<input type=hidden id="localnode" name="localnode" value="<?php echo $node ?>">
+<input type=hidden id="localnode" name="localnode" value="' . $node . '">
 <input type=hidden id="conncnt" name="conncnt" value="0">
 <label for="node">Node#</label><input type="text" inputmode="numeric" pattern="[0-9]*"
 	id="node" name="node" maxlength="8" value="' . $remNode . '">
