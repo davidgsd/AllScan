@@ -54,12 +54,12 @@ Log into your node by SSH and run the following commands:
 
 The Install/Update script will provide detailed status messages on each step of the process. Once the update/install is complete it is recommended to delete the script ("rm AllScanInstallUpdate.php"). Then the next time you want to do an update just run the above commands again.
 
-Now open a browser and go to your node's IP address followed by /allscan/, eg. `http://192.168.1.23/allscan/` and be sure to add a bookmark in your browser.
+Now open a browser and go to your node's IP address followed by /allscan/, eg. `http://192.168.1.23/allscan/` and be sure to add a bookmark in your browser. If you did a new install or upgraded from pre-v0.45, AllScan will prompt you to create an admin account. You can then configure the permission settings for AllScan. Note that rhese default to READ-ONLY for public (not logged-in) users. This setting can be changed on the "Cfgs" page.
 
 If you did an update, **be sure to force a browser reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.
 
 # Notes
-User authentication is now fully implemented as of v0.45. By default this will prevent unauthorized users from changing any settings, connecting/disconnecting nodes, or viewing any other user data. By default, public (not logged-in) users will have Read-Only access and will be able to see the Connection Status and Favorites data, but will not be able to make any changes or see any admin (ie. Cfgs / Users) pages. To change this setting, Login, click the "Cfgs" link, and edit the "Public Permission" parameter.
+User authentication is now fully implemented as of v0.45. By default this will prevent unauthorized users from changing any settings, connecting/disconnecting nodes, or viewing any other user data. By default, public (not logged-in) users will have Read-Only access and will be able to see the Connection Status and Favorites data, but will not be able to make any changes or see any admin (ie. Cfgs / Users) pages. To change this setting, Login, click the "Cfgs" link, and edit the "Public Permission" parameter. NOTE: Until you have set up the first admin account, anyone could access the url and do this themselves. Therefore be sure to log on and setup your admin account immediately after installing or updating from pre-v0.45.
 
 # Node Notes
 If you do not yet have a node or might like to upgrade your node, check out the following article by AllScan's author NR9V: [How To Build a High-Quality Full-Duplex AllStar Node for Under $200](https://allscan.info/docs/diy-node.php).
