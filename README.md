@@ -48,11 +48,12 @@ The AllScan Install/Update script automatically checks all system configuration 
 Log into your node by SSH and run the following commands:
 
 	cd ~
+	sudo rm AllScanInstallUpdate.php
 	wget 'https://raw.githubusercontent.com/davidgsd/AllScan/main/AllScanInstallUpdate.php'
 	chmod 755 AllScanInstallUpdate.php
 	sudo ./AllScanInstallUpdate.php
 
-The Install/Update script will provide detailed status messages on each step of the process. Once the update/install is complete it is recommended to delete the script ("rm AllScanInstallUpdate.php"). Then the next time you want to do an update just run the above commands again.
+The Install/Update script will provide detailed status messages on each step of the process. Once the update/install is complete it is recommended to delete the script ("rm AllScanInstallUpdate.php"). Then the next time you want to update just run the above commands again.
 
 Now open a browser and go to your node's IP address followed by /allscan/, eg. `http://192.168.1.23/allscan/` and be sure to add a bookmark in your browser. If you did a new install or upgraded from pre-v0.45, AllScan will prompt you to create an admin account. You can then configure the permission settings for AllScan. Note that rhese default to READ-ONLY for public (not logged-in) users. This setting can be changed on the "Cfgs" page.
 

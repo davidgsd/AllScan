@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-// AllScan Install/Update script v1.0
+// AllScan Install/Update script v1.1
 //
 // Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory. The script will then determine
 // the location of the web root folder on your system, cd to that folder, check if you have AllScan installed and install
@@ -50,8 +50,11 @@ if($cwd !== $webdir) {
 
 // Destination dir in web root folder:
 $asdir = 'allscan';
+// Enable mkdir(..., 0775) to work properly
+umask(0002);
 
 // Check if dir exists. If so, see if an update is needed. If not, install AllScan
+$dlfiles = true;
 if(is_dir($asdir)) {
 	msg("$asdir dir exists. Checking if update needed...");
 	$fname = 'common.php';
@@ -63,6 +66,7 @@ if(is_dir($asdir)) {
 	if(empty($ver))
 		$ver = 'Unknown';
 	msg("Allscan current version: $ver");
+
 	msg("Checking github version...");
 	if(file_exists($fname)) {
 		unlink($fname);
@@ -83,26 +87,24 @@ if(is_dir($asdir)) {
 	if(empty($gver))
 		$gver = 'Unknown';
 	msg("Allscan github version: $gver");
+
 	if($gver <= $ver) {
 		msg("AllScan is up-to-date.");
-		exit();
+		$dlfiles = false;
+	} else {
+		msg("AllScan is out-of-date.");
+
+		$s = readline("Ready to Update AllScan. Enter 'y' to confirm, any other key to exit: ");
+		if($s !== 'y')
+			exit();
+
+		$bak = $asdir . '-old';
+		msg("Backing up existing folder to $bak/...");
+		`rm -rf $bak`;
+		`cp -a allscan $bak`;
+		if(!is_dir($bak))
+			errExit("Backup failed.");
 	}
-	msg("AllScan is out-of-date.");
-	$s = readline("Ready to Update AllScan. Enter 'y' to confirm, any other key to exit: ");
-	if($s !== 'y')
-		exit();
-
-	$bak = $asdir . '-old';
-	msg("Backing up existing folder to $bak/...");
-	`rm -rf $bak`;
-	`cp -a allscan $bak`;
-	if(!is_dir($bak))
-		errExit("Backup failed.");
-
-	msg("Verifying $asdir dir has 0775 permissions and $group group");
-	if(!chmod($asdir, 0775))
-		errExit('chmod failed');
-
 } else {
 	msg("$asdir dir not found.");
 	$s = readline("Ready to Install AllScan. Enter 'y' to confirm, any other key to exit: ");
@@ -114,54 +116,28 @@ if(is_dir($asdir)) {
 		errExit('mkdir failed');
 }
 
+msg("Verifying $asdir dir has 0775 permissions and $group group");
+if(!chmod($asdir, 0775))
+	msg("ERROR: chmod($asdir, 0775) failed");
+
 if(!chgrp($asdir, $group))
-	errExit('chgrp failed');
+	msg("ERROR: chgrp($asdir, $group) failed");
 
-// Confirm /etc/allscan dir exists and is writeable by web server
-$asdbdir = '/etc/allscan';
-if(!is_dir($asdbdir)) {
-	msg("Creating $asdbdir dir with 0775 permissions and $group group");
-	if(!mkdir($asdbdir, 0775))
-		errExit('mkdir failed');
-} else {
-	msg("Verifying $asdbdir dir has 0775 permissions and $group group");
-	if(!chmod($asdbdir, 0775))
-		errExit('chmod failed');
-	// Backup DB
-	$dbfile = $asdbdir . '/allscan.db';
-	if(file_exists("$asdbdir.db")) {
-		if(!$ver)
-			$ver = 'bak';
-		copy($dbfile, "$dbfile.$ver");
-	}
+checkDbDir();
+
+if($dlfiles) {
+	$fname = 'main.zip';
+	$url = 'https://github.com/davidgsd/AllScan/archive/refs/heads/' . $fname;
+	`wget $url`;
+	if(!file_exists($fname))
+		errExit("Retrieve $fname from github failed.");
+
+	`unzip main.zip; rm main.zip`;
+	$s = 'AllScan-main/*';
+	`cp -rf $s $asdir/; rm -rf AllScan-main`;
 }
-if(!chgrp($asdbdir, $group))
-	errExit('chgrp failed');
 
-$fname = 'main.zip';
-$url = 'https://github.com/davidgsd/AllScan/archive/refs/heads/' . $fname;
-`wget $url`;
-if(!file_exists($fname))
-	errExit("Retrieve $fname from github failed.");
-
-`unzip main.zip; rm main.zip`;
-$s = 'AllScan-main/*';
-`cp -rf $s $asdir/; rm -rf AllScan-main`;
-
-// Verify supermon folder favorites.ini and favorites.ini.bak are writeable by web server
-$smdir = 'supermon';
-if(is_dir($smdir)) {
-	$favsini = 'favorites.ini';
-	$favsbak = $favsini . '.bak';
-	msg("Confirming supermon $favsini and $favsbak are writeable by web server");
-	chdir($smdir);
-	`touch $favsini $favsbak`;
-	`chmod 664 $favsini $favsbak; chmod 775 .`;
-	`chgrp $group $favsini $favsbak .`;
-	chdir('..');
-} else {
-	msg("No $smdir/ directory found. Supermon is not required but is recommended.");
-}
+checkSmDir();
 
 // Confirm necessary php extensions are installed
 msg("Checking PHP extension versions...");
@@ -189,6 +165,49 @@ msg("Be sure to bookmark the above URL(s) in your browser, and if you have just 
 exit();
 
 // ---------------------------------------------------
+function checkDbDir() {
+	global $group, $ver;
+	// Confirm /etc/allscan dir exists and is writeable by web server
+	$asdbdir = '/etc/allscan';
+	if(!is_dir($asdbdir)) {
+		msg("Creating $asdbdir dir with 0775 permissions and $group group");
+		if(!mkdir($asdbdir, 0775))
+			errExit('mkdir failed');
+	}
+	msg("Verifying $asdbdir dir has 0775 permissions and $group group");
+	if(!chmod($asdbdir, 0775))
+		msg("ERROR: chmod($asdbdir, 0775) failed");
+	if(!chgrp($asdbdir, $group))
+		msg("ERROR: chgrp($asdbdir, $group) failed");
+
+	// Backup DB file
+	$dbfile = $asdbdir . '/allscan.db';
+	if(file_exists("$asdbdir.db")) {
+		if(!$ver)
+			$ver = 'bak';
+		$bakfile = "$dbfile.$ver";
+		copy($dbfile, $bakfile);
+	}
+}
+
+function checkSmDir() {
+	global $group;
+	// Verify supermon folder favorites.ini and favorites.ini.bak are writeable by web server
+	$smdir = 'supermon';
+	if(is_dir($smdir)) {
+		$favsini = 'favorites.ini';
+		$favsbak = $favsini . '.bak';
+		msg("Confirming supermon $favsini and $favsbak are writeable by web server");
+		chdir($smdir);
+		`touch $favsini $favsbak`;
+		`chmod 664 $favsini $favsbak; chmod 775 .`;
+		`chgrp $group $favsini $favsbak .`;
+		chdir('..');
+	} else {
+		msg("No $smdir/ directory found. Supermon is not required but is recommended.");
+	}
+}
+
 function msg($s) {
 	echo $s . PHP_EOL;
 }
