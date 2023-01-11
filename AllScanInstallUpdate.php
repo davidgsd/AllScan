@@ -1,7 +1,6 @@
 #!/usr/bin/php
 <?php
-// AllScan Install/Update script v1.1
-//
+$AllScanInstallerUpdaterVersion = "v1.1";
 // Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory. The script will then determine
 // the location of the web root folder on your system, cd to that folder, check if you have AllScan installed and install
 // it if not, or if already installed will check the version and update the install if a newer version is available.
@@ -9,6 +8,8 @@
 // NOTE: Updating can result in modified files being overwritten. This script will make a backup copy of the allscan
 // folder to ./allscan-old/ You may then need to copy any cfgs you added/modified back into the allscan folder.
 //
+msg("AllScan Installer/Updater Version: $AllScanInstallerUpdaterVersion");
+
 // This should be run from CLI only (SSH), not over the web
 if(isset($_SERVER['REMOTE_ADDR']) || isset($_SERVER['HTTP_HOST'])) {
 	echo "This script must be run from the Command Line Interface only.<br>\n";
@@ -140,14 +141,19 @@ if($dlfiles) {
 checkSmDir();
 
 // Confirm necessary php extensions are installed
-msg("Checking PHP extension versions...");
-`apt-get install -y php-sqlite3 php-curl`;
+msg("Checking PHP extensions...");
+if($group === 'www-data') {
+	`apt-get install -y php-sqlite3 php-curl`;
+} else {
+	`sudo pacman -S php-sqlite`;
+}
 
 msg("Restarting web server...");
-if($group === 'www-data')
+if($group === 'www-data') {
 	`service apache2 restart`;
-else
+} else {
 	`systemctl restart lighttpd`;
+}
 
 msg("Install/Update Complete.");
 
