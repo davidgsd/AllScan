@@ -4,7 +4,11 @@ As there are a number of steps involved to set up various directories, download 
 NOTE: The below instructions are for ASL Distributions. For HamVOIP, make the following changes to the install/update commands:
 * Replace references to the web root folder "/var/www/html/" with "/srv/http/"
 * Replace references to the web server group name "www-data" with "http"
-* Command to restart web server on HamVOIP is "systemctl restart lighttpd"
+* Instead of "apt-get install..." do "pacman -S php-sqlite"
+* You may need to uncomment the following lines in /etc/php/php.ini (make sure they do not have a ';' in front)
+	extension=pdo_sqlite.so
+	extension=sqlite3.so
+* After installing on HamVOIP restart Lighttpd or do a reboot of the node
 
 You will need SSH access to your node and should have basic familiarity with Linux. Log into your node and run the following commands. Note that lines starting with '#' are comments. Read each comment and only execute the commands under it if applicable to your system.
 
@@ -14,11 +18,11 @@ You will need SSH access to your node and should have basic familiarity with Lin
 	# cd to web root folder
 	cd /var/www/html
 
-	# (Optional, for Updates Only) Backup your existing allscan folder
-	cp -a allscan allscan-old
+	# If updating, backup your existing allscan folder
+	mv allscan allscan.bak
 
 	# Confirm allscan directories exist and are web server writeable
-	ls allscan || mkdir allscan
+	mkdir allscan
 	ls /etc/allscan || mkdir /etc/allscan
 	chmod 775 allscan /etc/allscan
 	chgrp www-data allscan /etc/allscan
@@ -30,8 +34,7 @@ You will need SSH access to your node and should have basic familiarity with Lin
 	# Download latest AllScan files
 	wget https://github.com/davidgsd/AllScan/archive/refs/heads/main.zip
 	unzip main.zip; rm main.zip
-	cp -rf AllScan-main/* allscan/
-	rm -rf AllScan-main
+	mv AllScan-main allscan
 
 	# Confirm necessary php extensions are installed and up-to-date
 	apt-get install -y php-sqlite3 php-curl;

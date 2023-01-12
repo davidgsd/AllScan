@@ -59,6 +59,12 @@ Now open a browser and go to your node's IP address followed by /allscan/, eg. `
 
 If you did an update, **be sure to force a browser reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.
 
+NOTES for HamVOIP only:
+1. You may need to uncomment the following lines in /etc/php/php.ini (make sure they do not have a ';' in front).
+	extension=pdo_sqlite.so
+	extension=sqlite3.so
+2. Then restart Lighttpd web server or restart the node.
+
 # Notes
 User authentication is now fully implemented as of v0.45. By default this will prevent unauthorized users from changing any settings, connecting/disconnecting nodes, or viewing any other user data. By default, public (not logged-in) users will have Read-Only access and will be able to see the Connection Status and Favorites data, but will not be able to make any changes or see any admin (ie. Cfgs / Users) pages. To change this setting, Login, click the "Cfgs" link, and edit the "Public Permission" parameter. NOTE: Until you have set up the first admin account, anyone could access the url and do this themselves. Therefore be sure to log on and setup your admin account immediately after installing or updating from pre-v0.45.
 
