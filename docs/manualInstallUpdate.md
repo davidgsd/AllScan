@@ -6,8 +6,10 @@ NOTE: The below instructions are for ASL Distributions. For HamVOIP, make the fo
 * Replace references to the web server group name "www-data" with "http"
 * Instead of "apt-get install..." do "pacman -S php-sqlite"
 * You may need to uncomment the following lines in /etc/php/php.ini (make sure they do not have a ';' in front)
+
 	extension=pdo_sqlite.so
 	extension=sqlite3.so
+
 * After installing on HamVOIP restart Lighttpd or do a reboot of the node
 
 You will need SSH access to your node and should have basic familiarity with Linux. Log into your node and run the following commands. Note that lines starting with '#' are comments. Read each comment and only execute the commands under it if applicable to your system.

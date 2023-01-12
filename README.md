@@ -61,8 +61,10 @@ If you did an update, **be sure to force a browser reload by pressing CTRL-[F5] 
 
 NOTES for HamVOIP only:
 1. You may need to uncomment the following lines in /etc/php/php.ini (make sure they do not have a ';' in front).
-	extension=pdo_sqlite.so
+
+	extension=pdo_sqlite.so`
 	extension=sqlite3.so
+
 2. Then restart Lighttpd web server or restart the node.
 
 # Notes
