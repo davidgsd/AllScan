@@ -4,8 +4,8 @@ As there are a number of steps involved to set up various directories, download 
 NOTE: The below instructions are for ASL Distributions. For HamVOIP, make the following changes to the install/update commands:
 * Replace references to the web root folder "/var/www/html/" with "/srv/http/"
 * Replace references to the web server group name "www-data" with "http"
-* Instead of "apt-get install..." do "pacman -S php-sqlite"
-* You may need to uncomment the following lines in /etc/php/php.ini (make sure they do not have a ';' in front)<br>
+* Instead of "apt-get" commands do "pacman -Syu; pacman -S php-sqlite"
+* You may need to uncomment/add the following lines in /etc/php/php.ini (make sure they do not have a ';' in front)<br>
 	extension=pdo_sqlite.so<br>
 	extension=sqlite3.so
 * After installing on HamVOIP restart Lighttpd or do a reboot of the node
@@ -36,8 +36,9 @@ You will need SSH access to your node and should have basic familiarity with Lin
 	unzip main.zip; rm main.zip
 	mv AllScan-main allscan
 
-	# Confirm necessary php extensions are installed and up-to-date
-	apt-get install -y php-sqlite3 php-curl;
+	# Confirm OS packages and necessary php extensions are up-to-date
+	apt-get -y update; apt-get -y upgrade
+	apt-get install -y php-sqlite3 php-curl
 	
 	# Restart web server
 	service apache2 restart

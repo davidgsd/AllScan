@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.46";
+$AllScanVersion = "v0.47";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -144,7 +144,7 @@ function msg($txt, $class=null) {
 // Get nodes list and host IP(s)
 function readAllmonIni(&$msg, &$hosts) {
 	// Check for file in our directory and if not found look in the asterisk, supermon and allmon2 dirs
-	$file = ['allmon.ini', '/etc/asterisk/allmon.ini.php', '../supermon/allmon.ini', '../allmon2/allmon.ini.php'];
+	$file = ['allmon.ini', '../supermon/allmon.ini', '/etc/asterisk/allmon.ini.php', '../allmon2/allmon.ini.php'];
 	foreach($file as $f) {
 		if(file_exists($f)) {
 			$cfg = parse_ini_file($f, true);

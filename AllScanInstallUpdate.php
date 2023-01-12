@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-$AllScanInstallerUpdaterVersion = "v1.12";
+$AllScanInstallerUpdaterVersion = "v1.14";
 // Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory. The script will then determine
 // the location of the web root folder on your system, cd to that folder, check if you have AllScan installed and install
 // it if not, or if already installed will check the version and update the install if a newer version is available.
@@ -140,11 +140,13 @@ if($dlfiles) {
 checkSmDir();
 
 // Confirm necessary php extensions are installed
-msg("Checking PHP extensions...");
+msg("Checking OS packages and PHP extensions...");
 if($group === 'www-data') {
+	`apt-get -y update; apt-get -y upgrade`;
 	`apt-get install -y php-sqlite3 php-curl`;
 } else {
-	`sudo pacman -S php-sqlite`;
+	`pacman -Syu`;
+	`pacman -S php-sqlite`;
 }
 
 msg("Restarting web server...");
@@ -152,6 +154,7 @@ if($group === 'www-data') {
 	`service apache2 restart`;
 } else {
 	`systemctl restart lighttpd`;
+	msg("Please restart lighttpd or restart node");
 }
 
 msg("Install/Update Complete.");

@@ -192,7 +192,9 @@ function getTableList($colName=null) {
 	return $a;
 }
 function getColList($table) {
-	$rows = $this->getRecordSet("SELECT name FROM PRAGMA_TABLE_INFO('$table')");
+	// Below fails on old SQLite versions
+	//$rows = $this->getRecordSet("SELECT name FROM PRAGMA_TABLE_INFO('$table')");
+	$rows = $this->getRecordSet("PRAGMA table_info('$table')");
 	if($this->error)
 		return null;
 	$a = [];

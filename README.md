@@ -60,7 +60,7 @@ Now open a browser and go to your node's IP address followed by /allscan/, eg. `
 If you did an update, **be sure to force a browser reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.
 
 NOTES for HamVOIP only:
-1. You may need to uncomment the following lines in /etc/php/php.ini (make sure they do not have a ';' in front)<br>
+1. You may need to uncomment/add the following lines in /etc/php/php.ini (make sure they do not have a ';' in front)<br>
 	extension=pdo_sqlite.so<br>
 	extension=sqlite3.so
 2. Then restart Lighttpd web server or restart the node
@@ -100,8 +100,8 @@ I have received many Thank You's and offers for a cup of coffee or other small d
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
-**v0.46 2022-01-11**<br>
-Add additional log messages to dbUtils checkTables().
+**v0.47 2022-01-11**<br>
+Add additional log messages to dbUtils checkTables(). Change default order of possible allmon.ini locations to look in ../supermon/ prior to /etc/asterisk/ as supermon may be more likely to have valid AMI credentials. Update install/update script to update & upgrade OS packages (fixes issue seen on RPi4 w/latest ASL 2.0 where failed to find SQLite php extension).
 
 **v0.45 2022-01-11**<br>
 Implement User Authentication, User Admin, Login/Logout, User Settings and Cfg Management functions. Major refactoring and additions. AllScan now defaults public (not logged-in) users to Read-Only access. This can be changed to None (no public access), Read/Modify, or to Full (no logins needed). Upon install of this version, AllScan will automatically verify the system configuration, create its Database and necessary tables, and when you first visit the allscan url it will prompt you to create an Admin user account, with detailed usage notes.
