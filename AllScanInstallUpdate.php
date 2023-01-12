@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-$AllScanInstallerUpdaterVersion = "v1.1";
+$AllScanInstallerUpdaterVersion = "v1.12";
 // Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory. The script will then determine
 // the location of the web root folder on your system, cd to that folder, check if you have AllScan installed and install
 // it if not, or if already installed will check the version and update the install if a newer version is available.
@@ -99,23 +99,22 @@ if(is_dir($asdir)) {
 		if($s !== 'y')
 			exit();
 
-		$bak = $asdir . '-old';
-		msg("Backing up existing folder to $bak/...");
-		`rm -rf $bak`;
-		`cp -a allscan $bak`;
-		if(!is_dir($bak))
-			errExit("Backup failed.");
+		$bak = "$asdir.bak.$ver";
+		msg("Moving $asdir/ to $bak/...");
+		if(is_dir($bak))
+			`rm -rf $bak`;
+		`mv $asdir $bak`;
 	}
 } else {
 	msg("$asdir dir not found.");
 	$s = readline("Ready to Install AllScan. Enter 'y' to confirm, any other key to exit: ");
 	if($s !== 'y')
 		exit();
-
-	msg("Creating $asdir dir with 0775 permissions and $group group");
-	if(!mkdir($asdir, 0775))
-		errExit('mkdir failed');
 }
+
+msg("Creating $asdir dir with 0775 permissions and $group group");
+if(!mkdir($asdir, 0775))
+	errExit('mkdir failed');
 
 msg("Verifying $asdir dir has 0775 permissions and $group group");
 if(!chmod($asdir, 0775))

@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.45";
+$AllScanVersion = "v0.46";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -13,6 +13,9 @@ require_once('CfgModel.php');
 
 // API functions
 define('GET_CPU_TEMP', 'getCpuTemp');
+
+// Enable files to be written with group writeable permissions
+umask(0002);
 
 /*	AllScan can be installed in any top level folder within the www server root folder. allscan/ is the default,
 	additional copies can be installed in other test/version-specific/backup dirs.

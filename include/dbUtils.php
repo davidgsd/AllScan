@@ -39,19 +39,25 @@ function checkTables($db, &$msg) {
 	global $createUserSql, $createCfgSql;
 	// Verify users table exists, create if not
 	$tables = $db->getTableList();
-	if($db->error)
+	if($db->error) {
+		$msg[] = "getTableList Error: $db->error";
 		initErrExit($msg);
+	}
 	$s = $tables ? implode(', ', $tables) : 'None found';
 	$msg[] = "DB Tables: $s";
 	if(!in_array('user', $tables)) {
 		$msg[] = "Creating user DB Table";
 		$ret = $db->exec($createUserSql);
-		if(!$ret)
+		if(!$ret) {
+			$msg[] = "DB Error: $db->error";
 			initErrExit($msg);
+		}
 	} else {
 		$cols = $db->getColList('user');
-		if($db->error)
+		if($db->error) {
+			$msg[] = "getColList(user) Error: $db->error";
 			initErrExit($msg);
+		}
 		//$s = $cols ? implode(', ', $cols) : 'None found';
 		//$msg[] = "User Table cols: $s";
 	}
@@ -59,19 +65,25 @@ function checkTables($db, &$msg) {
 	if(!in_array('cfg', $tables)) {
 		$msg[] = "Creating cfg DB Table";
 		$ret = $db->exec($createCfgSql);
-		if(!$ret)
+		if(!$ret) {
+			$msg[] = "DB Error: $db->error";
 			initErrExit($msg);
+		}
 	} else {
 		$cols = $db->getColList('cfg');
-		if($db->error)
+		if($db->error) {
+			$msg[] = "getColList(cfg) Error: $db->error";
 			initErrExit($msg);
+		}
 		//$s = $cols ? implode(', ', $cols) : 'None found';
 		//$msg[] = "Cfg Table cols: $s";
 	}
 	// Return user count or false on error
 	$cnt = $db->getRecordCount('user');
-	if($db->error)
+	if($db->error) {
+		$msg[] = "getRecordCount(user) Error: $db->error";
 		initErrExit($msg);
+	}
 	return $cnt;
 }
 
