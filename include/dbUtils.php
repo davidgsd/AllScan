@@ -12,7 +12,7 @@ function dbInit() {
 		asExit("$asdbdir/ directory not found. Unable to init DB." . BR
 			. "Run Update script or create $asdbdir with web server writeable permissions.");
 	}
-	if(!class_exists(SQLite3)) {
+	if(!class_exists('SQLite3')) {
 		pageInit();
 		asExit("SQLite3 Class not found. Try running update script, update your OS and php-sqlite3 package, " . BR
 			. "and check that pdo_sqlite and sqlite3 extensions are enabled (uncommented) in php.ini.");
