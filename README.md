@@ -72,7 +72,9 @@ User authentication is now fully implemented as of v0.45. By default this will p
 If you do not yet have a node or might like to upgrade your node, check out the following article by AllScan's author NR9V: [How To Build a High-Quality Full-Duplex AllStar Node for Under $200](https://allscan.info/docs/diy-node.php).
 
 # Troubleshooting / FAQs
-For any issues including directory/file permissions issues, it is recommended to first always run the update script. The script will check if you have the latest version of AllScan, will update your install if not, and either way it will also validate all directory and file permissions. Refer to the "Automatic Install / Update" section above and run the update script and then see if the issue was resolved.
+For any issues including directory/file permissions issues or issues with SQLite not being available it is recommended to first always run the update script. The script will check if you have the latest version of AllScan, will update your install if not, and either way it will also validate all directory and file permissions. Refer to the "Automatic Install / Update" section above and run the update script and then see if the issue was resolved.
+
+HamVOIP users: See this great [Blog Post by KJ7T](https://randomwire.substack.com/p/updating-allscan-on-the-clearnode) for detailed steps on how to enable the SQLite3 extension in php.ini.
 
 If you get a permissions error when trying to Add a Favorite, check that the /var/www/html/allscan and supermon dirs have 775 permissions and www-data group, and that the favorites.ini file exists in one or both of directories and has 664 permissions and www-data as the group. These settings should already be that way if your Supermon install is properly working, or it would not be able to edit and save the favorites.ini file. As a test you can go into Supermon, click the Configuration Editor button and try adding a blank line to favorites.ini and see if it saves OK. If not, there is something improperly configured with the Supermon install. The following commands should correct those settings:
 
@@ -101,10 +103,7 @@ I have received many Thank You's and offers for a cup of coffee or other small d
 
 # Release Notes
 **v0.47 2022-01-11**<br>
-Add additional log messages to dbUtils checkTables(). Change default order of possible allmon.ini locations to look in ../supermon/ prior to /etc/asterisk/ as supermon may be more likely to have valid AMI credentials. Update install/update script to update & upgrade OS packages (fixes issue seen on RPi4 w/latest ASL 2.0 where failed to find SQLite php extension).
-
-**v0.45 2022-01-11**<br>
-Implement User Authentication, User Admin, Login/Logout, User Settings and Cfg Management functions. Major refactoring and additions. AllScan now defaults public (not logged-in) users to Read-Only access. This can be changed to None (no public access), Read/Modify, or to Full (no logins needed). Upon install of this version, AllScan will automatically verify the system configuration, create its Database and necessary tables, and when you first visit the allscan url it will prompt you to create an Admin user account, with detailed usage notes.
+Implement User Authentication, User Admin, Login/Logout, User Settings and Cfg Management functions. Major refactoring and additions. AllScan now defaults public (not logged-in) users to Read-Only access. This can be changed to None (no public access), Read/Modify, or to Full (no logins needed). Upon install of this version, AllScan will automatically verify the system configuration, create its Database and necessary tables, and when you first visit the allscan url it will prompt you to create an Admin user account, with detailed usage notes. Add additional log messages to dbUtils checkTables(). Change default order of possible allmon.ini locations to look in ../supermon/ prior to /etc/asterisk/ as supermon may be more likely to have valid AMI credentials. Update install/update script to update & upgrade OS packages (fixes issue seen on RPi4 w/latest ASL 2.0 where failed to find SQLite php extension).
 
 **v0.42 2022-01-08**<br>
 JavaScript optimizations. Update page Title with node PTT/COS status to allow status to be seen when browser tab is not active. Initial checkin of functions supporting base configs, SQLite3 DB and config management, and user authentication and account management (these functions are not yet all integrated into the main controller file).
@@ -119,10 +118,7 @@ Minor optimizations. Add API to eventually support stats caching and additional 
 For EchoLink nodes don't link node Name text to ASL stats page. Revise Green/Yellow CPU Temp range threshold from 120 to 130 °F. Support 7-digit (EchoLink) node numbers when reading in favorites.ini. Fix issue where stats request scanning would stop once it reached an EchoLink node number in the Favorites Table. Properly handle case of invalid node number in favorites file. Download ASTDB file if not found in allscan, allmon or supermon locations. Reload page on event-stream error if location.href is available.
 
 **v0.35 2022-12-21**<br>
-Optimize stats request timing to more quickly populate the favorites table after page load, then go to a reduced request rate over time, to reduce the chance of the ASL stats request limit (30 per minute) being exceeded if there are multiple AllScan web clients on a node. Link Favorites table Names text to the ASL stats page. Update JS reload function to prevent POST data being resubmitted after page reload.
-
-**v0.33 2022-12-20**<br>
-Add default global.inc file docs/global.inc.sample and give user option to configure and save this to ./global.inc if file was not found in . or ../supermon/. Documentation updates. GUI optimizations. Add default favorites file docs/favorites.ini.sample and give user option to copy this to ./favorites.ini if file was not found in . or ../supermon/. Use PHP cURL lib if present for ASL Stats requests.
+Optimize stats request timing to more quickly populate the favorites table after page load, then go to a reduced request rate over time, to reduce the chance of the ASL stats request limit (30 per minute) being exceeded if there are multiple AllScan web clients on a node. Link Favorites table Names text to the ASL stats page. Update JS reload function to prevent POST data being resubmitted after page reload. Add default global.inc file docs/global.inc.sample and give user option to configure and save this to ./global.inc if file was not found in . or ../supermon/. Documentation updates. GUI optimizations. Add default favorites file docs/favorites.ini.sample and give user option to copy this to ./favorites.ini if file was not found in . or ../supermon/. Use PHP cURL lib if present for ASL Stats requests.
 
 **v0.3 2022-12-19**<br>
 Implement ASL Stats functions, color coding of Favorites Table and new 'Rx%' and 'LCnt' columns. Improve handling of page reload logic after browser JS online event when node is not accessible. Enable automatic reading of astdb.txt file from allscan's directory or from ../supermon/ or /var/log/asterisk/. Enable automatic reading of allmon.ini file from allscan's directory or from /etc/asterisk/, ../supermon/, or ../allmon/allmon.ini.php. Show detailed messages on any issues found when trying to read various files.
@@ -147,4 +143,4 @@ Q: What is the blinking icon for?<br>
 A: AllScan's blinking 'lighting bolt' icon is a status indicator similar the 'spinny' in supermon or the blinking asterisk ('*') in allmon, which toggles on/off as each Connection Status event message is received from the node (ie. from AllScan's astapi/server.php file who reads status info from a socket connection to Asterisk on the node and then forwards that data every 500mS to AllScan's JavaScript in the browser.) If it stops blinking that means there is a communication issue between the browser and your node.
 
 # Thanks
-Thanks to all ASL Developers. Thanks to KK6QMS and N6ATC for help in Beta testing.
+Thanks to all ASL Developers. Thanks to KK6QMS, N6ATC, KJ7T and K5LK for help with Beta testing.
