@@ -30,14 +30,10 @@ You will need SSH access to your node and should have basic familiarity with Lin
 	unzip main.zip; rm main.zip
 	mv AllScan-main allscan
 
-	# Confirm AllScan directory is web server writeable
-	chmod 775 allscan
-	chgrp www-data allscan
-
-	# Confirm AllScan DB directory exists and is web server writeable
+	# Validate directories
 	ls /etc/allscan || mkdir /etc/allscan
-	chmod 775 /etc/allscan
-	chgrp www-data /etc/allscan
+	chmod 775 /etc/allscan allscan
+	chgrp www-data /etc/allscan allscan
 
 	# Check if SQLite3 extension is installed. If below outputs NOT FOUND try OS update & upgrade steps
 	php -r 'echo class_exists("SQLite3") ? "SQLite OK\n" : "SQLite NOT FOUND\n";'

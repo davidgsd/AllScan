@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-$AllScanInstallerUpdaterVersion = "v1.15";
+$AllScanInstallerUpdaterVersion = "v1.16";
 define('NL', "\n");
 // Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory. The script will then determine
 // the location of the web root folder on your system, cd to that folder, check if you have AllScan installed and install
@@ -110,6 +110,23 @@ if(is_dir($asdir)) {
 		exit();
 }
 
+if($dlfiles) {
+	$fname = 'main.zip';
+	$url = 'https://github.com/davidgsd/AllScan/archive/refs/heads/' . $fname;
+	$zdir = 'AllScan-main';
+	if(file_exists($fname))
+		unlink($fname);
+	if(is_dir($zdir))
+		exec("rm -rf $zdir");
+	if(!execCmd("wget -q '$url'") || !file_exists($fname))
+		errExit("Retrieve $fname from github failed. Try executing \"wget '$url'\" and check error messages.");
+	if(!execCmd("unzip -q $fname"))
+		errExit('Unzip failed. Check that you have unzip installed. Try "sudo apt-get install unzip" to install');
+	unlink($fname);
+	if(!rename($zdir, $asdir))
+		msg("ERROR: mv($zdir, $asdir) failed");
+}
+
 msg("Verifying $asdir dir has 0775 permissions and $group group");
 if(!chmod($asdir, 0775))
 	msg("ERROR: chmod($asdir, 0775) failed");
@@ -118,19 +135,6 @@ if(!chgrp($asdir, $group))
 	msg("ERROR: chgrp($asdir, $group) failed");
 
 checkDbDir();
-
-if($dlfiles) {
-	$fname = 'main.zip';
-	$url = 'https://github.com/davidgsd/AllScan/archive/refs/heads/' . $fname;
-	if(!execCmd("wget '$url'") || !file_exists($fname))
-		errExit("Retrieve $fname from github failed.");
-	if(!execCmd("unzip main.zip"))
-		errExit('Unzip failed. Check that you have unzip installed. Try "sudo apt-get install unzip" to install');
-	unlink('main.zip');
-	$s = 'AllScan-main/*';
-	execCmd("cp -rf $s $asdir/");
-	execCmd("rm -rf AllScan-main");
-}
 
 checkSmDir();
 
