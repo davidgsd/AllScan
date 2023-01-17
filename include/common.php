@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.48";
+$AllScanVersion = "v0.49";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -74,6 +74,11 @@ function htmlInit($title) {
 
 function pageInit($onload='', $showHdrLinks=true) {
 	global $html, $AllScanVersion, $urlbase, $subdir, $globalInc, $title, $title2, $userCnt;
+	// This function only applies to HTML context
+	// Can also be called during init from API/files that output JSON/text data
+	if(!isset($html))
+		return;
+
 	htmlInit('AllScan - AllStarLink Favorites Management & Scanning');
 	// Load Title cfgs. Do this after htmlInit() - global.inc may cause whitespace to be output
 	$locs = [globalinc, smglobalinc];
@@ -553,9 +558,10 @@ function redirect($path='') {
 }
 
 function asExit($errMsg=null) {
+	global $html;
 	if($errMsg)
 		errMsg($errMsg);
-	echo '</body>' . NL
-		.'</html>' . NL;
+	if(isset($html))
+		echo "</body>\n</html>\n";
 	exit();
 }

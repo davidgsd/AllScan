@@ -4,9 +4,13 @@ header('Content-Type: text/event-stream');
 header('Cache-Control: no-cache');
 header('X-Accel-Buffering: no');
 date_default_timezone_set('America/New_York');
-require_once('../include/common.php');
+
+require_once('../include/apiInit.php');
 require_once('AMI.php');
 require_once('nodeInfo.php');
+
+if(!readOk())
+	die("Insufficient user permission to retrieve data\n");
 
 // Validate request
 if(empty($_GET['nodes'])) {

@@ -1,7 +1,8 @@
 <?php
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
-require_once('../include/common.php');
-// TBI: Authenticate user
+require_once('../include/apiInit.php');
+
+if(!readOk())
+	die("Insufficient user permission to execute commands\n");
 
 // Filter and validate user input
 if((!isset($_POST['node']) || !$_POST['node']) && (!isset($_POST['nodes']) || !$_POST['nodes'])) {

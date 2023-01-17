@@ -1,12 +1,14 @@
 <?php
 // AllScan API Controller - Handles requests from AllScan JavaScript functions
+// No need to Authenticate user yet, this API currently returns only CPU temp
+//require_once('../include/apiInit.php');
+
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 require_once("../include/common.php");
+
 require_once("../include/hwUtils.php");
 // Supports the following API functions:
 // f=getCpuTemp : returns color-coded CPU Temp string
-
-// TBI: Authenticate user
 
 // Filter and validate user input
 $parms = getRequestParms();

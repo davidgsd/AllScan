@@ -406,10 +406,20 @@ function disconnectNode() {
 	parms = 'remotenode='+remoteNode + '&perm='+perm + '&button=disconnect' + '&localnode='+localNode;
 	xhttpSend(astApiDir + 'connect.php', parms);
 }
+function dtmfCmd() {
+	var localNode = document.getElementById('localnode').value;
+	var cmd = document.getElementById('node').value;
+	if(cmd.length == 0) {
+		alert('Please enter a valid DTMF command in the Node# field.');
+		return;
+	}
+	parms = 'button=dtmf' + '&cmd='+cmd + '&localnode='+localNode;
+	xhttpSend(astApiDir + 'cmd.php', parms);
+}
 function astrestart() {
 	var localNode = document.getElementById('localnode').value;
-	parms = 'localnode='+localNode;
-	xhttpSend(astApiDir + 'restart.php', parms);
+	parms = 'button=restart' + '&localnode='+localNode;
+	xhttpSend(astApiDir + 'cmd.php', parms);
 	// Reload page
 	statMsg("Reloading in 500mS...");
 	setTimeout(function() { window.location.assign(window.location.href); }, 500);

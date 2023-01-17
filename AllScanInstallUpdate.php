@@ -1,6 +1,7 @@
 #!/usr/bin/php
 <?php
-$AllScanInstallerUpdaterVersion = "v1.14";
+$AllScanInstallerUpdaterVersion = "v1.15";
+define('NL', "\n");
 // Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory. The script will then determine
 // the location of the web root folder on your system, cd to that folder, check if you have AllScan installed and install
 // it if not, or if already installed will check the version and update the install if a newer version is available.
@@ -29,7 +30,7 @@ msg("Web Server Folder: " . (isset($webdir) ? $webdir : "Not Found."));
 // Determine web server group name
 $name = ['www-data', 'http'];
 foreach($name as $n) {
-	if(`grep "^$n:" /etc/group` != '') {
+	if(`grep "^$n:" /etc/group`) {
 		$group = $n;
 		break;
 	}
@@ -59,8 +60,7 @@ $dlfiles = true;
 if(is_dir($asdir)) {
 	msg("$asdir dir exists. Checking if update needed...");
 	$fname = 'common.php';
-	$s = `grep '^\$AllScanVersion' $asdir/include/$fname`;
-	if($s != '') {
+	if(($s = `grep '^\$AllScanVersion' $asdir/include/$fname`)) {
 		if(preg_match('/"v([0-9\.]{3,4})"/', $s, $m) == 1)
 			$ver = $m[1];
 	}
@@ -75,16 +75,14 @@ if(is_dir($asdir)) {
 			errExit("$fname already exists in cwd, delete failed.");
 	}
 	$url = 'https://raw.githubusercontent.com/davidgsd/AllScan/main/include/' . $fname;
-	`wget "$url"`;
-	if(!file_exists($fname))
-		errExit("wget $fname from github failed.");
+	if(!execCmd("wget -q '$url'") || !file_exists($fname))
+		errExit("wget $fname failed.");
 
-	$s = `grep '^\$AllScanVersion' $fname`;
-	unlink($fname);
-	if($s != '') {
+	if(($s = `grep '^\$AllScanVersion' $fname`)) {
 		if(preg_match('/"v([0-9\.]{3,4})"/', $s, $m) == 1)
 			$gver = $m[1];
 	}
+	unlink($fname);
 	if(empty($gver))
 		$gver = 'Unknown';
 	msg("Allscan github version: $gver");
@@ -102,8 +100,8 @@ if(is_dir($asdir)) {
 		$bak = "$asdir.bak.$ver";
 		msg("Moving $asdir/ to $bak/...");
 		if(is_dir($bak))
-			`rm -rf $bak`;
-		`mv $asdir $bak`;
+			execCmd("rm -rf $bak");
+		execCmd("mv $asdir $bak");
 	}
 } else {
 	msg("$asdir dir not found.");
@@ -111,10 +109,6 @@ if(is_dir($asdir)) {
 	if($s !== 'y')
 		exit();
 }
-
-msg("Creating $asdir dir with 0775 permissions and $group group");
-if(!mkdir($asdir, 0775))
-	errExit('mkdir failed');
 
 msg("Verifying $asdir dir has 0775 permissions and $group group");
 if(!chmod($asdir, 0775))
@@ -128,33 +122,49 @@ checkDbDir();
 if($dlfiles) {
 	$fname = 'main.zip';
 	$url = 'https://github.com/davidgsd/AllScan/archive/refs/heads/' . $fname;
-	`wget $url`;
-	if(!file_exists($fname))
+	if(!execCmd("wget '$url'") || !file_exists($fname))
 		errExit("Retrieve $fname from github failed.");
-
-	`unzip main.zip; rm main.zip`;
+	if(!execCmd("unzip main.zip"))
+		errExit('Unzip failed. Check that you have unzip installed. Try "sudo apt-get install unzip" to install');
+	unlink('main.zip');
 	$s = 'AllScan-main/*';
-	`cp -rf $s $asdir/; rm -rf AllScan-main`;
+	execCmd("cp -rf $s $asdir/");
+	execCmd("rm -rf AllScan-main");
 }
 
 checkSmDir();
 
 // Confirm necessary php extensions are installed
 msg("Checking OS packages and PHP extensions...");
-if($group === 'www-data') {
-	`apt-get -y update; apt-get -y upgrade`;
-	`apt-get install -y php-sqlite3 php-curl`;
-} else {
-	`pacman -Syu`;
-	`pacman -S php-sqlite`;
+if(!class_exists('SQLite3')) {
+	msg("NOTE: Required SQLite3 Class not found." . NL
+		."Try running the update commands below to update your OS and php-sqlite3 package." . NL
+		."You may also need to enable the pdo_sqlite and sqlite3 extensions in php.ini.");
 }
 
-msg("Restarting web server...");
-if($group === 'www-data') {
-	`service apache2 restart`;
-} else {
-	`systemctl restart lighttpd`;
-	msg("Please restart lighttpd or restart node");
+msg("Ready to run OS update/upgrade commands." . NL
+	."If you have recently updated and upgraded your system you do not need to do this now." . NL
+	."NOTE: THE UPDATE/UPGRADE PROCESS CAN POTENTIALLY CAUSE OLDER SOFTWARE PACKAGES TO STOP WORKING." . NL
+	."DO NOT PROCEED WITH THIS STEP IF YOU ARE NOT SURE OR IF YOU ARE NOT AN AUTHORIZED SERVER ADMIN." . NL
+	."Otherwise it is recommended to ensure your system is up-to-date.");
+$s = readline("Enter 'y' to proceed, any other key to skip this step: ");
+if($s === 'y') {
+	if($group === 'www-data') {
+		execCmd("apt-get -y update");
+		execCmd("apt-get -y upgrade");
+		execCmd("apt-get install -y php-sqlite3 php-curl");
+	} else {
+		execCmd("pacman -Syu");
+		execCmd("pacman -S php-sqlite");
+	}
+
+	msg("Restarting web server...");
+	if($group === 'www-data')
+		$cmd = "service apache2 restart";
+	else
+		$cmd = "systemctl restart lighttpd";
+	if(!execCmd($cmd))
+		msg("Restart webserver or restart node now");
 }
 
 msg("Install/Update Complete.");
@@ -173,6 +183,15 @@ msg("Be sure to bookmark the above URL(s) in your browser, and if you have just 
 exit();
 
 // ---------------------------------------------------
+// Execute command, show the command, show the output and return val
+function execCmd($cmd) {
+	msg("Executing cmd: $cmd");
+	$ret = system($cmd);
+	$s = ($ret === false) ? 'ERROR' : 'OK';
+	msg("Return Code: $s");
+	return ($ret !== false);
+}
+
 function checkDbDir() {
 	global $group, $ver;
 	// Confirm /etc/allscan dir exists and is writeable by web server
@@ -207,9 +226,10 @@ function checkSmDir() {
 		$favsbak = $favsini . '.bak';
 		msg("Confirming supermon $favsini and $favsbak are writeable by web server");
 		chdir($smdir);
-		`touch $favsini $favsbak`;
-		`chmod 664 $favsini $favsbak; chmod 775 .`;
-		`chgrp $group $favsini $favsbak .`;
+		execCmd("touch $favsini $favsbak");
+		execCmd("chmod 664 $favsini $favsbak");
+		execCmd("chmod 775 .");
+		execCmd("chgrp $group $favsini $favsbak .");
 		chdir('..');
 	} else {
 		msg("No $smdir/ directory found. Supermon is not required but is recommended.");
@@ -217,7 +237,7 @@ function checkSmDir() {
 }
 
 function msg($s) {
-	echo $s . PHP_EOL;
+	echo $s . NL;
 }
 
 function errExit($s) {

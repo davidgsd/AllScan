@@ -55,7 +55,7 @@ Log into your node by SSH and run the following commands:
 
 The Install/Update script will provide detailed status messages on each step of the process. Once the update/install is complete it is recommended to delete the script ("rm AllScanInstallUpdate.php"). Then the next time you want to update just run the above commands again.
 
-Now open a browser and go to your node's IP address followed by /allscan/, eg. `http://192.168.1.23/allscan/` and be sure to add a bookmark in your browser. If you did a new install or upgraded from pre-v0.45, AllScan will prompt you to create an admin account. You can then configure the permission settings for AllScan. Note that rhese default to READ-ONLY for public (not logged-in) users. This setting can be changed on the "Cfgs" page.
+Now open a browser and go to your node's IP address followed by /allscan/, eg. `http://192.168.1.23/allscan/` and be sure to add a bookmark in your browser. If you did a new install or upgraded from pre-v0.45, AllScan will prompt you to create an admin account. You can then configure the permission settings for AllScan. These default to READ-ONLY for public (not logged-in) users. This setting can be changed on the "Cfgs" page.
 
 If you did an update, **be sure to force a browser reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.
 
@@ -102,6 +102,9 @@ I have received many Thank You's and offers for a cup of coffee or other small d
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.49 2022-01-16**<br>
+Add user authentication and permissions checks to all API files. Add DTMF command button. Updates and optimizations to installer/updater: Fix issue where updater would exit prior to completing all checks if install was up-to-date, provide more detail about all commands executed, prompt user before executing any apt-get/pacman update/upgrade actions.
+
 **v0.48 2022-01-11**<br>
 Implement User Authentication, User Admin, Login/Logout, User Settings and Cfg Management functions. Major refactoring and additions. AllScan now defaults public (not logged-in) users to Read-Only access. This can be changed to None (no public access), Read/Modify, or to Full (no logins needed). Upon install of this version, AllScan will automatically verify the system configuration, create its Database and necessary tables, and when you first visit the allscan url it will prompt you to create an Admin user account, with detailed usage notes. Add additional log messages to dbUtils checkTables(). Change default order of possible allmon.ini locations to look in ../supermon/ prior to /etc/asterisk/ as supermon may be more likely to have valid AMI credentials. Update install/update script to update & upgrade OS packages (fixes issue seen on RPi4 w/latest ASL 2.0 where failed to find SQLite php extension).
 
@@ -132,6 +135,9 @@ Initial Commit.
 # FAQs
 Q: What is the blinking icon for?<br>
 A: AllScan's blinking 'lighting bolt' icon is a status indicator similar the 'spinny' in supermon or the blinking asterisk ('*') in allmon, which toggles on/off as each Connection Status event message is received from the node (ie. from AllScan's astapi/server.php file who reads status info from a socket connection to Asterisk on the node and then forwards that data every 500mS to AllScan's JavaScript in the browser.) If it stops blinking that means there is a communication issue between the browser and your node.
+
+Q: If I ever wanted to uninstall AllScan how can this be done?<br>
+A: All you'd have to do is delete the allscan folder in the web server root directory &ndash; which on ASL is /var/www/html/ or on HamVOIP is /srv/http/. cd to that folder, then execute "sudo rm -rf allscan" to delete the AllScan folder. Or you could move the folder somewhere else, but it's so easy to install that you might as well just delete it and then if you want to install it again later just run the installer. AllScan also keeps a database file in /etc/allscan/, which isn't going to do anything by itself if allscan was deleted from the web server folder, but if you wanted to delete the db file also, execute "sudo rm -rf /etc/allscan".
 
 # Thanks
 Thanks to all ASL Developers. Thanks to KK6QMS, N6ATC, KJ7T and K5LK for help with Beta testing.

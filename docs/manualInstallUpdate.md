@@ -21,12 +21,6 @@ You will need SSH access to your node and should have basic familiarity with Lin
 	# If updating, backup your existing allscan folder
 	mv allscan allscan.bak
 
-	# Confirm allscan directories exist and are web server writeable
-	mkdir allscan
-	ls /etc/allscan || mkdir /etc/allscan
-	chmod 775 allscan /etc/allscan
-	chgrp www-data allscan /etc/allscan
-
 	# (Optional, if you have Supermon installed) Confirm supermon directory is web server writeable
 	chmod 775 supermon; chmod 664 supermon/favorites.ini
 	chgrp www-data supermon supermon/favorites.ini
@@ -36,13 +30,26 @@ You will need SSH access to your node and should have basic familiarity with Lin
 	unzip main.zip; rm main.zip
 	mv AllScan-main allscan
 
+	# Confirm AllScan directory is web server writeable
+	chmod 775 allscan
+	chgrp www-data allscan
+
+	# Confirm AllScan DB directory exists and is web server writeable
+	ls /etc/allscan || mkdir /etc/allscan
+	chmod 775 /etc/allscan
+	chgrp www-data /etc/allscan
+
+	# Check if SQLite3 extension is installed. If below outputs NOT FOUND try OS update & upgrade steps
+	php -r 'echo class_exists("SQLite3") ? "SQLite OK\n" : "SQLite NOT FOUND\n";'
+
 	# Confirm OS packages and necessary php extensions are up-to-date
-	apt-get -y update; apt-get -y upgrade
+	apt-get -y update
+	apt-get -y upgrade
 	apt-get install -y php-sqlite3 php-curl
-	
+
 	# Restart web server
 	service apache2 restart
-	
+
 Now open a browser and go to your node's IP address followed by /allscan/, and be sure to add a bookmark in your browser.
 
 If you did an update, **be sure to force a browser reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.

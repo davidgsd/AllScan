@@ -1,8 +1,9 @@
 <?php
-error_reporting(E_ERROR | E_WARNING | E_PARSE);
-require_once('../include/common.php');
+require_once('../include/apiInit.php');
 require_once('AMI.php');
-// TBI: Authenticate user
+
+if(!modifyOk())
+	die("Insufficient user permission to execute commands\n");
 
 // Filter and validate user input
 $remotenode = trim(strip_tags($_POST['remotenode']));
@@ -19,10 +20,8 @@ if(!preg_match("/^\d+$/", $remotenode) || (!$remotenode && $button !== 'disconne
 
 // Load allmon.ini
 $cfg = readAllmonCfg();
-if($cfg === false) {
-	die("allmon.ini not found.");
-	exit();
-}
+if($cfg === false)
+	die("allmon.ini not found\n");
 
 // Open socket to Asterisk Manager
 $ami = new AMI();
@@ -79,5 +78,5 @@ switch($button) {
 }
 
 $resp = $ami->command($fp, "rpt cmd $localnode ilink $ilink $remotenode");
-
+fclose($fp);
 echo $resp;
