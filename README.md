@@ -102,16 +102,16 @@ I have received many Thank You's and offers for a cup of coffee or other small d
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
-**v0.49 2022-01-16**<br>
+**v0.49 2023-01-16**<br>
 Add user authentication and permissions checks to all API files. Add DTMF command button. Updates and optimizations to installer/updater: Fix issue where updater would exit prior to completing all checks if install was up-to-date, provide more detail about all commands executed, prompt user before executing any apt-get/pacman update/upgrade actions.
 
-**v0.48 2022-01-11**<br>
+**v0.48 2023-01-11**<br>
 Implement User Authentication, User Admin, Login/Logout, User Settings and Cfg Management functions. Major refactoring and additions. AllScan now defaults public (not logged-in) users to Read-Only access. This can be changed to None (no public access), Read/Modify, or to Full (no logins needed). Upon install of this version, AllScan will automatically verify the system configuration, create its Database and necessary tables, and when you first visit the allscan url it will prompt you to create an Admin user account, with detailed usage notes. Add additional log messages to dbUtils checkTables(). Change default order of possible allmon.ini locations to look in ../supermon/ prior to /etc/asterisk/ as supermon may be more likely to have valid AMI credentials. Update install/update script to update & upgrade OS packages (fixes issue seen on RPi4 w/latest ASL 2.0 where failed to find SQLite php extension).
 
-**v0.42 2022-01-08**<br>
+**v0.42 2023-01-08**<br>
 JavaScript optimizations. Update page Title with node PTT/COS status to allow status to be seen when browser tab is not active. Initial checkin of functions supporting base configs, SQLite3 DB and config management, and user authentication and account management (these functions are not yet all integrated into the main controller file).
 
-**v0.4 2022-01-02**<br>
+**v0.4 2023-01-02**<br>
 Only show CPU Temp if data is available. Reduce favs table CSS cell padding from 4 to 3 px. Update InstallUpdate script to verify favorites.ini file in supermon dir is writeable by web server if dir exists. Readme updates. Minor optimizations. Add API to eventually support stats caching and additional stats features. Update CPU temp data once per minute.
 
 **v0.38 2022-12-24**<br>

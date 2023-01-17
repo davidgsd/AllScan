@@ -60,7 +60,7 @@ function showNodeCtrlForm() {
 <input type=button value="Connect" onClick="connectNode(\'connect\');">
 <input type=button value="Disconnect" onClick="disconnectNode();">
 <input type=button value="Monitor" onClick="connectNode(\'monitor\');">
-<input type=button value="Local Monitor" onClick="connectNode(\'localmonitor\');">
+<input type=button value="Local Mon" onClick="connectNode(\'localmonitor\');">
 <input type=button value="DTMF" onClick="dtmfCmd();">
 <br>
 <input type=checkbox id="permanent"><label for="permanent">Permanent</label>&nbsp;

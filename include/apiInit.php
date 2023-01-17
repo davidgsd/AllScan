@@ -5,8 +5,8 @@
 error_reporting(E_ERROR | E_WARNING | E_PARSE);
 require_once('common.php');
 
-// Authenticate user. Exits if AllScan init error or user login not valid. Caller should then call
-// readOk(), modifyOk(), writeOk(), etc. to verify user permission level is sufficient for requested function
+// Authenticate user. Exits if AllScan init error or user login not valid. Otherwise call readOk(),
+// modifyOk(), writeOk(), etc. to verify user permission level is sufficient for requested function
 
 // Init base cfgs
 $msg = [];
