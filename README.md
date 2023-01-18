@@ -8,7 +8,7 @@ See [screenshot.png](https://github.com/davidgsd/AllScan/blob/main/screenshot.pn
 
 These features finally give AllStar nodes similar memory management and scan capabilities that analog radios have had for decades. AllScan is mobile-friendly and optimized for ease of use on both small and large screens. AllScan follows the latest web development standards, with PHP, JavaScript, HTML, and CSS cleanly partitioned, runs on both ASL and HamVOIP, and is very easy to install, configure, and update.
 
-AllScan supports multiple locations of the favorites.ini file, giving priority to the allscan folder or secondarily using the ../supermon folder. Multiple favorites files can be used and easily switched between. If no favorites.ini file is found AllScan will ask if you'd like to create the file and if so will copy the docs/favorites.ini.sample file to ./favorites.ini, which has a small list of nodes to get you started. (AllMon's controlpanel.ini file may also be supported at some point.)
+AllScan supports multiple locations of the favorites.ini file. If no favorites.ini file is found AllScan will ask if you'd like to create the file and if so will copy the docs/favorites.ini.sample file to ./favorites.ini, which has a small list of nodes to get you started. (AllMon's controlpanel.ini file may also be supported at some point.)
 
 Prior to installing AllScan it is recommended that you have a working install of SuperMon or AllMon2. AllScan can automatically read their config files and thereby need no additional configuration. AllScan is very easy-to-use and can be downloaded and installed in minutes. Currently AllScan supports favorites.ini entries that refer to connecting to nodes eg. 'cmd[] = "rpt cmd %node% ilink 3 [node#]"' but may also support other types of commands in the future. AllScan saves a backup copy to favorites.ini.bak in case of any issue.
 
@@ -40,9 +40,7 @@ Ideally you should be using a recent (2021 or later) 2.0 Beta version of the ASL
 
 If you have Supermon already working, AllScan will need no additional configuration and will use the favorites.ini file in the supermon directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon. Confirm you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. Supermon is easy to set up and has some nice maintenance/debug features. For example it allows you to edit the text in the favorites.ini file in your browser, so for example you could add notes there of weekly Net times.
 
-AllScan will use the ../supermon/global.inc file automatically if global.inc is not present in the allscan folder. If you do not have Supermon installed or its global.inc file cannot be read AllScan will prompt you to enter your Call, Location and Node Title and save to global.inc.
-
-If you use Supermon2 instead of Supermon, or want to put your global.inc or favorites.ini files in some other folder, you can make symbolic links to those locations. For example to use the supermon2 favorites.ini do the following: 1. "cd /var/www/html/allscan" 2. "ln -s ../supermon2/favorites.ini ."
+If you use Supermon2 instead of Supermon or want to put your favorites.ini file in some other folder, the favorites.ini search location(s) can be set on the AllScan Cfgs Page.
 
 # Automatic Install / Update
 The AllScan Install/Update script automatically checks all system configuration details, changes to the web server root folder, checks if AllScan is already Installed and if so what version, and if not installed or a newer version is available will prompt you to continue with the Install/Update. Just enter 'y' and seconds later the install/update will be complete. If you prefer to install/update manually see the [Manual Install / Update Instructions](https://github.com/davidgsd/AllScan/blob/main/docs/manualInstallUpdate.md).
@@ -77,7 +75,7 @@ Most nodes already have a number of Cfg files and to simplify the install proces
 1. **global.inc**: Cfg file in the supermon directory with user settings such as your name, call sign, node title, etc. AllScan will automatically import the following variables from global.inc if found: $CALL, $LOCATION, and $TITLE2. Otherwise, go to the AllScan Cfgs Page and enter your Call Sign, Location and Node Title parameters there. Once these parms have been imported or set AllScan will not read from the global.inc file again. The Call Sign and Location parameters are shown in the AllScan Page Header, and the Node Title parameter is shown in the Connection Status Table header.
 2. **astdb.txt**: The ASL database file with the list of all nodes provisioned on the AllStarLink network. This file should already exist in ../supermon/astdb.txt or /var/log/asterisk/astdb.txt. If the file is not found it will be automatically downloaded into the allscan directory. If you have a properly configured node you should have a cron entry that downloads the latest astdb file at least once per week, and ideally once per day. AllScan shows the status of the above files and their last modification time in the status messages box (below the Favorites Table). If you see there is no recent astdb file (less than 1 week old) you should review your cron settings (which should have been configured when you installed ASL/AllMon and Supermon).
 3. **allmon.ini**: This defines your node number(s) and the Asterisk Manager credentials. It can usually be found in any of the following locations: ../supermon/allmon.ini, /etc/asterisk/allmon.ini.php or ../allmon2/allmon.ini.php. AllScan will search those locations in that order and use the first file found. If you see connection/stats error messages check those file locations and verify they have the correct data. If you have multiple Nodes defined in allmon.ini, AllScan will use the first Node# in the file. A future version of AllScan may support multiple Node#s and allow these cfgs to be stored in AllScan's database.
-4. **favorites.ini**: The favorites file can be found in the supermon directory or in the allscan directory. If not found in ../supermon/ you will be prompted to create a new favorites.ini file in the allscan directory which will make a copy of docs/favorites.ini.sample. A future version of AllScan will allow you to specify the location of the favorites file or if AllScan's database should be used instead.
+4. **favorites.ini**: The favorites file can be found in the supermon directory or in the allscan directory. If not found in ../supermon/ you will be prompted to create a new favorites.ini file in the allscan directory. A future version of AllScan will allow you to specify the location of the favorites file or if AllScan's database should be used instead.
 
 All AllScan Cfg parameters can be viewed and set on the Cfgs page if you are logged in as an Admin user. Just click the 'Cfgs' link and all Cfgs are then shown along with an Edit form.
 
@@ -86,7 +84,7 @@ For any issues including directory/file permissions issues or issues with SQLite
 
 HamVOIP users: See this [Blog Post by KJ7T](https://randomwire.substack.com/p/updating-allscan-on-the-clearnode) for detailed steps on how to enable the SQLite3 extension in php.ini.
 
-If you get a permissions error when trying to Add a Favorite, check that the /var/www/html/allscan and supermon dirs have 775 permissions and www-data group, and that the favorites.ini file exists in one or both of directories and has 664 permissions and www-data as the group. These settings should already be that way if your Supermon install is properly working, or it would not be able to edit and save the favorites.ini file. As a test you can go into Supermon, click the Configuration Editor button and try adding a blank line to favorites.ini and see if it saves OK. If not, there is something improperly configured with the Supermon install. The following commands should correct those settings:
+If you get a permissions error when trying to Add a Favorite, check that the /var/www/html/allscan and supermon dirs have 775 permissions and www-data group, and that the favorites.ini file exists in one or both directories and has 664 permissions and www-data as the group. These settings should already be that way if your Supermon install is properly working, or it would not be able to edit and save the favorites.ini file. As a test you can go into Supermon, click the Configuration Editor button and try adding a blank line to favorites.ini and see if it saves OK. If not, there is something improperly configured with the Supermon install. The following commands should correct those settings:
 
 	cd /var/www/html || cd /srv/http # Change to www root folder (works on ASL and HamVOIP)
 	cd supermon
@@ -97,8 +95,6 @@ If you get a permissions error when trying to Add a Favorite, check that the /va
 	sudo chgrp www-data favorites.ini favorites.ini.bak .
 	# else for HamVOIP set group to http
 	# sudo chgrp http favorites.ini favorites.ini.bak .
-
-If you keep your favorites.ini file in the allscan directory and see error messages when writing the file from allscan, run the same steps as above but in the /var/www/html/allscan/ folder.
 
 # Contact
 If you have any questions email chc_media at yahoo dot com. Also see [AllScan.info](https://AllScan.info). 73, NR9V
