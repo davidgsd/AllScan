@@ -11,6 +11,7 @@ define('favsIniLoc', 2);
 define('call', 3);
 define('location', 4);
 define('title', 5);
+define('autodisc_def', 6);
 //define('', );
 
 // Global Cfgs Default Values
@@ -19,7 +20,8 @@ $gCfgDef = [
 	favsIniLoc => ['favorites.ini', '../supermon/favorites.ini'],
 	call => '',
 	location => '',
-	title => ''
+	title => '',
+	autodisc_def => 1
 ];
 
 $gCfgName = [
@@ -27,7 +29,8 @@ $gCfgName = [
 	favsIniLoc => 'Favorites.ini Locations',
 	call => 'Call Sign',
 	location => 'Location',
-	title => 'Node Title'
+	title => 'Node Title',
+	autodisc_def => 'DiscBeforeConn Default'
 ];
 
 $publicPermissionVals = [
@@ -36,13 +39,16 @@ $publicPermissionVals = [
 	PERMISSION_READ_MODIFY	=> 'Read/Modify',
 	PERMISSION_FULL			=> 'Full'];
 
+$checkboxVals = [0=>'Off', 1=>'On'];
+
 // Value definition arrays for enumerated cfgs. Specify null for plain text/numeric cfgs
 $gCfgVals = [
 	publicPermission => $publicPermissionVals,
 	favsIniLoc => null,
 	call => null,
 	location => null,
-	title => null
+	title => null,
+	autodisc_def => $checkboxVals
 ];
 
 // Global Cfgs structure
@@ -76,6 +82,12 @@ function adminUser() {
 	return (isset($user) && userPermission() >= PERMISSION_ADMIN);
 }
 
+function cfgCompare($a, $b) {
+	if(is_numeric($a) && is_numeric($b))
+		return ($a == $b);
+	return ($a === $b);
+}
+
 class CfgModel {
 const	TABLENAME = 'cfg';
 public  $db;
@@ -106,6 +118,7 @@ function readCfgs() {
 	foreach($cfgs as $c) {
 		$k = $c->cfg_id;
 		$gCfg[$k] = is_array($gCfgDef[$k]) ? explode(',', $c->val) : $c->val;
+		//msg("Cfg $k val=" . $gCfg[$k]);
 		$gCfgUpdated[$k] = $c->updated;
 	}
 }
@@ -119,19 +132,29 @@ function saveCfgs() {
 	foreach($ids as $k) {
 		// If val=DBval nothing to be done
 		$val = is_array($gCfgDef[$k]) ? arrayToCsv($gCfg[$k]) : $gCfg[$k];
-		$dbVal = isset($cfgs[$k]) ? (is_array($gCfgDef[$k]) ? arrayToCsv($cfgs[$k]) : $cfgs[$k]) : null;
-		if($val === $dbVal)
+		if(isset($cfgs[$k])) {
+			$cVal = $cfgs[$k]->val;
+			$dbVal = is_array($gCfgDef[$k]) ? arrayToCsv($cVal) : $cVal;
+		} else {
+			$dbVal = null;
+		}
+		if(cfgCompare($val, $dbVal)) {
+			//msg("Cfg $k val=DBval");
 			continue;
+		}
 		// If val=DefVal delete from DB, else write to DB
 		$defVal = is_array($gCfgDef[$k]) ? arrayToCsv($gCfgDef[$k]) : $gCfgDef[$k];
-		if($val === $defVal) {
-			if($dbVal) {
+		if(cfgCompare($val, $defVal)) {
+			//msg("Cfg $k val=defVal");
+			if($dbVal !== null) {
+				//msg("Deleting Cfg $k");
 				$this->delete($k);
 				unset($gCfgUpdated[$k]);
 			}
 		} else {
 			// Add if not in DB / Update otherwise
 			$c = (object)['cfg_id'=>$k, 'val'=>$val, 'updated'=>$gCfgUpdated[$k]];
+			//msg("Cfg $k val!=defVal, updating");
 			$this->update($c, !isset($cfgs[$k]));
 		}
 	}

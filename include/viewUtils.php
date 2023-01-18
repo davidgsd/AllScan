@@ -28,7 +28,7 @@ function showConnStatusTable() {
 }
 
 function showNodeCtrlForm() {
-	global $node, $remNode, $autodisc;
+	global $node, $remNode, $gCfg;
 	echo '<form id="nodeForm" method="post" action="/allscan/"><fieldset>
 <input type=hidden id="localnode" name="localnode" value="' . $node . '">
 <input type=hidden id="conncnt" name="conncnt" value="0">
@@ -44,7 +44,7 @@ function showNodeCtrlForm() {
 <input type=button value="DTMF" onClick="dtmfCmd();">
 <br>
 <input type=checkbox id="permanent"><label for="permanent">Permanent</label>&nbsp;
-<input type=checkbox id="autodisc"' . ($autodisc ? ' checked' : '') . '><label
+<input type=checkbox id="autodisc"' . ($gCfg[autodisc_def] ? ' checked' : '') . '><label
 	for="autodisc">Disconnect before Connect</label>
 </fieldset></form>
 ';

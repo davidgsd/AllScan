@@ -29,6 +29,8 @@ function showCfgs($cfgs) {
 		}
 		if($val === $def)
 			$val = '[Default]';
+		if(empty($def))
+			$def = '-';
 		$row = [$id, $name, $val, $def, $updated];
 		$out .= $html->tableRow($row, null);
 	}

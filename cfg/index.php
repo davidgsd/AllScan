@@ -22,14 +22,20 @@ $user =	$userModel->validate();
 if(!readOk())
 	redirect('user/');
 
+$msg = [];
 // Ignore Add/Edit requests if not Admin user
 if(isset($_POST['Submit']) && adminUser()) {
-	$cfg = processForm($_POST['Submit'], arrayToObj($_POST, ['cfg_id', 'val']));
+	$cfg = processForm($_POST['Submit'], arrayToObj($_POST, ['cfg_id', 'val']), $msg);
 }
 
 pageInit();
 h1("Manage Cfgs");
 $view = new CfgView();
+
+if(!empty($msg)) {
+	h3("Process Form Results:");
+	echo implode(BR, $msg) . BR;
+}
 
 // Show Cfgs
 h2("Configuration Parameters");
@@ -42,12 +48,12 @@ if(adminUser())
 asExit();
 
 //-------- functions --------
-function processForm($Submit, $cfg) {
+function processForm($Submit, $cfg, &$msg) {
 	global $cfgModel, $gCfg, $gCfgDef, $gCfgUpdated, $gCfgVals;
 	$id = $cfg->cfg_id;
 	$val = $cfg->val ?? null;
 	if(!array_key_exists($id, $gCfg)) {
-		errMsg('Cfg not found');
+		$msg[] = error('Cfg not found');
 		return;
 	}
 	if($Submit === EDIT_CFG) {
@@ -55,32 +61,43 @@ function processForm($Submit, $cfg) {
 			$cfg->val = $gCfg[$cfg->cfg_id];
 			return $cfg;
 		} else {
-			// Convert array cfgs from csv / Validate enumerated cfgs
+			// Convert array cfgs from csv / validate enumerated cfgs
 			if(is_array($gCfgDef[$id])) {
 				$val = csvToArray($val);
 			} elseif($gCfgVals[$id] !== null && !array_key_exists($val, $gCfgVals[$id])) {
-				errMsg('Invalid Cfg value');
+				$msg[] = error('Invalid Cfg value');
 				return;
 			}
 			// Return now if cfg val did not change
-			if($val === $gCfg[$id])
+			if(cfgCompare($val, $gCfg[$id])) {
+				$msg[] = 'Cfg val unchanged';
 				return null;
+			} else {
+				//$msg[] = "cfg={$gCfg[$id]} val=$val";
+			}
 			// Set Cfg
+			$msg[] = 'Setting Cfg';
 			$gCfg[$id] = $val;
 			$gCfgUpdated[$id] = time();
 		}
 	} elseif($Submit === DEFAULT_CFG) {
 		// Return now if cfg val is already the default
-		if($gCfg[$id] === $gCfgDef[$id])
+		if(cfgCompare($gCfg[$id], $gCfgDef[$id])) {
+			$msg[] = 'Cfg val already = default val';
 			return null;
+		} else {
+			//$msg[] = "cfg={$gCfg[$id]} Defval={$gCfgDef[$id]}";
+		}
 		// Set Cfg to default val
+		$msg[] = 'Defaulting Cfg';
 		$gCfg[$id] = $gCfgDef[$id];
 		unset($gCfgUpdated[$id]);
 	} else {
 		return null;
 	}
+	$msg[] = 'Saving Cfgs';
 	$cfgModel->saveCfgs();
 	if($cfgModel->error)
-		errMsg($cfgModel->error);
+		$msg[] = error($cfgModel->error);
 	return null;
 }

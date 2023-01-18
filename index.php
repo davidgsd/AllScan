@@ -55,7 +55,6 @@ if(!isset($node) || $astdb === false)
 if(!$gCfg[call] && adminUser())
 	p('global.inc not found. Check Supermon install or Enter Call Sign, Location and Node Title on Cfgs page');
 
-$autodisc = !isset($parms['autodisc']) || $parms['autodisc'];
 $remNode = (isset($parms['node']) && validDbID($parms['node']) && strlen($parms['node']) < 9) ? $parms['node'] : '';
 
 showConnStatusTable();
