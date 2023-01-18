@@ -27,7 +27,9 @@ Color codes for '#' column:
 
 ASL's stats APIs are limited to 30 requests/minute per IP Address. AllScan uses a dynamic request timing algorithm to prevent exceeding this limit, even if multiple web clients are using AllScan on a node.
 
-As of v0.45 AllScan now implements full User Authentication, User Account Administration, Login/Logout, User Settings and Cfg Management functions. After installing or upgrading from pre-v0.45, AllScan will automatically create its Database and necessary tables, and when you first visit the allscan/ url will prompt you to create an Admin user account, with detailed usage notes. Additional screenshots:
+As of v0.45 AllScan implements User Authentication, User Account Administration, Login/Logout, User Settings and Cfg Management functions. After installing or upgrading from pre-v0.45, AllScan will automatically create its Database and necessary tables, and when you first visit the allscan/ url will prompt you to create an Admin user account. By default, public (not logged-in) users will have Read-Only access and will be able to see the Connection Status and Favorites data, but will not be able to make changes or view any admin (Cfgs / Users) pages. To change this setting, Log in, click the "Cfgs" link, and edit the "Public Permission" parameter.
+
+Additional screenshots:
 [init.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/init.png)
 [cfgs.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/cfgs.png)
 [users.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/users.png)
@@ -55,7 +57,7 @@ Log into your node by SSH and run the following commands:
 
 The Install/Update script will provide detailed status messages on each step of the process. Once the update/install is complete it is recommended to delete the script ("rm AllScanInstallUpdate.php"). Then the next time you want to update just run the above commands again.
 
-Now open a browser and go to your node's IP address followed by /allscan/, eg. `http://192.168.1.23/allscan/` and be sure to add a bookmark in your browser. If you did a new install or upgraded from pre-v0.45, AllScan will prompt you to create an admin account. You can then configure the permission settings for AllScan. These default to READ-ONLY for public (not logged-in) users. This setting can be changed on the "Cfgs" page.
+Now open a browser and go to your node's IP address followed by /allscan/, eg. `http://192.168.1.23/allscan/` and be sure to add a bookmark in your browser. If you did a new install or upgraded from pre-v0.45, AllScan will prompt you to create an admin account. Be sure to do this right after installing/upgrading. You can then configure the permission settings for AllScan. These default to READ-ONLY for public (not logged-in) users. This setting can be changed on the "Cfgs" page.
 
 If you did an update, **be sure to force a browser reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.
 
@@ -65,11 +67,17 @@ NOTES for HamVOIP only:
 	extension=sqlite3.so
 2. Then restart Lighttpd web server or restart the node
 
-# Notes
-User authentication is now fully implemented as of v0.45. By default this will prevent unauthorized users from changing any settings, connecting/disconnecting nodes, or viewing any other user data. By default, public (not logged-in) users will have Read-Only access and will be able to see the Connection Status and Favorites data, but will not be able to make any changes or see any admin (ie. Cfgs / Users) pages. To change this setting, Login, click the "Cfgs" link, and edit the "Public Permission" parameter. NOTE: Until you have set up the first admin account, anyone could access the url and do this themselves. Therefore be sure to log on and setup your admin account immediately after installing or updating from pre-v0.45.
-
 # Node Notes
 If you do not yet have a node or might like to upgrade your node, check out the following article by AllScan's author NR9V: [How To Build a High-Quality Full-Duplex AllStar Node for Under $200](https://allscan.info/docs/diy-node.php).
+
+# Notes on Configuration Files and Parameters
+There are several files and various Cfg parameters used by AllScan. Most nodes will already have some existing files with needed information thus to simplify the install process AllScan tries to use any existing config files. These files are as follows:
+1. **global.inc**: Cfg file in the supermon directory with user settings such as your name, call sign, node title, etc. AllScan will automatically import the following variables from global.inc if found: $CALL, $LOCATION, and $TITLE2. Otherwise, go to the AllScan Cfgs Page and enter your Call, Location and Node Title parameters there. Once these parms have been imported or set AllScan will not read from the global.inc file again. The Call Sign and Location parameters are shown in the AllScan header bar, and the Node Title parameter is shown in the Connection Status table header.
+2. **astdb.txt**: This is the ASL database file with the list of all nodes active on the AllStar network. This file should already exist at one or more of the following locations: ../supermon/astdb.txt or /var/log/asterisk/astdb.txt. If the file is not found it will be automatically downloaded into the allscan directory. If you have a properly set up node you should already have a cron entry that downloads the latest astdb file at least once per week. AllScan shows the status of the above files and their last modification time in the status messages box (below the Favorites Table). If you see that there is no recent astdb file (less than 1 week old) you should review your cron settings.
+3. **allmon.ini**: This defines your node number(s) and the Asterisk Manager credentials. It can be found in any of the following locations: ../supermon/allmon.ini, /etc/asterisk/allmon.ini.php, or ../allmon2/allmon.ini.php. Currently AllScan will search those 3 locations in that order, and use the first file found. If you see connection/stats error messages check those file locations and verify they have the correct data.
+4. **favorites.ini**: The favorites file can be found
+
+All AllScan Cfg parameters can be viewed and set on the Cfgs page if you are logged in as an Admin user. Just click the 'Cfgs' link and all Cfgs are then shown along with an Edit form.
 
 # Troubleshooting / FAQs
 For any issues including directory/file permissions issues or issues with SQLite not being available it is recommended to first always run the update script. The script will check if you have the latest version of AllScan and update your install if not, and will validate all directory and file permissions and update/upgrade any out-of-date OS packages. Refer to the "Automatic Install / Update" section above and run the update script and then see if the issue was resolved.
@@ -102,6 +110,9 @@ I have received many Thank You's and offers for a cup of coffee or other small d
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.50 2023-01-17**<br>
+Add 'Node Stats' button. Implement Call Sign, Location and Node Title Cfgs, these are automatically imported from global.inc as before but once imported they are now managed on the Cfgs page and global.inc will no lomger be read from (unless the cfgs are later deleted). Fix issue where API files would require a logged in user prior to checking the 'Public Permission' cfg, resulting in non-logged-in users not seeing Connection Status data.
+
 **v0.49 2023-01-16**<br>
 Add user authentication and permissions checks to all API files. Add DTMF command button. Updates and optimizations to installer/updater: Fix issue where updater would exit prior to completing all checks if install was up-to-date, provide more detail about all commands executed, prompt user before executing any apt-get/pacman update/upgrade actions.
 

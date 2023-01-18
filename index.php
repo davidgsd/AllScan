@@ -52,10 +52,8 @@ pageInit($onLoad);
 if(!isset($node) || $astdb === false)
 	asExit(implode(BR, $msg));
 
-if(!$globalInc) {
-	p('global.inc not found. Check Supermon install or enter data below to create file in ' . getcwd() . '/.');
-	showGlobalIncForm();
-}
+if(!$gCfg[call] && adminUser())
+	p('global.inc not found. Check Supermon install or Enter Call Sign, Location and Node Title on Cfgs page');
 
 $autodisc = !isset($parms['autodisc']) || $parms['autodisc'];
 $remNode = (isset($parms['node']) && validDbID($parms['node']) && strlen($parms['node']) < 9) ? $parms['node'] : '';
@@ -188,6 +186,8 @@ if(($ct = cpuTemp()))
 	echo '<span id="cputemp">' . $ct . '</span>' . $sep;
 
 // Show function buttons and Links
+echo $html->linkButton('Node Stats', "http://stats.allstarlink.org/stats/$node", 'small', null, null, 'stats');
+
 if(modifyOk())
 	echo $html->linkButton('Restart Asterisk', null, 'small', null, 'astrestart();');
 
@@ -286,25 +286,6 @@ function processForm($parms, &$msg) {
 				$favsFile = $to;
 			} else {
 				$msg[] = error("Copy $from to $to Error. Check directory permissions.");
-			}
-			break;
-		case CREATE_GLOBALINC_FILE:
-			$from = 'docs/global.inc.sample';
-			$file = file_get_contents($from);
-			if($file === false) {
-				$msg[] = error("$from not found");
-				break;
-			}
-			$tags = ['[CALL]', '[LOCATION]', '[TITLE2]'];
-			$parms = [$parms['call'], $parms['location'], $parms['title2']];
-			$file = str_replace($tags, $parms, $file);
-			$to = globalinc;
-			if(file_put_contents($to, $file)) {
-				$msg[] = "Wrote to $to OK";
-				chmod($to, 0664);
-				$globalInc = $to;
-			} else {
-				$msg[] = error("Error saving $to. Check directory permissions.");
 			}
 			break;
 	}

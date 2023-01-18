@@ -1,8 +1,10 @@
 <?php
 require_once('../include/apiInit.php');
 
-if(!readOk())
-	die("Insufficient user permission to execute commands\n");
+if(!readOk()) {
+	sendData(['status' => 'Insufficient user permission']);
+	exit();
+}
 
 // Filter and validate user input
 if((!isset($_POST['node']) || !$_POST['node']) && (!isset($_POST['nodes']) || !$_POST['nodes'])) {

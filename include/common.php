@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.49";
+$AllScanVersion = "v0.50";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -38,13 +38,9 @@ $urlbase = '';	// eg. /allscan (prepended to url paths eg. <img src=\"$urlbase/A
 $title = '';
 $title2 = '';
 // ASL/AllMon/Supermon Files
-define('globalinc', 'global.inc');
-define('smglobalinc', '../supermon/global.inc');
-$globalInc = '';
 define('favsini', 'favorites.ini');
 define('smfavsini', '../supermon/favorites.ini');
 $favsFile = '';
-//$favsFile = checkFileLocs([favsini, '../supermon/favorites.ini', ists(smfavsini) ? smfavsini : null);
 
 function asInit(&$msg) {
 	global $wwwroot, $asdir, $subdir, $relpath, $urlbase;
@@ -73,32 +69,20 @@ function htmlInit($title) {
 }
 
 function pageInit($onload='', $showHdrLinks=true) {
-	global $html, $AllScanVersion, $urlbase, $subdir, $globalInc, $title, $title2, $userCnt;
-	// This function only applies to HTML context
-	// Can also be called during init from API/files that output JSON/text data
+	global $html, $AllScanVersion, $gCfg, $urlbase, $subdir, $title, $title2, $cfgModel, $userCnt;
+	// Return now if not called from an HTML context
 	if(!isset($html))
 		return;
 
 	htmlInit('AllScan - AllStarLink Favorites Management & Scanning');
-	// Load Title cfgs. Do this after htmlInit() - global.inc may cause whitespace to be output
-	$locs = [globalinc, smglobalinc];
-	foreach($locs as $loc) {
-		if($subdir)
-			$loc = "../$loc";
-		if(strpos($subdir, '/'))
-			$loc = "../$loc";
-		if(file_exists($loc)) {
-			$globalInc = $loc;
-			break;
-		}
-	}
-	if($globalInc) {
-		include($globalInc);
-		$title = $CALL . ' ' . $LOCATION;
-		$title2 = $TITLE2 . ' - ' . $title;
+	// Load Title cfgs. Do this after htmlInit(), global.inc can cause whitespace output
+	if($cfgModel->checkGlobalInc()) {
+		$title2 = $title = $gCfg[call] . ' ' . $gCfg[location];
+		if($gCfg[title])
+			$title2 .= ' - ' . $gCfg[title];
 	} else {
-		$title = '[CALL] [LOCATION]';
-		$title2 = '[TITLE2] - ' . $title;
+		$title = '[Call Sign] [Location]';
+		$title2 = '[Node Title] - ' . $title;
 	}
 	// Output header
 	$hdr = $lnk = [];

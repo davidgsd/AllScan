@@ -3,7 +3,7 @@ require_once('../include/apiInit.php');
 require_once('AMI.php');
 
 if(!modifyOk())
-	die("Insufficient user permission to execute commands\n");
+	exit("Insufficient user permission to execute commands\n");
 
 // Filter and validate user input
 $remotenode = trim(strip_tags($_POST['remotenode']));
@@ -13,24 +13,24 @@ $perm = (trim(strip_tags($_POST['perm'])) === 'true');
 $autodisc = (trim(strip_tags($_POST['autodisc'])) === 'true');
 
 if(!preg_match("/^\d+$/", $localnode) || !$localnode)
-	die("Invalid local node number\n");
+	exit("Invalid local node number\n");
 
 if(!preg_match("/^\d+$/", $remotenode) || (!$remotenode && $button !== 'disconnect'))
-	die("Invalid remote node number\n");
+	exit("Invalid remote node number\n");
 
 // Load allmon.ini
 $cfg = readAllmonCfg();
 if($cfg === false)
-	die("allmon.ini not found\n");
+	exit("allmon.ini not found\n");
 
 // Open socket to Asterisk Manager
 $ami = new AMI();
 $fp = $ami->connect($cfg[$localnode]['host']);
 if($fp === false)
-	die("Could not connect\n");
+	exit("Could not connect\n");
 
 if($ami->login($fp, $cfg[$localnode]['user'], $cfg[$localnode]['passwd']) === false)
-	die("Could not login\n");
+	exit("Could not login\n");
 
 switch($button) {
 	case 'connect':

@@ -16,11 +16,9 @@ $db = dbInit();
 // Validate DB tables. Returns count of users in user table (exits on error)
 $userCnt = checkTables($db, $msg);
 if(!$userCnt)
-	die("Authentication Failed\n");
+	exit("Authentication Failed\n");
 // Init gCfgs (exits on error)
 $cfgModel = new CfgModel($db);
 // Init Users module, validate user
 $userModel = new UserModel($db);
 $user =	$userModel->validate();
-if(empty($user))
-	die("User Authentication Failed\n");

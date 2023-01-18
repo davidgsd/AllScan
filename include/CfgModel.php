@@ -8,17 +8,26 @@
 // Callers need only reference $gCfg, and call saveCfgs() if they modify a $gCfg value.
 define('publicPermission', 1);
 define('favsIniLoc', 2);
-//define('', '');
+define('call', 3);
+define('location', 4);
+define('title', 5);
+//define('', );
 
 // Global Cfgs Default Values
 $gCfgDef = [
 	publicPermission => PERMISSION_READ_ONLY,
-	favsIniLoc => ['favorites.ini', '../supermon/favorites.ini']
+	favsIniLoc => ['favorites.ini', '../supermon/favorites.ini'],
+	call => '',
+	location => '',
+	title => ''
 ];
 
 $gCfgName = [
 	publicPermission => 'Public Permission',
-	favsIniLoc => 'Favorites.ini Locations'
+	favsIniLoc => 'Favorites.ini Locations',
+	call => 'Call Sign',
+	location => 'Location',
+	title => 'Node Title'
 ];
 
 $publicPermissionVals = [
@@ -27,9 +36,13 @@ $publicPermissionVals = [
 	PERMISSION_READ_MODIFY	=> 'Read/Modify',
 	PERMISSION_FULL			=> 'Full'];
 
+// Value definition arrays for enumerated cfgs. Specify null for plain text/numeric cfgs
 $gCfgVals = [
 	publicPermission => $publicPermissionVals,
-	favsIniLoc => null
+	favsIniLoc => null,
+	call => null,
+	location => null,
+	title => null
 ];
 
 // Global Cfgs structure
@@ -97,7 +110,7 @@ function readCfgs() {
 	}
 }
 
-// Save global cfgs. Caller will have updated $gCfg. Loop through cfgs, compare vals to DB and Def Vals
+// Save global cfgs. Caller will have updated $gCfg. Loop through cfgs, compare vals to DB & Def Vals
 function saveCfgs() {
 	global $gCfg, $gCfgDef, $gCfgUpdated;
 	$ids = array_keys($gCfg);
@@ -184,6 +197,31 @@ function validateVal($c) {
 		return false;
 	}
 	return true;
+}
+
+// Do not call below prior to htmlInit(), global.inc include may cause whitespace to be output
+function checkGlobalInc() {
+	global $gCfg, $subdir;
+	if($gCfg[call] && $gCfg[location])
+		return true;
+	// If Call and Location cfgs not set try importing from ../supermon/global.inc
+	$loc = '../supermon/global.inc';
+	if($subdir)
+		$loc = "../$loc";
+	if(strpos($subdir, '/'))
+		$loc = "../$loc";
+	if(file_exists($loc)) {
+		include($loc);
+		if(!$CALL || !$LOCATION)
+			return false;
+		$gCfg[call] = $CALL;
+		$gCfg[location] = $LOCATION;
+		if($TITLE2)
+			$gCfg[title] = $TITLE2;
+		$this->saveCfgs();
+		return true;
+	}
+	return false;
 }
 
 private function checkDbError($method, $extraTxt='') {

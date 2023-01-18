@@ -288,13 +288,18 @@ function datetimeField($name, $ts) {
 		. $this->select($name . '[5]', null, $apList, $ap, null, false);
 	return $out;
 }
-function linkButton($title, $url, $class=null, $titleTag=null, $onClick=null) {
+function linkButton($title, $url, $class=null, $titleTag=null, $onClick=null, $target=null) {
 	if($class)
 		$class = " class=\"$class\"";
 	if($titleTag)
 		$titleTag = " title=\"$titleTag\"";
-	if($onClick === null)
-		$onClick = "window.location.href='$url';";
+	if($onClick === null) {
+		if($target) {
+			$onClick = "let a=document.createElement('a'); a.href='$url'; a.target='$target'; a.click();";
+		} else {
+			$onClick = "window.location.href='$url';";
+		}
+	}
 	return "<input type=button$class$titleTag value=\"$title\" onClick=\"$onClick\">\n";
 }
 function cmdButton($title, $parms, $class=null, $url=null, $titleTag=null) {

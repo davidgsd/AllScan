@@ -2,27 +2,7 @@
 // viewUtils.php
 // Author: David Gleason - AllScan.info
 require_once('commonForms.php');
-define('CREATE_GLOBALINC_FILE', 'Create global.inc File');
-define('EDIT_GLOBALINC_FILE', 'Edit global.inc File');
 define('CREATE_FAVORITESINI_FILE', 'Create Favorites.ini File');
-
-function showGlobalIncForm($parms=null) {
-	$form = new stdClass();
-	$form->id = 'editGlobalIncForm';
-	if($parms === null)
-		$parms = (object)['call'=>'', 'location'=>'', 'title2'=>''];
-	$form->fields = [
-		'CALL'		=> ['text' => ['call', $parms->call]],
-		'LOCATION' 	=> ['text' => ['location', $parms->location]],
-		'TITLE2'  	=> ['text' => ['title2', $parms->title2]]];
-	if(isset($parms->edit)) {
-		$form->submit = EDIT_GLOBALINC_FILE;
-	} else {
-		$form->submit = CREATE_GLOBALINC_FILE;
-	}
-	$form->fieldsetLegend = '';
-	echo htmlForm($form) . BR;
-}
 
 function showFavsIniForm() {
 	echo '<form id="nodeForm" method="post" action="/allscan/"><fieldset>' . NL

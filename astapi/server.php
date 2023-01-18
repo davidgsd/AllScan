@@ -9,8 +9,10 @@ require_once('../include/apiInit.php');
 require_once('AMI.php');
 require_once('nodeInfo.php');
 
-if(!readOk())
-	die("Insufficient user permission to retrieve data\n");
+if(!readOk()) {
+	sendData(['status' => 'Insufficient user permission to retrieve data.']);
+	exit();
+}
 
 // Validate request
 if(empty($_GET['nodes'])) {
