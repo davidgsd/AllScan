@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.51";
+$AllScanVersion = "v0.52";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -76,7 +76,7 @@ function pageInit($onload='', $showHdrLinks=true) {
 
 	htmlInit('AllScan - AllStarLink Favorites Management & Scanning');
 	// Load Title cfgs. Do this after htmlInit(), global.inc can cause whitespace output
-	if($cfgModel->checkGlobalInc()) {
+	if(isset($cfgModel) && $cfgModel->checkGlobalInc()) {
 		$title2 = $title = $gCfg[call] . ' ' . $gCfg[location];
 		if($gCfg[title])
 			$title2 .= ' - ' . $gCfg[title];
