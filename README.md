@@ -112,6 +112,9 @@ I have received many Thank You's and offers for a cup of coffee or other small d
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.53 2023-01-21**<br>
+Performance optimizations. Fix issue that would cause an unnecessary database write on every page load/stats request for logged-in users. Fix JS console warning re. no SameSite cookie parameter. Specify allscan's dir ($urlbase/) for cookie paths.
+
 **v0.52 2023-01-19**<br>
 Minor bug fix: If after a new install or update an error was detected in dbInit(), an error would occur resulting in a blank page rather than normal page load and a useful error message being displayed. This update is not needed if your AllScan install is already working fine.
 

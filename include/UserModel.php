@@ -182,7 +182,7 @@ function validate() {
 	if(!isset($_GET['export']) && isset($_COOKIE['name']) && isset($_COOKIE['cpass'])) {
 		// Periodically refresh cookies if expire in 15-45 days
 		$age = ($u->lexp > 0) ? ($u->lexp - time()) / 86400.0 : 0;
-		if($u->lexp <= 0 || ($age >= 15 && $age <= 45)) {
+		if($u->lexp <= 0 || ($age >= 15 && $age <= 35)) {
 			$this->setLoginCookies($u->name, $u->cpass, true);
 		}
 	}
@@ -196,7 +196,6 @@ function validate() {
 
 // Process login form submission
 function validateLogin($name, $pass, $remember) {
-	global $userModel;
 	usleep(rand(20000,500000)); // Prevent response time hack
 	if(!$this->validateName($name)) {
 		return false;
@@ -221,23 +220,44 @@ function validateLogin($name, $pass, $remember) {
 	if(isset($this->error))
 		return false;
 	// Send cookies
-	$userModel->setLoginCookies($user->name, $this->cpass($user->hash), $remember);
+	$this->setLoginCookies($user->name, $this->cpass($user->hash), $remember);
 	return true;
 }
 
 function setLoginCookies($name, $cpass, $remember) {
+	global $urlbase;
 	// If 'remember me' set, set cookie for 45 days, otherwise 8 hours
 	$exp = time() + ($remember ? 45*86400 : 8*3600);
-	setcookie("name", $name, $exp, "/");
-	setcookie("cpass", $cpass, $exp, "/");
-	setcookie("lexp", $exp, $exp, "/");
+	$opts = ['expires' => $exp,
+		'path' => "$urlbase/", // eg. /allscan/
+		//'domain' => '.example.com', // leading dot for compatibility or use subdomain
+		'secure' => false,
+		'httponly' => false,
+		'samesite' => 'Lax' // None/Lax/Strict
+	];
+	setcookie("name", $name, $opts);
+	setcookie("cpass", $cpass, $opts);
+	setcookie("lexp", $exp, $opts);
 }
 
 function logout() {
-	setcookie("name", '', 1, "/");
-	setcookie("cpass", '', 1, "/");
-	setcookie("lexp", '', 1, "/");
-	return;
+	global $urlbase;
+	$opts = ['expires' => 1,
+		'path' => "$urlbase/", // eg. /allscan/
+		//'domain' => '.example.com', // leading dot for compatibility or use subdomain
+		'secure' => false,
+		'httponly' => false,
+		'samesite' => 'Lax' // None/Lax/Strict
+	];
+	setcookie("name", '', $opts);
+	setcookie("cpass", '', $opts);
+	setcookie("lexp", '', $opts);
+	// Temp TBR: Also clear cookies at old path (pre-v0.52)
+	if($urlbase) {
+		setcookie("name", '', 1, "/");
+		setcookie("cpass", '', 1, "/");
+		setcookie("lexp", '', 1, "/");
+	}
 }
 
 private function updateUserStats($user) {
@@ -247,6 +267,7 @@ private function updateUserStats($user) {
 	$ipChanged = ($user->ip_addr !== $user->last_ip_addr);
 	if(!$llChanged && !$ipChanged)
 		return true;
+
 	$cols = ['last_login'];
 	$vals = [time()];
 	if($ipChanged) {

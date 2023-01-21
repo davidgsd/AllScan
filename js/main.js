@@ -1,21 +1,30 @@
 var astApiDir='/allscan/astapi/';
 var statsDir='/allscan/stats/';
 var apiDir='/allscan/api/';
-var source, xh, hbcnt=0, xha, cputemp;
+var source, xh, hbcnt=0, xha, favsCnt=0, xhs;
 var rldRetries=0, rldTmr;
-var statsState=0, statsIdx=0, statsReqCnt=0;
-var favsCnt=0, xhs, statsTmr, ftbl, pgTitle;
+var statsTmr, statsState=0, statsIdx=0, statsReqCnt=0;
+// DOM elements
+var hb, lnode, rnode, conncnt, ftbl, statmsg, scanmsg, cputemp, pgTitle;
 
-function initEventStream(url) {
+function asInit(url) {
 	if(typeof(EventSource) === 'undefined') {
 		alert("ERROR: Your browser does not support server-sent events.");
 		return;
 	}
+	hb = document.getElementById('hb');
+	lnode = document.getElementById('localnode');
+	rnode = document.getElementById('node');
+	conncnt = document.getElementById('conncnt');
+	ftbl = document.getElementById('favs');
+	statmsg = document.getElementById('statmsg');
+	scanmsg = document.getElementById('scanmsg');
+	cputemp = document.getElementById('cputemp');
+	pgTitle = document.title;
 	// Start SSE
 	source = new EventSource(astApiDir + url);
 	source.onerror = handleEventSourceError;
-	hb = document.getElementById('hb');
-	pgTitle = document.title;
+	// Close event stream on exit
 	window.addEventListener('beforeunload', function() { source.close(); });
 	// Handle node data, update whole Conn Status table
 	source.addEventListener('nodes', handleNodesEvent, false);
@@ -25,17 +34,11 @@ function initEventStream(url) {
 	source.addEventListener('connection', handleConnectionEvent, false);
 	// Handle error responses
 	source.addEventListener('errMsg', handleErrMsgEvent, false);
-	// Check for offline/online events. If PC/phone goes to sleep or loses connection
-	// we should be able to detect when it's restored and re-init the event stream
+	// Handle offline/online events
 	window.addEventListener('online', handleOnlineEvent);
 	window.addEventListener('offline', handleOfflineEvent);
-	// Call a test function...
-	//setTimeout(handleOnlineEvent, 5000);
-	// Call initAslApi() who will read in nodes in the favorites list and do various API requests to get their
-	// current status eg. last heard, num connected nodes, last keyed, etc.
-	ftbl = document.getElementById('favs');
+	// Init ASL stats & API functions
 	statsTmr = setTimeout(getStats, 250);
-	cputemp = document.getElementById('cputemp');
 }
 
 function getStats() {
@@ -74,66 +77,67 @@ function xhttpStatsInit(url, parms) {
 	xhs.send(parms);
 }
 function handleStatsResponse() {
-	if(xhs.readyState === 4) {
-		if(xhs.status === 200) {
-			// statMsg('statsResponse: ' + xhs.responseText);
-			var resp = JSON.parse(xhs.responseText);
-			// Data structure: event=stats; status=LogMsg; stats=statsStruct
-			var e = resp.event;
-			if(resp.data.stats === undefined) {
-				if(resp.data.retcode == 404) {
-					scanMsg('ASL Stats 404 response for node '+resp.data.node+'. Check node number.');
-					statsIdx++;
-					statsTmr = setTimeout(getStats, calcReqIntvl());
-					return;
-				}
-				if(resp.data.retcode != 429) {
-					scanMsg(resp.data.status + '. Will retry in 15 Seconds...');
-					statsIdx++;
-				}
-				statsTmr = setTimeout(getStats, 15000);
+	if(xhs.readyState != 4) {
+		return;
+	}
+	if(xhs.status == 200) {
+		// statMsg('statsResponse: ' + xhs.responseText);
+		var resp = JSON.parse(xhs.responseText);
+		// Data structure: event=stats; status=LogMsg; stats=statsStruct
+		var e = resp.event;
+		if(resp.data.stats === undefined) {
+			if(resp.data.retcode == 404) {
+				scanMsg('ASL Stats 404 response for node '+resp.data.node+'. Check node number.');
+				statsIdx++;
+				statsTmr = setTimeout(getStats, calcReqIntvl());
 				return;
 			}
-			statsIdx++;
-			var s = resp.data.stats;
-			var row;
-			// Update favs table
-			for(var r=0, n=ftbl.rows.length-1; r < n; r++) {
-				//for(var c=0, m=ftbl.rows[r].cells.length; c < m; c++) {
-				var cells = ftbl.rows[r+1].cells;
-				var node = cells[1].innerHTML;
-				if(node != s.node)
-					continue;
-				// Colors: Tx=maroon Busy=0-50% green LinkCnt:0-50 blue
-				// Cols #:Tx/Act/NotAct LCnt:linkCnt (Blue 0-50) Bsy%:busyPct (Green 0-50)
-				var c0 = cells[0];
-				scanMsg(c0.innerHTML + ': ' + resp.data.status);
-				if(s.keyed == 1)
-					c0.className = 'tColor';
-				else if(s.active == 1)
-					c0.className = (s.wt == 1) ? 'wColor' : 'gColor';
-				else
-					c0.className = '';
-				// Color Bsy%t column green, max 50%
-				var busy = cells[5];
-				var grn = Math.round(Math.log(3 + s.busyPct) * 5);
-				if(grn > 50)
-					grn = 50;
-				busy.innerHTML = s.busyPct;
-				busy.style.backgroundColor = (s.busyPct > 5) ? 'hsl(150,50%,'+grn+'%)' : 'transparent';
-				// Color LCnt column blue, max 50% = 50 links
-				var lcnt = cells[6];
-				var blue = Math.round(Math.log(3 + s.linkCnt) * 8);
-				if(blue > 30)
-					blue = 30;
-				lcnt.innerHTML = s.linkCnt;
-				lcnt.style.backgroundColor = (s.linkCnt > 3) ? 'hsl(240,40%,'+blue+'%)' : 'transparent';
+			if(resp.data.retcode != 429) {
+				scanMsg(resp.data.status + '. Will retry in 15 Seconds...');
+				statsIdx++;
 			}
-			statsTmr = setTimeout(getStats, calcReqIntvl());
-		} else {
-			statMsg('/stats/ HTTP error ' + xhs.status + '. Retrying in 60 Secs...');
-			statsTmr = setTimeout(getStats, 60000);
+			statsTmr = setTimeout(getStats, 15000);
+			return;
 		}
+		statsIdx++;
+		var s = resp.data.stats;
+		var row;
+		// Update favs table
+		for(var r=0, n=ftbl.rows.length-1; r < n; r++) {
+			//for(var c=0, m=ftbl.rows[r].cells.length; c < m; c++) {
+			var cells = ftbl.rows[r+1].cells;
+			var node = cells[1].innerHTML;
+			if(node != s.node)
+				continue;
+			// Colors: Tx=maroon Busy=0-50% green LinkCnt:0-50% blue
+			// Cols #:Tx/Act/NotAct LCnt:linkCnt (Blue 0-50) Bsy%:busyPct (Green 0-50)
+			var c0 = cells[0];
+			scanMsg(c0.innerHTML + ': ' + resp.data.status);
+			if(s.keyed == 1)
+				c0.className = 'tColor';
+			else if(s.active == 1)
+				c0.className = (s.wt == 1) ? 'wColor' : 'gColor';
+			else
+				c0.className = '';
+			// Color Rx% column green, max 50%
+			var busy = cells[5];
+			var grn = Math.round(Math.log(3 + s.busyPct) * 5);
+			if(grn > 50)
+				grn = 50;
+			busy.innerHTML = s.busyPct;
+			busy.style.backgroundColor = (s.busyPct > 5) ? 'hsl(150,50%,'+grn+'%)' : 'transparent';
+			// Color LCnt column blue, max 50% = 50 links
+			var lcnt = cells[6];
+			var blue = Math.round(Math.log(3 + s.linkCnt) * 8);
+			if(blue > 30)
+				blue = 30;
+			lcnt.innerHTML = s.linkCnt;
+			lcnt.style.backgroundColor = (s.linkCnt > 3) ? 'hsl(240,40%,'+blue+'%)' : 'transparent';
+		}
+		statsTmr = setTimeout(getStats, calcReqIntvl());
+	} else {
+		statMsg('/stats/ HTTP error ' + xhs.status + '. Retrying in 60 Secs...');
+		statsTmr = setTimeout(getStats, 60000);
 	}
 }
 function calcReqIntvl() {
@@ -144,8 +148,8 @@ function calcReqIntvl() {
 		t = 10000; // 6/min after 12hrs
 	else if(statsReqCnt > 4000)
 		t = 6000; // 10/min after 4hrs
-	else if(statsReqCnt > 1200)
-		t = 4000; // 15/min after 1hr
+	else if(statsReqCnt > 600)
+		t = 4000; // 15/min after 30min
 	else if(statsReqCnt > favsCnt || statsReqCnt > 25)
 		t = 3000; // 20/min after initial scan
 	return t;
@@ -159,6 +163,8 @@ function handleEventSourceError(event) {
 	statMsg(msg);
 	statMsg('Reloading in 15 Seconds...');
 	rldTmr = setTimeout(reloadPage, 15000);
+	if(statsTmr !== undefined)
+		clearTimeout(statsTmr);
 }
 
 function handleOnlineEvent() {
@@ -168,12 +174,10 @@ function handleOnlineEvent() {
 function handleOfflineEvent() {
 	statMsg('Offline event received.');
 	rldRetries=0;
-	if(rldTmr !== undefined) {
+	if(rldTmr !== undefined)
 		clearTimeout(rldTmr);
-	}
-	if(statsTmr !== undefined) {
+	if(statsTmr !== undefined)
 		clearTimeout(statsTmr);
-	}
 }
 function reloadPage() {
 	// Verify node is accessible before reloading
@@ -204,19 +208,16 @@ function reloadPage() {
 	request.send();
 }
 function statMsg(msg) {
-	const e = document.getElementById('statmsg');
-	if(e.innerHTML.length > 50000)
-		e.innerHTML = '';
-	e.innerHTML = (e.innerHTML === '') ? msg : (e.innerHTML + '<br>' + msg);
-	e.scrollTop = e.scrollHeight;
+	if(statmsg.innerHTML.length > 50000)
+		statmsg.innerHTML = '';
+	statmsg.innerHTML = (statmsg.innerHTML === '') ? msg : (statmsg.innerHTML + '<br>' + msg);
+	statmsg.scrollTop = statmsg.scrollHeight;
 }
 function clearStatMsg() {
-	const e = document.getElementById('statmsg');
-	e.innerHTML = '';
+	statmsg.innerHTML = '';
 }
 function scanMsg(msg) {
-	const e = document.getElementById('scanmsg');
-	e.innerHTML = msg;
+	scanmsg.innerHTML = msg;
 }
 
 function handleErrMsgEvent(event) {
@@ -319,9 +320,9 @@ function handleNodesEvent(event) {
 		// $('#table_' + localNode + ' tbody:first').html(tablehtml);
 		const cstbl = document.getElementById('table_' + localNode);
 		tbody0 = cstbl.getElementsByTagName('tbody')[0];
-		const conncnt = document.getElementById('conncnt');
 		tbody0.innerHTML = tablehtml;
-		conncnt.value = total_nodes;
+		if(conncnt)
+			conncnt.value = total_nodes;
 		document.title = pgTitlePrefix + pgTitle;
 	}
 }
@@ -380,8 +381,8 @@ function handleApiResponse() {
 }
 
 function connectNode(button) {
-	var localNode = document.getElementById('localnode').value;
-	var remoteNode = document.getElementById('node').value;
+	var localNode = lnode.value;
+	var remoteNode = rnode.value;
 	if(remoteNode < 1) {
 		alert('Please enter a valid remote node number.');
 		return;
@@ -389,15 +390,14 @@ function connectNode(button) {
 	var perm = document.getElementById('permanent').checked;
 	// Disconnect before Connect checkbox. Only applies if conncnt > 0
 	var autodisc = document.getElementById('autodisc').checked;
-	var conncnt = document.getElementById('conncnt').value;
-	if(conncnt < 1)
+	if(conncnt.value < 1)
 		autodisc = false;
 	parms = 'remotenode='+remoteNode + '&perm='+perm + '&button='+button + '&localnode='+localNode + '&autodisc='+autodisc;
 	xhttpSend(astApiDir + 'connect.php', parms);
 }
 function disconnectNode() {
-	var localNode = document.getElementById('localnode').value;
-	var remoteNode = document.getElementById('node').value;
+	var localNode = lnode.value;
+	var remoteNode = rnode.value;
 	if(remoteNode.length == 0) {
 		alert('Please enter the remote node number.');
 		return;
@@ -407,8 +407,8 @@ function disconnectNode() {
 	xhttpSend(astApiDir + 'connect.php', parms);
 }
 function dtmfCmd() {
-	var localNode = document.getElementById('localnode').value;
-	var cmd = document.getElementById('node').value;
+	var localNode = lnode.value;
+	var cmd = rnode.value;
 	if(cmd.length == 0) {
 		alert('Please enter a valid DTMF command in the Node# field.');
 		return;
@@ -417,7 +417,7 @@ function dtmfCmd() {
 	xhttpSend(astApiDir + 'cmd.php', parms);
 }
 function astrestart() {
-	var localNode = document.getElementById('localnode').value;
+	var localNode = lnode.value;
 	parms = 'button=restart' + '&localnode='+localNode;
 	xhttpSend(astApiDir + 'cmd.php', parms);
 	// Reload page
@@ -442,8 +442,7 @@ function handleXhttpResponse() {
 }
 
 function setNodeBox(n) {
-	var remoteNode = document.getElementById('node');
-	remoteNode.value = n;
+	rnode.value = n;
 }
 
 function varDump(v) {

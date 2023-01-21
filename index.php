@@ -34,7 +34,7 @@ if(!empty($nodes) && !empty($hosts)) {
 	$astdb = readAstDb($msg);
 
 	if($astdb !== false)
-		$onLoad = " onLoad=\"initEventStream('server.php?nodes=$node')\"";
+		$onLoad = " onLoad=\"asInit('server.php?nodes=$node')\"";
 
 	$favsFile = file_exists(favsini) ? favsini : (file_exists(smfavsini) ? smfavsini : null);
 

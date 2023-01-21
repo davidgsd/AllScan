@@ -100,8 +100,8 @@ function gmGetSecsIntoWeek($ts=null) {
 	return ($ts + 4 * SECS_PER_DAY) % SECS_PER_WEEK;
 }
 function diffSecs($str1, $str2=null) { // Returns: T2-T1 if T2 is set, otherwise time()-T1
-	$ts1 = strtotime($str1);
-	$ts2 = $str2 ? strtotime($str2) : time();
+	$ts1 = is_numeric($str1) ? $str1 : strtotime($str1);
+	$ts2 = $str2 ? (is_numeric($str2) ? $str2 : strtotime($str2)) : time();
 	return $ts2 - $ts1;
 }
 function diffDays($str1, $str2=null) { // Returns: T2-T1 if T2 is set, otherwise time()-T1 in days
