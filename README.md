@@ -116,7 +116,7 @@ I have received many Thank You's and offers for a cup of coffee or other small d
 Performance optimizations. Fix issue that would cause an unnecessary database write on every page load/stats request for logged-in users. Fix JS console warning re. no SameSite cookie parameter. Specify allscan's dir ($urlbase/) for cookie paths.
 
 **v0.52 2023-01-19**<br>
-Minor bug fix: If after a new install or update an error was detected in dbInit(), an error would occur resulting in a blank page rather than normal page load and a useful error message being displayed. This update is not needed if your AllScan install is already working fine.
+Minor bug fix: If after a new install or update an error was detected in dbInit(), an error would occur resulting in a blank page rather than normal page load and a useful error message being displayed.
 
 **v0.51 2023-01-18**<br>
 Optimizations to Cfgs module. Add 'DiscBeforeConn Default' Cfg parameter which determines if the 'Disconnect Before Connect checkbox' is checked by default. To have the checkbox be Off by default, go to the Cfgs page and set 'DiscBeforeConn Default' to Off.
@@ -159,7 +159,7 @@ Q: What is the blinking icon for?<br>
 A: AllScan's blinking 'lighting bolt' icon is a status indicator similar the 'spinny' in supermon or the blinking asterisk ('*') in allmon, which toggles on/off as each Connection Status event message is received from the node (ie. from AllScan's astapi/server.php file who reads status info from a socket connection to Asterisk on the node and then forwards that data every 500mS to AllScan's JavaScript in the browser.) If it stops blinking that means there is a communication issue between the browser and your node.
 
 Q: If I ever wanted to uninstall AllScan how can this be done?<br>
-A: All you'd have to do is delete the allscan folder in the web server root directory &ndash; which on ASL is /var/www/html/ or on HamVOIP is /srv/http/. cd to that folder, then execute "sudo rm -rf allscan" to delete the AllScan folder. Or you could move the folder somewhere else, but it's so easy to install that you might as well just delete it and then if you want to install it again later just run the installer. AllScan also keeps a database file in /etc/allscan/, which isn't going to do anything by itself if allscan was deleted from the web server folder, but if you wanted to delete the db file also, execute "sudo rm -rf /etc/allscan".
+A: To uninstall just delete the allscan folder in the web server root directory (/var/www/html/ for ASL / /srv/http/ for HamVOIP). cd to that folder, then execute "sudo rm -rf allscan" to delete the AllScan folder. AllScan also keeps a database file in /etc/allscan/, which can be deleted by executing "sudo rm -rf /etc/allscan".
 
 # Thanks
 Thanks to all ASL Developers. Thanks to KK6QMS, N6ATC, KJ7T and K5LK for help with Beta testing.
