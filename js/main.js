@@ -1,9 +1,9 @@
 var astApiDir='/allscan/astapi/';
 var statsDir='/allscan/stats/';
 var apiDir='/allscan/api/';
-var source, xh, hbcnt=0, xha, favsCnt=0, xhs;
+var source, xh, hbcnt=0, xha, favsCnt=0, xhs, xhr;
 var rldRetries=0, rldTmr;
-var statsTmr, statsState=0, statsIdx=0, statsReqCnt=0;
+var statsTmr, statsState=0, statsIdx=0, statsReqCnt=0, txCnt=[], txTim=[];
 // DOM elements
 var hb, lnode, rnode, conncnt, ftbl, statmsg, scanmsg, cputemp, pgTitle;
 
@@ -101,6 +101,7 @@ function handleStatsResponse() {
 		}
 		statsIdx++;
 		var s = resp.data.stats;
+		var time = unixtime();
 		var row;
 		// Update favs table
 		for(var r=0, n=ftbl.rows.length-1; r < n; r++) {
@@ -113,8 +114,18 @@ function handleStatsResponse() {
 			// Cols #:Tx/Act/NotAct LCnt:linkCnt (Blue 0-50) Bsy%:busyPct (Green 0-50)
 			var c0 = cells[0];
 			scanMsg(c0.innerHTML + ': ' + resp.data.status);
-			if(s.keyed == 1)
+			if(!txCnt[node] || txCnt[node] > s.keyups) {
+				txCnt[node] = s.keyups;
+				txTim[node] = 0;
+			}
+			var txd = s.keyups - txCnt[node];
+			if(s.keyed == 1 || txd > 0)
+				txTim[node] = time;
+			// Show # col in red if keyed or txcnt diff > 1, show in darker red if txd > 0 or was keyed in past 2 mins
+			if(s.keyed == 1 || txd > 1)
 				c0.className = 'tColor';
+			else if(time - txTim[node] < 120)
+				c0.className = 't2Color';
 			else if(s.active == 1)
 				c0.className = (s.wt == 1) ? 'wColor' : 'gColor';
 			else
@@ -133,6 +144,8 @@ function handleStatsResponse() {
 				blue = 30;
 			lcnt.innerHTML = s.linkCnt;
 			lcnt.style.backgroundColor = (s.linkCnt > 3) ? 'hsl(240,40%,'+blue+'%)' : 'transparent';
+			// Store last TxCnt, allows keyed status to be detected even if node not properly sending keyed val
+			txCnt[node] = s.keyups;
 		}
 		statsTmr = setTimeout(getStats, calcReqIntvl());
 	} else {
@@ -169,7 +182,7 @@ function handleEventSourceError(event) {
 
 function handleOnlineEvent() {
 	statMsg('Online event received. Reloading...');
-	rldTmr = setTimeout(reloadPage, 2000);
+	rldTmr = setTimeout(reloadPage, 2500);
 }
 function handleOfflineEvent() {
 	statMsg('Offline event received.');
@@ -183,30 +196,36 @@ function reloadPage() {
 	// Verify node is accessible before reloading
 	if(rldRetries == 0)
 		statMsg('Verifying node is accessible...');
-	var request = new XMLHttpRequest();
-	request.open('GET', window.location.href, true);
-	request.onreadystatechange = function() {
-		if(request.status == 200) {
-			request.abort();
-			// .assign & href prevents POST data resubmit
-			window.location.assign(window.location.href);
-		} else {
-			rldRetries++;
-			var s = request.status > 0 ? ' (stat=' + request.status + ')' : '';
-			if(rldRetries < 8) { // Try again after a delay
-				var t = 2 + rldRetries;
-				statMsg(`Node unreachable${s}, will retry in ${t} Secs...`);
-				rldTmr = setTimeout(reloadPage, t * 1000);
-			} else if(rldRetries < 23) {
-				statMsg(`Node unreachable${s}. Check internet/LAN connections and power to node. Retrying in 60 Secs...`);
-				rldTmr = setTimeout(reloadPage, 60000);
-			} else {
-				statMsg('Node unreachable. Retries exceeded. Reload this page when node is online.');
-			}
-		}
-	};
-	request.send();
+	xhr = new XMLHttpRequest();
+	xhr.open('GET', window.location.href, true);
+	xhr.onreadystatechange = handleXRldResp;
+	xhr.send();
 }
+function handleXRldResp() {
+	if(xhr.status == 200) {
+		xhr.abort();
+		rldRetries = 0;
+		// .assign & href prevents POST data resubmit
+		window.location.assign(window.location.href);
+	} else if(xhr.readyState === 4) {
+		rldRetries++;
+		var s = xhr.status > 0 ? ' (stat=' + xhr.status + ')' : '';
+		if(rldRetries < 8) { // Try again after a delay
+			var t = 2 + 2 * rldRetries;
+			statMsg(`Node unreachable${s}, will retry in ${t} Secs...`);
+			rldTmr = setTimeout(reloadPage, t * 1000);
+		} else if(rldRetries < 23) {
+			statMsg(`Node unreachable${s}. Retrying in 60 Secs...`);
+			rldTmr = setTimeout(reloadPage, 60000);
+		} else {
+			statMsg('Node unreachable. Check internet/LAN connections and power to node. '
+				+ 'Reload this page when node is online.');
+		}
+	} else {
+		statMsg(`RldResp: {xhr.readyState}, {xhr.status}`);
+	}
+}
+
 function statMsg(msg) {
 	if(statmsg.innerHTML.length > 50000)
 		statmsg.innerHTML = '';
@@ -444,7 +463,9 @@ function handleXhttpResponse() {
 function setNodeBox(n) {
 	rnode.value = n;
 }
-
+function unixtime() {
+	return Math.floor(Date.now() / 1000);
+}
 function varDump(v) {
 	const logLines = ["Property (Typeof): Value", `Var (${typeof v}): ${v}`];
 	for(const prop in v)

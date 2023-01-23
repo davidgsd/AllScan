@@ -112,8 +112,11 @@ I have received many Thank You's and offers for a cup of coffee or other small d
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.54 2023-01-22**<br>
+Major improvement to Keyed node status detection. ASL stats API data for many nodes shows a 0 stats.keyed value even when the node is in fact keyed. Testing revealed that the stats.keyups count is valid in these cases however and thus keyed status can be detected from changes in the stats.keyups count between stats requests. The '#' column for the node is now highlighted in red / dark red if stats.keyed=1 or if stats.keyups count increased since the previous stats request for that node, and will remain highlighted for 2 minutes after stats.keyed=1 / stats.keyups last increased.
+
 **v0.53 2023-01-21**<br>
-Performance optimizations. Fix issue that would cause an unnecessary database write on every page load/stats request for logged-in users. Fix JS console warning re. no SameSite cookie parameter. Specify allscan's dir ($urlbase/) for cookie paths.
+Performance optimizations. Fix issue that would cause an unnecessary database write on every page load/stats request for logged-in users. Fix JS console warning re. no SameSite cookie parameter. Specify AllScan's dir ($urlbase/) for cookie paths.
 
 **v0.52 2023-01-19**<br>
 Minor bug fix: If after a new install or update an error was detected in dbInit(), an error would occur resulting in a blank page rather than normal page load and a useful error message being displayed.
@@ -159,7 +162,7 @@ Q: What is the blinking icon for?<br>
 A: AllScan's blinking 'lighting bolt' icon is a status indicator similar the 'spinny' in supermon or the blinking asterisk ('*') in allmon, which toggles on/off as each Connection Status event message is received from the node (ie. from AllScan's astapi/server.php file who reads status info from a socket connection to Asterisk on the node and then forwards that data every 500mS to AllScan's JavaScript in the browser.) If it stops blinking that means there is a communication issue between the browser and your node.
 
 Q: If I ever wanted to uninstall AllScan how can this be done?<br>
-A: To uninstall just delete the allscan folder in the web server root directory (/var/www/html/ for ASL / /srv/http/ for HamVOIP). cd to that folder, then execute "sudo rm -rf allscan" to delete the AllScan folder. AllScan also keeps a database file in /etc/allscan/, which can be deleted by executing "sudo rm -rf /etc/allscan".
+A: To uninstall just delete the allscan folder in the web server root directory (/var/www/html/ on ASL or /srv/http/ on HamVOIP). cd to that folder, then execute "sudo rm -rf allscan" to delete the AllScan folder. AllScan also keeps a database file in /etc/allscan/ that can be deleted by executing "sudo rm -rf /etc/allscan".
 
 # Thanks
 Thanks to all ASL Developers. Thanks to KK6QMS, N6ATC, KJ7T and K5LK for help with Beta testing.

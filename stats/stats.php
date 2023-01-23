@@ -45,12 +45,15 @@ foreach($nodes as $n) {
 	$s = parseStats($resp, $time);
 	if(!isset($s->node)) {
 		$s->node = $n;
-		$s->active = $s->keyed = 0;
-		$s->busyPct = $s->linkCnt = $s->txtime = '-';
+		$s->active = $s->keyed = $s->uptime = $s->txtime = $s->keyups = $s->kerchunks = $s->txperday = 0;
+		$s->busyPct = $s->linkCnt = $s->avgTx = '-';
 	}
 	$time = $s->timeAgo;
+	$uph = round($s->uptime/3600) . 'h';
+	$txh = round($s->txtime/3600) . 'h';
 	// Data structure: event=stats; status=LogMsg; stats=statsStruct
-	$msg = "$n: Tx=$s->keyed Act=$s->active $s->timeAgo LCnt=$s->linkCnt Rx%=$s->busyPct TxTm=$s->txtime WT=$s->wt";
+	$msg = "$n: Act=$s->active $s->timeAgo $uph Tx=$s->keyed $txh $s->keyups/$s->kerchunks AvgTx=$s->avgTx "
+		. "Tx/d=$s->txperday Rx%=$s->busyPct LCnt=$s->linkCnt WT=$s->wt";
 	sendData(['status' => $msg, 'stats' => $s], 'stats');
 }
 
@@ -65,6 +68,9 @@ function parseStats($resp, $time) {
 		$s->uptime = $data->apprptuptime;
 		$s->keyups = $data->totalkeyups;
 		$s->txtime = $data->totaltxtime;
+		$s->kerchunks = $data->totalkerchunks;
+		$s->avgTx = ($s->txtime && $s->keyups) ? round($s->txtime/$s->keyups) : '-';
+		$s->txperday = ($s->uptime > 60 && $s->keyups) ? round($s->keyups/($s->uptime/86400)) : '-';
 		$s->busyPct = ($s->uptime > 60 && $s->txtime > 10) ? round(100 * $s->txtime / $s->uptime) : '-';
 		$s->linkCnt = _count($data->links);
 		$s->keyed = $data->keyed ? '1' : '0';

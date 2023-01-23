@@ -255,6 +255,9 @@ background-color:hsl(150,50%,15%);
 table.grid tr.tColor td, td.tColor { /* Node PTT */
 background-color:maroon;
 }
+td.t2Color { /* Node Recently Keyed */
+background-color:#600000;
+}
 table.grid tr.lColor td, td.lColor { /* Node COS */
 background-color:green;
 }
