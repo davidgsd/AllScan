@@ -15,8 +15,8 @@ define('PERMISSION_FULL', 6);
 define('PERMISSION_ADMIN', 10);
 define('PERMISSION_SUPERUSER', 14);
 
-$cookieSameSiteOpt = 'Lax'; // None/Lax/Strict
 $cookieUseRootPath = false;
+$cookieSameSiteOpt = 'Lax'; // None/Lax/Strict
 
 function userPermission($u=null) {
 	global $user;
@@ -236,16 +236,20 @@ function setLoginCookies($name, $cpass, $remember) {
 	global $urlbase, $cookieSameSiteOpt, $cookieUseRootPath;
 	// If 'remember me' set, set cookie for 45 days, otherwise 8 hours
 	$exp = time() + ($remember ? 45*86400 : 8*3600);
-	$opts = ['expires' => $exp,
-		'path' => $cookieUseRootPath ? '/' : "$urlbase/", // eg. /allscan/
-		//'domain' => '.example.com', // leading dot for compatibility or use subdomain
-		'secure' => false,
-		'httponly' => false,
-		'samesite' => $cookieSameSiteOpt
-	];
-	setcookie("name", $name, $opts);
-	setcookie("cpass", $cpass, $opts);
-	setcookie("lexp", $exp, $opts);
+	$path = $cookieUseRootPath ? '/' : "$urlbase/"; // eg. /allscan/
+	// PHP setcookie only supports opts array in >= v7.3.0
+	if(PHP_VERSION_ID >= 70300) {
+		$opts = ['expires'=>$exp, 'path'=>$path, 'samesite'=>$cookieSameSiteOpt];
+		setcookie("name", $name, $opts);
+		setcookie("cpass", $cpass, $opts);
+		setcookie("lexp", $exp, $opts);
+	} else {
+		// For < 7.3 PHP versions SameSite parm can be appended to the path parm
+		$path .= '; SameSite=' . $cookieSameSiteOpt;
+		setcookie("name", $name, $exp, $path);
+		setcookie("cpass", $cpass, $exp, $path);
+		setcookie("lexp", $exp, $exp, $path);
+    }
 }
 
 function logout() {

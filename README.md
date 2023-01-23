@@ -112,11 +112,8 @@ I have received many Thank You's and offers for a cup of coffee or other small d
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
-**v0.58 2023-01-23**<br>
-Enable cookie options to be set with $cookieSameSiteOpt and $cookieUseRootPath variables at top of include/UserModel.php. Several users have reported login issues when these are at the default values used since v0.53. Setting $cookieSameSiteOpt to 'None' and $cookieUseRootPath to false should return the settings to what they were prior to v0.53.
-
-**v0.57 2023-01-23**<br>
-Fix issue where allmon.ini search path used by API files could be different than used by main files. Add additional debug log messages during login process.
+**v0.59 2023-01-23**<br>
+Support old PHP versions (< 7.3.x) setcookie() function w/SameSite parameter. Fixes login issues seen since v0.53 on nodes with < PHP 7.3. Enable cookie options to be set with cookieSameSiteOpt and cookieUseRootPath variables in include/UserModel.php. Fix issue where allmon.ini search path used by API files could be different than used by main files. Add additional debug log messages during login process.
 
 **v0.56 2023-01-22**<br>
 Optimizations to Keyed node status detection. ASL stats API data for many nodes shows a 0 stats.keyed value even when the node is in fact keyed. Testing revealed that stats.totalkeyups count and stats.totaltxtime are usually valid however and thus keyed status can be detected from changes in these values between stats requests. Implement moving average calculation of Tx keyed activity level based on stats.keyed or total time keyed divided by elapsed time between the 2 most recent stats requests. The Favorites Table '#' column for each node is now highlighted in a variable shade of red corresponding to the average Tx activity level over the past few minutes.
