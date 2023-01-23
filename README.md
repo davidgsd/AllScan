@@ -113,7 +113,7 @@ I have received many Thank You's and offers for a cup of coffee or other small d
 
 # Release Notes
 **v0.55 2023-01-22**<br>
-Major improvement to Keyed node status detection. ASL stats API data for many nodes shows a 0 stats.keyed value even when the node is in fact keyed. Testing revealed that stats.totalkeyups count is valid in however and thus keyed status can be detected from changes in stats.totalkeyups and stats.totaltxtime between stats requests. The '#' column for the node is now highlighted in red / dark red if stats.keyed=1 or if stats.keyups count increased and stats.totaltxtime increased by > 10 secs since the previous stats request for that node, and will remain highlighted for 2 minutes after.
+Major improvement to Keyed node status detection. ASL stats API data for many nodes shows a 0 stats.keyed value even when the node is in fact keyed. Testing revealed that stats.totalkeyups count is valid however and thus keyed status can be detected from changes in stats.totalkeyups and stats.totaltxtime between stats requests. The '#' column for the node is now highlighted in red/dark red if stats.keyed=1, or if stats.keyups count increased and stats.totaltxtime increased by > 10 secs since the previous stats request for that node, and will remain highlighted for 2 minutes after.
 
 **v0.53 2023-01-21**<br>
 Performance optimizations. Fix issue that would cause an unnecessary database write on every page load/stats request for logged-in users. Fix JS console warning re. no SameSite cookie parameter. Specify AllScan's dir ($urlbase/) for cookie paths.
