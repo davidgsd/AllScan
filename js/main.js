@@ -3,7 +3,7 @@ var statsDir='/allscan/stats/';
 var apiDir='/allscan/api/';
 var source, xh, hbcnt=0, xha, favsCnt=0, xhs, xhr;
 var rldRetries=0, rldTmr;
-var statsTmr, statsState=0, statsIdx=0, statsReqCnt=0, txCnt=[], txTim=[];
+var statsTmr, statsState=0, statsIdx=0, statsReqCnt=0, txCnt=[], txTim=[], txTT=[];
 // DOM elements
 var hb, lnode, rnode, conncnt, ftbl, statmsg, scanmsg, cputemp, pgTitle;
 
@@ -113,16 +113,19 @@ function handleStatsResponse() {
 			// Colors: Tx=maroon Busy=0-50% green LinkCnt:0-50% blue
 			// Cols #:Tx/Act/NotAct LCnt:linkCnt (Blue 0-50) Bsy%:busyPct (Green 0-50)
 			var c0 = cells[0];
-			scanMsg(c0.innerHTML + ': ' + resp.data.status);
-			if(!txCnt[node] || txCnt[node] > s.keyups) {
+			if(!txCnt[node] || s.keyups < txCnt[node] || s.txtime < txTT[node]) {
 				txCnt[node] = s.keyups;
 				txTim[node] = 0;
+				txTT[node] = s.txtime;
 			}
 			var txd = s.keyups - txCnt[node];
-			if(s.keyed == 1 || txd > 0)
+			var ttd = s.txtime - txTT[node];
+			var s2 = (txd || ttd) ? (' &Delta;TxC=' + txd + ' &Delta;TxT=' + ttd) : '';
+			scanMsg(c0.innerHTML + ': ' + resp.data.status + s2);
+			if(s.keyed == 1 || (txd > 0 && ttd > 10))
 				txTim[node] = time;
 			// Show # col in red if keyed or txcnt diff > 1, show in darker red if txd > 0 or was keyed in past 2 mins
-			if(s.keyed == 1 || txd > 1)
+			if(s.keyed == 1 || txd > 1 || ttd > 20)
 				c0.className = 'tColor';
 			else if(time - txTim[node] < 120)
 				c0.className = 't2Color';
@@ -144,8 +147,9 @@ function handleStatsResponse() {
 				blue = 30;
 			lcnt.innerHTML = s.linkCnt;
 			lcnt.style.backgroundColor = (s.linkCnt > 3) ? 'hsl(240,40%,'+blue+'%)' : 'transparent';
-			// Store last TxCnt, allows keyed status to be detected even if node not properly sending keyed val
+			// Store last Tx Cnt & total time to support more reliable keyed status detection
 			txCnt[node] = s.keyups;
+			txTT[node] = s.txtime;
 		}
 		statsTmr = setTimeout(getStats, calcReqIntvl());
 	} else {
