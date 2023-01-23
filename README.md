@@ -112,11 +112,11 @@ I have received many Thank You's and offers for a cup of coffee or other small d
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
-**v0.55 2023-01-22**<br>
-Major improvement to Keyed node status detection. ASL stats API data for many nodes shows a 0 stats.keyed value even when the node is in fact keyed. Testing revealed that stats.totalkeyups count is valid however and thus keyed status can be detected from changes in stats.totalkeyups and stats.totaltxtime between stats requests. The '#' column for the node is now highlighted in red/dark red if stats.keyed=1, or if stats.keyups count increased and stats.totaltxtime increased by > 10 secs since the previous stats request for that node, and will remain highlighted for 2 minutes after.
+**v0.56 2023-01-22**<br>
+Optimizations to Keyed node status detection. ASL stats API data for many nodes shows a 0 stats.keyed value even when the node is in fact keyed. Testing revealed that stats.totalkeyups count and stats.totaltxtime are usually valid however and thus keyed status can be detected from changes in these values between stats requests. Implement moving average calculation of Tx keyed activity level based on stats.keyed or total time keyed divided by elapsed time between the 2 most recent stats requests. The Favorites Table '#' column for each node is now highlighted in a variable shade of red corresponding to the average Tx activity level over the past few minutes.
 
 **v0.53 2023-01-21**<br>
-Performance optimizations. Fix issue that would cause an unnecessary database write on every page load/stats request for logged-in users. Fix JS console warning re. no SameSite cookie parameter. Specify AllScan's dir ($urlbase/) for cookie paths.
+Performance optimizations. Fix issue that would cause an unnecessary database write on every page load/stats request for logged-in users. Fix JS console warning re. no SameSite cookie parameter. Specify AllScan's dir ($urlbase/) for cookie paths. NOTE: If you have any issues logging in, clear your browser cookies/cache, or delete just the allscan cookies which can be done from your browser F12->Storage tools.
 
 **v0.52 2023-01-19**<br>
 Minor bug fix: If after a new install or update an error was detected in dbInit(), an error would occur resulting in a blank page rather than normal page load and a useful error message being displayed.

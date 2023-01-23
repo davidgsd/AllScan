@@ -249,24 +249,17 @@ table.grid tr.rColor td { /* Link Keyed */
 background-color:maroon;
 color:yellow;
 }
-table.grid tr.gColor td, td.gColor { /* Node Idle */
+table.grid tr.gColor td { /* Node Idle */
 background-color:hsl(150,50%,15%);
 }
-table.grid tr.tColor td, td.tColor { /* Node PTT */
+table.grid tr.tColor td { /* Node PTT */
 background-color:maroon;
 }
-td.t2Color { /* Node Recently Keyed */
-background-color:#600000;
-}
-table.grid tr.lColor td, td.lColor { /* Node COS */
+table.grid tr.lColor td { /* Node COS */
 background-color:green;
 }
 table.grid tr.bColor td { /* Node COS+PTT */
 background-color:#660;
-}
-
-td.wColor { /* Active, Idle, & WT enabled */
-background-color:hsl(150,50%,20%);
 }
 
 div.twrap {

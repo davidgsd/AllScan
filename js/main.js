@@ -1,11 +1,13 @@
-var astApiDir='/allscan/astapi/';
-var statsDir='/allscan/stats/';
-var apiDir='/allscan/api/';
-var source, xh, hbcnt=0, xha, favsCnt=0, xhs, xhr;
+const astApiDir='/allscan/astapi/';
+const statsDir='/allscan/stats/';
+const apiDir='/allscan/api/';
+var source, hbcnt=0, pgTitle, favsCnt=0, c1;
 var rldRetries=0, rldTmr;
-var statsTmr, statsState=0, statsIdx=0, statsReqCnt=0, txCnt=[], txTim=[], txTT=[];
+var statsTmr, statsState=0, statsIdx=0, statsReqCnt=0;
+var xh, xha, xhs, xhr;
+var txCnt=[], txTim=[], txTT=[], txAvg=[];
 // DOM elements
-var hb, lnode, rnode, conncnt, ftbl, statmsg, scanmsg, cputemp, pgTitle;
+var hb, lnode, rnode, conncnt, ftbl, statmsg, scanmsg, cputemp;
 
 function asInit(url) {
 	if(typeof(EventSource) === 'undefined') {
@@ -111,28 +113,44 @@ function handleStatsResponse() {
 			if(node != s.node)
 				continue;
 			// Colors: Tx=maroon Busy=0-50% green LinkCnt:0-50% blue
-			// Cols #:Tx/Act/NotAct LCnt:linkCnt (Blue 0-50) Bsy%:busyPct (Green 0-50)
+			// Cols #:Tx(Red 0-50)/Act/NotAct LCnt:linkCnt (Blue 0-50) Bsy%:busyPct (Green 0-50)
 			var c0 = cells[0];
+			// Highlight node# col during stats scanning
+			if(c1)
+				c1.style.backgroundColor = 'transparent';
+			c1 = cells[1];
+			c1.style.backgroundColor = 'hsl(240,30%,20%)';
+			// Calculate rolling average Tx busy indication
 			if(!txCnt[node] || s.keyups < txCnt[node] || s.txtime < txTT[node]) {
 				txCnt[node] = s.keyups;
 				txTim[node] = 0;
 				txTT[node] = s.txtime;
+				txAvg[node] = 0;
 			}
 			var txd = s.keyups - txCnt[node];
 			var ttd = s.txtime - txTT[node];
-			var s2 = (txd || ttd) ? (' &Delta;TxC=' + txd + ' &Delta;TxT=' + ttd) : '';
+			var dt = time - txTim[node];
+			if(ttd > 2 * dt || txd > dt / 5)
+				txd = ttd = 0;
+			txTim[node] = time;
+			var txp = dt ? Math.min(100, Math.round(100 * ttd/dt)) : 0;
+			txAvg[node] = (s.keyed == 1) ? 100 : Math.round(txAvg[node]/2 + txp/2);
+			// Show stats
+			var s2 = (txd || ttd) ? (' &Delta;TxC=' + txd + ' &Delta;TxT=' + ttd + ' TxAvg=' + txAvg[node]) : '';
 			scanMsg(c0.innerHTML + ': ' + resp.data.status + s2);
-			if(s.keyed == 1 || (txd > 0 && ttd > 10))
-				txTim[node] = time;
-			// Show # col in red if keyed or txcnt diff > 1, show in darker red if txd > 0 or was keyed in past 2 mins
-			if(s.keyed == 1 || txd > 1 || ttd > 20)
-				c0.className = 'tColor';
-			else if(time - txTim[node] < 120)
-				c0.className = 't2Color';
-			else if(s.active == 1)
-				c0.className = (s.wt == 1) ? 'wColor' : 'gColor';
-			else
-				c0.className = '';
+			// Color # column red, max 50%
+			if(txAvg[node] > 5) {
+				var red = Math.round(Math.log(3 + txAvg[node]) * 5);
+				//var red = txAvg[node];
+				if(red > 25)
+					red = 25;
+				c0.style.backgroundColor = 'hsl(0,100%,'+red+'%)';
+			} else {
+				if(s.active == 1)
+					c0.style.backgroundColor = (s.wt == 1) ? 'hsl(150,50%,20%)' : 'hsl(150,50%,15%)';
+				else
+					c0.style.backgroundColor = 'transparent';
+			}
 			// Color Rx% column green, max 50%
 			var busy = cells[5];
 			var grn = Math.round(Math.log(3 + s.busyPct) * 5);
@@ -167,8 +185,10 @@ function calcReqIntvl() {
 		t = 6000; // 10/min after 4hrs
 	else if(statsReqCnt > 600)
 		t = 4000; // 15/min after 30min
-	else if(statsReqCnt > favsCnt || statsReqCnt > 25)
-		t = 3000; // 20/min after initial scan
+	else if(statsReqCnt > 200)
+		t = 3000; // 20/min after first 5-10 scans of table
+	else if(statsReqCnt > favsCnt || statsReqCnt > 20)
+		t = 2000; // 30/min after initial scan
 	return t;
 }
 
