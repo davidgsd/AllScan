@@ -112,6 +112,9 @@ I have received many Thank You's and offers for a cup of coffee or other small d
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.58 2023-01-23**<br>
+Enable cookie options to be set with $cookieSameSiteOpt and $cookieUseRootPath variables at top of include/UserModel.php. Several users have reported login issues when these are at the default values used since v0.53. Setting $cookieSameSiteOpt to 'None' and $cookieUseRootPath to false should return the settings to what they were prior to v0.53.
+
 **v0.57 2023-01-23**<br>
 Fix issue where allmon.ini search path used by API files could be different than used by main files. Add additional debug log messages during login process.
 

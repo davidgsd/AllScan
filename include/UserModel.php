@@ -15,6 +15,9 @@ define('PERMISSION_FULL', 6);
 define('PERMISSION_ADMIN', 10);
 define('PERMISSION_SUPERUSER', 14);
 
+$cookieSameSiteOpt = 'Lax'; // None/Lax/Strict
+$cookieUseRootPath = false;
+
 function userPermission($u=null) {
 	global $user;
 	if(!$u) {
@@ -198,17 +201,20 @@ function validate() {
 function validateLogin($name, $pass, $remember) {
 	usleep(rand(20000,500000)); // Prevent response time hack
 	if(!$this->validateName($name)) {
-		$this->error = 'Invalid Name or Password';
+		$this->error = 'Invalid Name / Call Sign';
 		return false;
 	}
-	if(!$this->validatePassword($pass, false)) {
-		$this->error = 'Invalid Name or Password';
-		unset($this->error);
+	if(!$this->validatePassword($pass)) {
+		$this->error = 'Invalid Password';
 		return false;
 	}
 	$users = $this->getUsers("name='$name'");
-	if(!$users || $this->error)
+	if($this->error)
 		return false;
+	if(!$users) {
+		$this->error = 'Invalid Login Name';
+		return false;
+	}
 	foreach($users as $u) {
 		if($u->permission <= PERMISSION_NONE) {
 			$this->error = 'Access Denied (account is currently disabled)';
@@ -227,15 +233,15 @@ function validateLogin($name, $pass, $remember) {
 }
 
 function setLoginCookies($name, $cpass, $remember) {
-	global $urlbase;
+	global $urlbase, $cookieSameSiteOpt, $cookieUseRootPath;
 	// If 'remember me' set, set cookie for 45 days, otherwise 8 hours
 	$exp = time() + ($remember ? 45*86400 : 8*3600);
 	$opts = ['expires' => $exp,
-		'path' => "$urlbase/", // eg. /allscan/
+		'path' => $cookieUseRootPath ? '/' : "$urlbase/", // eg. /allscan/
 		//'domain' => '.example.com', // leading dot for compatibility or use subdomain
 		'secure' => false,
 		'httponly' => false,
-		'samesite' => 'Lax' // None/Lax/Strict
+		'samesite' => $cookieSameSiteOpt
 	];
 	setcookie("name", $name, $opts);
 	setcookie("cpass", $cpass, $opts);
@@ -244,16 +250,9 @@ function setLoginCookies($name, $cpass, $remember) {
 
 function logout() {
 	global $urlbase;
-	$opts = ['expires' => 1,
-		'path' => "$urlbase/", // eg. /allscan/
-		//'domain' => '.example.com', // leading dot for compatibility or use subdomain
-		'secure' => false,
-		'httponly' => false,
-		'samesite' => 'Lax' // None/Lax/Strict
-	];
-	setcookie("name", '', $opts);
-	setcookie("cpass", '', $opts);
-	setcookie("lexp", '', $opts);
+	setcookie("name", '', 1, "$urlbase/");
+	setcookie("cpass", '', 1, "$urlbase/");
+	setcookie("lexp", '', 1, "$urlbase/");
 	// Temp TBR: Also clear cookies at old path (pre-v0.52)
 	if($urlbase) {
 		setcookie("name", '', 1, "/");

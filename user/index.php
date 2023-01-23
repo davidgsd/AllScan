@@ -36,7 +36,7 @@ if($userCnt) {
 		showLoginForm($_GET); // Does not return
 	// Handle Logout
 	if($user && isset($_GET['logout']))
-		processLogout($_GET); // Does not return
+		processLogout(); // Does not return
 }
 
 pageInit();
@@ -245,7 +245,7 @@ function showLoginForm($parms) {
 }
 
 function processLogin($parms) {
-	global $html, $userModel, $asdir;
+	global $userModel;
 	$loginOK = $userModel->validateLogin($parms['name'], $parms['pass'], $parms['remember']);
 	if($loginOK && !isset($userModel->error))
 		redirect();
@@ -264,8 +264,8 @@ function processLogin($parms) {
 	asExit();
 }
 
-function processLogout($parms) {
-	global $userModel, $asdir;
+function processLogout() {
+	global $userModel;
 	$userModel->logout();
 	redirect();
 }
