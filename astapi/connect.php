@@ -18,6 +18,8 @@ if(!preg_match("/^\d+$/", $localnode) || !$localnode)
 if(!preg_match("/^\d+$/", $remotenode) || (!$remotenode && $button !== 'disconnect'))
 	exit("Invalid remote node number\n");
 
+chdir('..');
+
 // Load allmon.ini
 $cfg = readAllmonCfg();
 if($cfg === false)

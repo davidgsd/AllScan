@@ -198,9 +198,11 @@ function validate() {
 function validateLogin($name, $pass, $remember) {
 	usleep(rand(20000,500000)); // Prevent response time hack
 	if(!$this->validateName($name)) {
+		$this->error = 'Invalid Name or Password';
 		return false;
 	}
 	if(!$this->validatePassword($pass, false)) {
+		$this->error = 'Invalid Name or Password';
 		unset($this->error);
 		return false;
 	}

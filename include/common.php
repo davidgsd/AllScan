@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.56";
+$AllScanVersion = "v0.57";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -130,11 +130,13 @@ function msg($txt, $class=null) {
 	echo $txt . NL;
 }
 
+$allmonini = ['allmon.ini', '../supermon/allmon.ini', '/etc/asterisk/allmon.ini.php', '../allmon2/allmon.ini.php'];
+
 // Get nodes list and host IP(s)
 function readAllmonIni(&$msg, &$hosts) {
+	global $allmonini;
 	// Check for file in our directory and if not found look in the asterisk, supermon and allmon2 dirs
-	$file = ['allmon.ini', '../supermon/allmon.ini', '/etc/asterisk/allmon.ini.php', '../allmon2/allmon.ini.php'];
-	foreach($file as $f) {
+	foreach($allmonini as $f) {
 		if(file_exists($f)) {
 			$cfg = parse_ini_file($f, true);
 			if($cfg === false) {
@@ -169,9 +171,9 @@ function readAllmonIni(&$msg, &$hosts) {
 // Below called by astapi files, which should only happen if controller file eg. index.php already called
 // readAllmonIni() above which confirms there is a valid file available
 function readAllmonCfg() {
+	global $allmonini;
 	// Check for file in our directory and if not found look in the asterisk, supermon and allmon2 dirs
-	$file = ['../allmon.ini', '/etc/asterisk/allmon.ini.php', '../../supermon/allmon.ini', '../../allmon2/allmon.ini.php'];
-	foreach($file as $f) {
+	foreach($allmonini as $f) {
 		if(file_exists($f)) {
 			$cfg = parse_ini_file($f, true);
 			if($cfg === false)
@@ -182,13 +184,15 @@ function readAllmonCfg() {
 	return false;
 }
 
+$astdbtxt = ['astdb.txt', '../supermon/astdb.txt', '/var/log/asterisk/astdb.txt'];
+
 // Read AstDB file, looking in all commonly used locations
 function readAstDb(&$msg) {
+	global $astdbtxt;
 	// Check for file in our directory and in the allmon/supermon locations
 	// If exists in more than one place use the newest. Download it if not found
-	$file = ['astdb.txt', '../supermon/astdb.txt', '/var/log/asterisk/astdb.txt'];
 	$mtime = [0, 0, 0];
-	foreach($file as $i => $f) {
+	foreach($astdbtxt as $i => $f) {
 		if(file_exists($f)) {
 			$mtime[$i] = filemtime($f);
 			$msg[] = "$f last updated " . date('Y-m-d', $mtime[$i]);
@@ -203,7 +207,7 @@ function readAstDb(&$msg) {
 		$file = 'astdb.txt';
 	} else {
 		$keys = array_keys($mtime);
-		$file = $file[$keys[0]];
+		$file = $astdbtxt[$keys[0]];
 	}
 	$msg[] = "Reading $file...";
 	$rows = readFileLines($file, $msg);
@@ -228,11 +232,11 @@ function readAstDb(&$msg) {
 // Below called by astapi files, which should only happen if controller file eg. index.php already called
 // readAllmonIni() above which confirms there is a valid file available
 function readAstDb2() {
+	global $astdbtxt;
 	// Check for file in our directory and if not found look in the asterisk, supermon and allmon2 dirs
 	// If it exists in more than one place use the newest
-	$file = ['../astdb.txt', '../../supermon/astdb.txt', '/var/log/asterisk/astdb.txt'];
 	$mtime = [0, 0, 0];
-	foreach($file as $i => $f) {
+	foreach($astdbtxt as $i => $f) {
 		if(file_exists($f)) {
 			$mtime[$i] = filemtime($f);
 		}
@@ -242,7 +246,7 @@ function readAstDb2() {
 		return false;
 	}
 	$keys = array_keys($mtime);
-	$file = $file[$keys[0]];
+	$file = $astdbtxt[$keys[0]];
 	$rows = readFileLines($file, $msg);
 	if(!$rows) {
 		return false;

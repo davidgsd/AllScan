@@ -24,7 +24,7 @@ $view = new UserView();
 $userModel = new UserModel($db);
 
 // Handle Login
-if(isset($_POST['name']) && isset($_POST['pass']) && $_POST['pass'] && $_POST['Submit'] !== ADD_USER) {
+if(isset($_POST['name']) && isset($_POST['pass']) && $_POST['name'] && $_POST['pass'] && $_POST['Submit'] !== ADD_USER) {
 	processLogin($_POST); // Does not return. Redirects to main page if login OK, or displays login failed message
 }
 

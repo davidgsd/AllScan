@@ -13,6 +13,8 @@ $cmd = trim(strip_tags($_POST['cmd']));
 if(!$localnode || !preg_match("/^\d+$/", $localnode))
 	exit("Invalid local node number\n");
 
+chdir('..');
+
 // Load allmon.ini
 $cfg = readAllmonCfg();
 if($cfg === false)

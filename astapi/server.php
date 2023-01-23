@@ -23,6 +23,8 @@ if(empty($_GET['nodes'])) {
 // Read parms
 $passedNodes = explode(',', trim(strip_tags($_GET['nodes'])));
 
+chdir('..');
+
 // Load allmon.ini
 $cfg = readAllmonCfg();
 if($cfg === false) {

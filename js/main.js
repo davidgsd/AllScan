@@ -15,10 +15,10 @@ function asInit(url) {
 		return;
 	}
 	hb = document.getElementById('hb');
+	ftbl = document.getElementById('favs');
 	lnode = document.getElementById('localnode');
 	rnode = document.getElementById('node');
 	conncnt = document.getElementById('conncnt');
-	ftbl = document.getElementById('favs');
 	statmsg = document.getElementById('statmsg');
 	scanmsg = document.getElementById('scanmsg');
 	cputemp = document.getElementById('cputemp');
@@ -141,7 +141,6 @@ function handleStatsResponse() {
 			// Color # column red, max 50%
 			if(txAvg[node] > 5) {
 				var red = Math.round(Math.log(3 + txAvg[node]) * 5);
-				//var red = txAvg[node];
 				if(red > 25)
 					red = 25;
 				c0.style.backgroundColor = 'hsl(0,100%,'+red+'%)';
