@@ -17,9 +17,7 @@ As AllScan receives data from the ASL stats server it updates the Favorites Tabl
 Color codes for '#' column:
 * Dark Green: Node Active (registered and reporting to AllStarLink Network)
 * Medium Green: Node Active, Web-Transceiver enabled (may be more likely to accept connections)
-* Red: Node is Keyed (transmitting audio)
-
-(Note: The ASL stats data is not always accurate. Some active keyed nodes may not show as Keyed. This is not an issue in AllScan. The remote node may not be reporting that information or may only report it at certain intervals. Future releases may be able to get the keyed status more reliably using other ASL stats APIs/pages or other mechanisms.)
+* Red: Node is keyed or was recently keyed (transmitting audio). Brighter shades indicate a higher percentage of time keyed over the past few minutes
 
 'Rx%' column: The remote node's reported TxTime divided by its Uptime, provides a general indication of how busy the node tends to be.
 
@@ -84,6 +82,8 @@ For any issues including directory/file permissions issues or issues with SQLite
 
 HamVOIP users: See this [Blog Post by KJ7T](https://randomwire.substack.com/p/updating-allscan-on-the-clearnode) for detailed steps on how to enable the SQLite3 extension in php.ini.
 
+Login issues: A change was made to cookies in v0.53 to make them specific to the allscan directory path and improve security. If you have any issues logging in, clear your browser cache and cookies, or delete just the allscan cookies by using the browser F12->Storage tools and deleting all cookies with names 'cpass', 'name' or 'lexp'.
+
 If you get a permissions error when trying to Add a Favorite, check that the /var/www/html/allscan and supermon dirs have 775 permissions and www-data group, and that the favorites.ini file exists in one or both directories and has 664 permissions and www-data as the group. These settings should already be that way if your Supermon install is properly working, or it would not be able to edit and save the favorites.ini file. As a test you can go into Supermon, click the Configuration Editor button and try adding a blank line to favorites.ini and see if it saves OK. If not, there is something improperly configured with the Supermon install. The following commands should correct those settings:
 
 	cd /var/www/html || cd /srv/http # Change to www root folder (works on ASL and HamVOIP)
@@ -116,7 +116,7 @@ I have received many Thank You's and offers for a cup of coffee or other small d
 Optimizations to Keyed node status detection. ASL stats API data for many nodes shows a 0 stats.keyed value even when the node is in fact keyed. Testing revealed that stats.totalkeyups count and stats.totaltxtime are usually valid however and thus keyed status can be detected from changes in these values between stats requests. Implement moving average calculation of Tx keyed activity level based on stats.keyed or total time keyed divided by elapsed time between the 2 most recent stats requests. The Favorites Table '#' column for each node is now highlighted in a variable shade of red corresponding to the average Tx activity level over the past few minutes.
 
 **v0.53 2023-01-21**<br>
-Performance optimizations. Fix issue that would cause an unnecessary database write on every page load/stats request for logged-in users. Fix JS console warning re. no SameSite cookie parameter. Specify AllScan's dir ($urlbase/) for cookie paths. NOTE: If you have any issues logging in, clear your browser cookies/cache, or delete just the allscan cookies which can be done from your browser F12->Storage tools.
+Performance optimizations. Fix issue that would cause an unnecessary database write on every page load/stats request for logged-in users. Fix JS console warning re. no SameSite cookie parameter. Specify AllScan's dir ($urlbase/) for cookie paths.
 
 **v0.52 2023-01-19**<br>
 Minor bug fix: If after a new install or update an error was detected in dbInit(), an error would occur resulting in a blank page rather than normal page load and a useful error message being displayed.
