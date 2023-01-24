@@ -82,8 +82,6 @@ For any issues including directory/file permissions issues or issues with SQLite
 
 HamVOIP users: See this [Blog Post by KJ7T](https://randomwire.substack.com/p/updating-allscan-on-the-clearnode) for detailed steps on how to enable the SQLite3 extension in php.ini.
 
-Login issues: A change was made to cookies in v0.53 to make them specific to the allscan directory path and improve security. If you have any issues logging in, clear your browser cache and cookies, or delete just the allscan cookies by using the browser F12->Storage tools and deleting all cookies with names 'cpass', 'name' or 'lexp'.
-
 If you get a permissions error when trying to Add a Favorite, check that the /var/www/html/allscan and supermon dirs have 775 permissions and www-data group, and that the favorites.ini file exists in one or both directories and has 664 permissions and www-data as the group. These settings should already be that way if your Supermon install is properly working, or it would not be able to edit and save the favorites.ini file. As a test you can go into Supermon, click the Configuration Editor button and try adding a blank line to favorites.ini and see if it saves OK. If not, there is something improperly configured with the Supermon install. The following commands should correct those settings:
 
 	cd /var/www/html || cd /srv/http # Change to www root folder (works on ASL and HamVOIP)
@@ -107,13 +105,15 @@ If you have any questions email chc_media at yahoo dot com. Also see [AllScan.in
 I have received many Thank You's and offers for a cup of coffee or other small donation, which are much appreciated, initially though I would ask that any contributions be directed to AllStarLink.org, who have put in many years of work maintaining the free & open-source ASL ecosystem, and who have a lot of overhead expenses. See [this link](https://donorbox.org/allstarlink-donations?amount=24&default_interval=a&utm_campaign=donate_4&utm_source=allscan) to donate to Allstarlink Inc. If in addition to supporting ASL you did also want to contribute to AllScan feel free to send anything by paypal or venmo to chc_media at yahoo dot com. Even $1 does help cover web server expenses and enable me to spend more time on further development. Thank you for your support, and with helping spread the word about AllScan and ASL.
 
 # Road Map
-1. Additional refinements to existing features
-2. Enhanced stats and scan features
-3. Other features that are highly requested or that seem like a good fit
+1. Enhanced stats features, caching of stats data to AllScan DB
+2. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.60 2023-01-24**<br>
+Minor optimizations. Link Connection Status table node names to ASL stats page. Adjust Favs table highlight colors.
+
 **v0.59 2023-01-23**<br>
-Support old PHP versions (< 7.3.x) setcookie() function w/SameSite parameter. Fixes login issues seen since v0.53 on nodes with < PHP 7.3. Enable cookie options to be set with cookieSameSiteOpt and cookieUseRootPath variables in include/UserModel.php. Fix issue where allmon.ini search path used by API files could be different than used by main files. Add additional debug log messages during login process.
+Support old PHP versions (< 7.3.x) setcookie function w/SameSite parameter. Fixes login issues in v0.53-0.58 on nodes with < PHP 7.3. Enable cookie options to be set with cookieSameSiteOpt and cookieUseRootPath variables in include/UserModel.php. Fix issue where allmon.ini search path used by API files could be different than used by main files. Add additional debug log messages during login process.
 
 **v0.56 2023-01-22**<br>
 Optimizations to Keyed node status detection. ASL stats API data for many nodes shows a 0 stats.keyed value even when the node is in fact keyed. Testing revealed that stats.totalkeyups count and stats.totaltxtime are usually valid however and thus keyed status can be detected from changes in these values between stats requests. Implement moving average calculation of Tx keyed activity level based on stats.keyed or total time keyed divided by elapsed time between the 2 most recent stats requests. The Favorites Table '#' column for each node is now highlighted in a variable shade of red corresponding to the average Tx activity level over the past few minutes.

@@ -246,6 +246,8 @@ function showLoginForm($parms) {
 
 function processLogin($parms) {
 	global $userModel;
+	if(!isset($parms['remember']))
+		$parms['remember'] = false;
 	$loginOK = $userModel->validateLogin($parms['name'], $parms['pass'], $parms['remember']);
 	if($loginOK && !isset($userModel->error))
 		redirect();

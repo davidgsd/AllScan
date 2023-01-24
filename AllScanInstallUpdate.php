@@ -166,7 +166,7 @@ if($s === 'y') {
 	if($group === 'www-data')
 		$cmd = "service apache2 restart";
 	else
-		$cmd = "systemctl restart lighttpd";
+		$cmd = "systemctl restart lighttpd.service";
 	if(!execCmd($cmd))
 		msg("Restart webserver or restart node now");
 }

@@ -81,7 +81,6 @@ foreach($nodes as $node) {
 $current = [];
 $saved = [];
 $nodeTime = [];
-$ticToc = '';
 while(1) {
 	foreach($nodes as $node) {
 		// Is host of this node logged in?
@@ -89,12 +88,13 @@ while(1) {
 			continue;
 		$connectedNodes = getNode($fp[$cfg[$node]['host']], $node);
 		$sortedConnectedNodes = sortNodes($connectedNodes);
+		$info = getAstInfo($fp[$cfg[$node]['host']], $node);
 		// Build array of time values
 		$nodeTime[$node]['node'] = $node;
-		$nodeTime[$node]['info'] = getAstInfo($fp[$cfg[$node]['host']], $node);
+		$nodeTime[$node]['info'] = $info;
 		// Build array
 		$current[$node]['node'] = $node;
-		$current[$node]['info'] = getAstInfo($fp[$cfg[$node]['host']], $node);
+		$current[$node]['info'] = $info;
 		// Save remote nodes
 		$current[$node]['remote_nodes'] = [];
 		$i = 0;
@@ -114,8 +114,6 @@ while(1) {
 			$current[$node]['remote_nodes'][$i]['elapsed'] = '&nbsp;';
 			$current[$node]['remote_nodes'][$i]['last_keyed'] = $arr['last_keyed'] === 'Never' ? 'Never' : NBSP;
 			$current[$node]['remote_nodes'][$i]['cos_keyed'] = $arr['cos_keyed'];
-			$current[$node]['remote_nodes'][$i]['info'] = $arr['info'];
-			$current[$node]['remote_nodes'][$i]['node'] = $arr['node'];
 			$current[$node]['remote_nodes'][$i]['tx_keyed'] = $arr['tx_keyed'];
 			$i++;
 		}
@@ -127,11 +125,8 @@ while(1) {
 	}
 	// Send times every cycle
 	sendData($nodeTime, 'nodetimes');
-	if(isset($SMLOOPDELAY) && ($SMLOOPDELAY > 299999 && $SMLOOPDELAY < 30000001)) {
-		usleep($SMLOOPDELAY);
-	} else {
-		usleep(500000); // Wait Default 0.5 seconds
-	}
+	// Wait 500mS
+	usleep(500000);
 }
 
 fwrite($fp, "ACTION: Logoff\r\n\r\n");
@@ -171,12 +166,12 @@ function sendData($data, $event='errMsg') {
 
 function sortNodes($nodes) {
 	$arr = [];
-	$never_heard = [];
+	$notHeard = [];
 	$sortedNodes = [];
 	// Build arrays of heard and unheard
 	foreach($nodes as $nodeNum => $row) {
 		if($row['last_keyed'] == '-1') {
-			$never_heard[$nodeNum] = 'Never heard';
+			$notHeard[$nodeNum] = 'Never heard';
 		} else {
 			$arr[$nodeNum] = $row['last_keyed'];
 		}
@@ -186,9 +181,9 @@ function sortNodes($nodes) {
 		asort($arr, SORT_NUMERIC);
 	}
 	// Add in nodes that have not been heard
-	if(count($never_heard) > 0) {
-		ksort($never_heard, SORT_NUMERIC);
-		foreach($never_heard as $nodeNum => $row) {
+	if(count($notHeard) > 0) {
+		ksort($notHeard, SORT_NUMERIC);
+		foreach($notHeard as $nodeNum => $row) {
 			$arr[$nodeNum] = $row;
 		}
 	}
@@ -211,7 +206,6 @@ function sortNodes($nodes) {
 
 function parseNode($fp, $rptStatus, $sawStatus) {
 	$curNodes = [];
-	$links = [];
 	$conns = [];
 	// Parse 'rptStat Conn:' lines
 	$lines = explode("\n", $rptStatus);
@@ -244,10 +238,10 @@ function parseNode($fp, $rptStatus, $sawStatus) {
 	// Parse 'LinkedNodes:' line
 	if(preg_match("/LinkedNodes: (.*)/", $rptStatus, $matches)) {
 		$longRangeLinks = preg_split("/, /", trim($matches[1]));
-	}
-	foreach($longRangeLinks as $line) {
-		$n = substr($line,1);
-		$modes[$n]['mode'] = substr($line,0,1);
+		foreach($longRangeLinks as $line) {
+			$n = substr($line,1);
+			$modes[$n]['mode'] = substr($line,0,1);
+		}
 	}
 	// Combine above arrays
 	if(count($conns)) {
@@ -257,9 +251,9 @@ function parseNode($fp, $rptStatus, $sawStatus) {
 			$curNodes[$n]['node'] = $node[0];
 			$curNodes[$n]['info'] = getAstInfo($fp, $node[0]);
 			$curNodes[$n]['ip'] = $node[1];
-			$curNodes[$n]['direction'] = $node[3];
-			$curNodes[$n]['elapsed'] = $node[4];
 			if(isset($node[5])) {
+				$curNodes[$n]['direction'] = $node[3];
+				$curNodes[$n]['elapsed'] = $node[4];
 				$curNodes[$n]['link'] = $node[5];
 			} else {
 				$curNodes[$n]['direction'] = $node[2];

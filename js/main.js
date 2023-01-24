@@ -1,7 +1,7 @@
 const astApiDir='/allscan/astapi/';
 const statsDir='/allscan/stats/';
 const apiDir='/allscan/api/';
-var source, hbcnt=0, pgTitle, favsCnt=0, c1;
+var source, hbcnt=0, pgTitle, favsCnt=0, c0;
 var rldRetries=0, rldTmr;
 var statsTmr, statsState=0, statsIdx=0, statsReqCnt=0;
 var xh, xha, xhs, xhr;
@@ -104,7 +104,7 @@ function handleStatsResponse() {
 		statsIdx++;
 		var s = resp.data.stats;
 		var time = unixtime();
-		var row;
+		var row, lum;
 		// Update favs table
 		for(var r=0, n=ftbl.rows.length-1; r < n; r++) {
 			//for(var c=0, m=ftbl.rows[r].cells.length; c < m; c++) {
@@ -112,15 +112,7 @@ function handleStatsResponse() {
 			var node = cells[1].innerHTML;
 			if(node != s.node)
 				continue;
-			// Colors: Tx=maroon Busy=0-50% green LinkCnt:0-50% blue
-			// Cols #:Tx(Red 0-50)/Act/NotAct LCnt:linkCnt (Blue 0-50) Bsy%:busyPct (Green 0-50)
-			var c0 = cells[0];
-			// Highlight node# col during stats scanning
-			if(c1)
-				c1.style.backgroundColor = 'transparent';
-			c1 = cells[1];
-			c1.style.backgroundColor = 'hsl(240,30%,20%)';
-			// Calculate rolling average Tx busy indication
+			// Calculate rolling avg Tx activity indication
 			if(!txCnt[node] || s.keyups < txCnt[node] || s.txtime < txTT[node]) {
 				txCnt[node] = s.keyups;
 				txTim[node] = 0;
@@ -130,41 +122,40 @@ function handleStatsResponse() {
 			var txd = s.keyups - txCnt[node];
 			var ttd = s.txtime - txTT[node];
 			var dt = time - txTim[node];
-			if(ttd > 2 * dt || txd > dt / 5)
+			if(ttd > 2 * dt || txd > dt / 3)
 				txd = ttd = 0;
 			txTim[node] = time;
 			var txp = dt ? Math.min(100, Math.round(100 * ttd/dt)) : 0;
 			txAvg[node] = (s.keyed == 1) ? 100 : Math.round(txAvg[node]/2 + txp/2);
+			// Highlight Fav#
+			if(c0)
+				c0.style.textDecoration = 'none';
+			c0 = cells[0];
+			c0.style.textDecoration = 'underline';
 			// Show stats
-			var s2 = (txd || ttd) ? (' &Delta;TxC=' + txd + ' &Delta;TxT=' + ttd + ' TxAvg=' + txAvg[node]) : '';
+			var s2 = (txAvg[node] > 5) ? (' &Delta;TxC=' + txd + ' &Delta;TxT=' + ttd + ' TxAvg=' + txAvg[node]) : '';
 			scanMsg(c0.innerHTML + ': ' + resp.data.status + s2);
-			// Color # column red, max 50%
+			// Highlight # column red, {6-100%} -> 15%-30% lum
 			if(txAvg[node] > 5) {
-				var red = Math.round(Math.log(3 + txAvg[node]) * 5);
-				if(red > 25)
-					red = 25;
-				c0.style.backgroundColor = 'hsl(0,100%,'+red+'%)';
+				lum = convertRange(txAvg[node], 15, 30);
+				c0.style.backgroundColor = 'hsl(0,100%,'+lum+'%)';
 			} else {
 				if(s.active == 1)
 					c0.style.backgroundColor = (s.wt == 1) ? 'hsl(150,50%,20%)' : 'hsl(150,50%,15%)';
 				else
 					c0.style.backgroundColor = 'transparent';
 			}
-			// Color Rx% column green, max 50%
+			// Highlight Rx% column green, {3-50+%} -> 10%-30% lum
 			var busy = cells[5];
-			var grn = Math.round(Math.log(3 + s.busyPct) * 5);
-			if(grn > 50)
-				grn = 50;
 			busy.innerHTML = s.busyPct;
-			busy.style.backgroundColor = (s.busyPct > 5) ? 'hsl(150,50%,'+grn+'%)' : 'transparent';
-			// Color LCnt column blue, max 50% = 50 links
+			lum = convertRange(2 * s.busyPct, 10, 30);
+			busy.style.backgroundColor = (s.busyPct > 2) ? 'hsl(125,40%,'+lum+'%)' : 'transparent';
+			// Highlight LCnt column blue, {3-33+} -> 15%-30% lum
 			var lcnt = cells[6];
-			var blue = Math.round(Math.log(3 + s.linkCnt) * 8);
-			if(blue > 30)
-				blue = 30;
 			lcnt.innerHTML = s.linkCnt;
-			lcnt.style.backgroundColor = (s.linkCnt > 3) ? 'hsl(240,40%,'+blue+'%)' : 'transparent';
-			// Store last Tx Cnt & total time to support more reliable keyed status detection
+			lum = convertRange(3 * s.linkCnt, 15, 30);
+			lcnt.style.backgroundColor = (s.linkCnt > 2) ? 'hsl(240,40%,'+lum+'%)' : 'transparent';
+			// Store last Tx Cnt & total time
 			txCnt[node] = s.keyups;
 			txTT[node] = s.txtime;
 		}
@@ -174,21 +165,27 @@ function handleStatsResponse() {
 		statsTmr = setTimeout(getStats, 60000);
 	}
 }
+function convertRange(val, min, max) {
+	if(val > 100)
+		val = 100;
+	else if(val < 0)
+		val = 0;
+	return Math.round(val*(max-min)/100 + min);
+}
 function calcReqIntvl() {
 	// Do initial stats requests quickly to populate Favs table then reduce request rate so if multiple
 	// clients are using the node the ASL stats request limit (30/min) will be less likely to be exceeded
-	var t = 1000;
 	if(statsReqCnt > 9000)
-		t = 10000; // 6/min after 12hrs
-	else if(statsReqCnt > 4000)
-		t = 6000; // 10/min after 4hrs
-	else if(statsReqCnt > 600)
-		t = 4000; // 15/min after 30min
-	else if(statsReqCnt > 200)
-		t = 3000; // 20/min after first 5-10 scans of table
-	else if(statsReqCnt > favsCnt || statsReqCnt > 20)
-		t = 2000; // 30/min after initial scan
-	return t;
+		return 10000; // 6/min after 12hrs
+	if(statsReqCnt > 4000)
+		return 6000; // 10/min after 4hrs
+	if(statsReqCnt > 600)
+		return 4000; // 15/min after 30min
+	if(statsReqCnt > 200)
+		return 3000; // 20/min after first 5-10 scans of table
+	if(statsReqCnt > favsCnt || statsReqCnt > 20)
+		return 2000; // 30/min after initial scan
+	return 1000;
 }
 
 function handleEventSourceError(event) {

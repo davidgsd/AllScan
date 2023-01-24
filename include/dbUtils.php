@@ -35,8 +35,7 @@ function initErrExit($msg) {
 }
 
 // checkTables() is called during page init prior to any headers or html output.
-// Verifies necessary DB Tables exist and have correct columns needed for current AllScan version.
-// Creates/updates any tables as needed.
+// Verifies necessary DB Tables and columns exist, creates/updates tables as needed.
 // If no admin user account has been created yet user is redirected to the User module to create an account.
 // After logging in they can then change Cfg settings, User settings, and create additional user accounts.
 // If any errors occur msg will be written to $db->error and false will be returned

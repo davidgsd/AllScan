@@ -6,11 +6,14 @@ function getAstInfo($fp, $nodeNum) {
 	if(isset($astdb[$nodeNum])) {
 		$dbNode = $astdb[$nodeNum];
 		$info = $dbNode[1] . ' ' . $dbNode[2] . ' ' . $dbNode[3];
+		// Link to ASL stats page
+		$info = "<a href=\"http://stats.allstarlink.org/stats/$nodeNum\" target=\"stats\">$info</a>";
 	} elseif($nodeNum > 3000000) {
 		// EchoLink and IRLP stuff added by Paul Aidukas, KN2R
 		$info = echolink_cache_lookup($fp, $nodeNum);
 	} elseif($nodeNum > 80000) {
-		$info = irlp_cache_lookup($nodeNum);
+		//$info = irlp_cache_lookup($nodeNum);
+		$info = '[IRLP Node]';
 	} elseif(!empty($node['ip'])) {
 		if(strlen(trim($node['ip'])) > 3) {
 			$info = 'Web Txcvr / Phone Portal (' . $node['ip'] . ')';

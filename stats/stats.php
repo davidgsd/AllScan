@@ -52,8 +52,8 @@ foreach($nodes as $n) {
 	$uph = round($s->uptime/3600) . 'h';
 	$txh = round($s->txtime/3600) . 'h';
 	// Data structure: event=stats; status=LogMsg; stats=statsStruct
-	$msg = "$n: Act=$s->active $s->timeAgo $uph Tx=$s->keyed $txh $s->keyups/$s->kerchunks AvgTx=$s->avgTx "
-		. "Tx/d=$s->txperday Rx%=$s->busyPct LCnt=$s->linkCnt WT=$s->wt";
+	$msg = "$n: Act=$s->active $s->timeAgo $uph Tx=$s->keyed $txh $s->keyups/$s->kerchunks $s->txperday/d {$s->avgTx}s "
+		. "Rx%=$s->busyPct LCnt=$s->linkCnt WT=$s->wt";
 	sendData(['status' => $msg, 'stats' => $s], 'stats');
 }
 
