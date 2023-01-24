@@ -133,7 +133,7 @@ function handleStatsResponse() {
 			c0 = cells[0];
 			c0.style.textDecoration = 'underline';
 			// Show stats
-			var s2 = (txAvg[node] > 5) ? (' &Delta;TxC=' + txd + ' &Delta;TxT=' + ttd + ' TxAvg=' + txAvg[node]) : '';
+			var s2 = (s.keyed != 1 && txAvg[node]) ? (' Tx%=' + txAvg[node] + ' ' + txd + '/' + ttd) : '';
 			scanMsg(c0.innerHTML + ': ' + resp.data.status + s2);
 			// Highlight # column red, {6-100%} -> 15%-30% lum
 			if(txAvg[node] > 5) {
@@ -242,7 +242,7 @@ function handleXRldResp() {
 				+ 'Reload this page when node is online.');
 		}
 	} else {
-		statMsg(`RldResp: {xhr.readyState}, {xhr.status}`);
+		statMsg(`XRldResp ${xhr.readyState}:${xhr.status}`);
 	}
 }
 

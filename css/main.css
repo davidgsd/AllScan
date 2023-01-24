@@ -184,6 +184,7 @@ margin:2px auto;
 font-size:0.9em;
 line-height:1.2;
 font-family:"Lucida Console",Courier,monospace;
+max-width:95%;
 }
 
 table tr th, table tr td {

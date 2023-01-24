@@ -36,7 +36,12 @@ if(!empty($nodes) && !empty($hosts)) {
 	if($astdb !== false)
 		$onLoad = " onLoad=\"asInit('server.php?nodes=$node')\"";
 
-	$favsFile = file_exists(favsini) ? favsini : (file_exists(smfavsini) ? smfavsini : null);
+	// Determine favorites.ini file location
+	foreach($gCfg[favsIniLoc] as $favsFile) {
+		if(file_exists($favsFile))
+			break;
+		unset($favsFile);
+	}
 
 	// Handle form submits
 	$parms = getRequestParms();
@@ -66,8 +71,8 @@ h2('Favorites');
 // Read in favorites.ini
 $favs = [];
 $favcmds = [];
-if(!$favsFile) {
-	msg('favorites.ini not found. Check Supermon install or click below to create file in ' . getcwd() . '/.');
+if(!isset($favsFile)) {
+	msg('favorites.ini not found. Check Supermon install or click below to create ' . $gCfg[favsIniLoc][0]);
 	showFavsIniForm();
 } else {
 	$favsIni = parse_ini_file($favsFile, true);
@@ -106,7 +111,6 @@ if(!$favsFile) {
 		$msg[] = _count($favs) . " favorites read from $favsFile";
 	}
 }
-
 // Combine favs node, label data with astdb data into favList
 $favList = [];
 foreach($favs as $n => $f) {
@@ -127,7 +131,6 @@ foreach($favs as $n => $f) {
 		$name = $call . ' ' . $name;
 	$favList[] = [$n, $f->node, $name, $desc, $loc, NBSP, NBSP];
 }
-
 // Sort favList by specified column if fs parm is set
 $colKey = ['num', 'node', 'name', 'desc', 'loc'];
 $sortCol = isset($_GET['fs']) && in_array($_GET['fs'], $colKey) ? $_GET['fs'] : 'num';
@@ -136,7 +139,6 @@ if($sortCol && !empty($favList) && count($favList) > 1) {
 	$sortAsc = !(isset($_GET['fso']) && $_GET['fso'] === 'd');
 	$favList = sortArray($favList, $col, !$sortAsc);
 }
-
 // Output Favorites table
 if(empty($favList)) {
 	p('No Favorites have yet been added');
@@ -196,7 +198,7 @@ asExit();
 
 // ---------------------------------------------------
 function processForm($parms, &$msg) {
-	global $astdb, $favsFile, $globalInc;
+	global $astdb, $favsFile, $gCfg;
 	$node = $parms['node'];
 	switch($parms['Submit']) {
 		case "Add Favorite":
@@ -211,11 +213,17 @@ function processForm($parms, &$msg) {
 			}
 			// Parse file lines and add new favorite after last label,cmd lines.
 			// Note: Does not look at [general] or [node#] sections (TBI)
-			if(($favs = readFileLines($favsFile, $msg, true)) === false)
-				break;
-			$n = count($favs);
-			$msg[] = "$n lines read from $favsFile";
-			$lastCmdLn = 0;
+			if(isset($favsFile)) {
+				if(($favs = readFileLines($favsFile, $msg, true)) === false)
+					break;
+				$n = count($favs);
+				$msg[] = "$n lines read from $favsFile";
+			} else {
+				$favsFile = $gCfg[favsIniLoc][0];
+				$favs = ['[general]', ''];
+				$n = count($favs);
+			}
+			$insertLn = 0;
 			for($i=0; $i < $n; $i++) {
 				if(strpos($favs[$i], 'cmd[]') === 0) {
 					if(strpos($favs[$i], " $node\"")) {
@@ -225,6 +233,8 @@ function processForm($parms, &$msg) {
 					$insertLn = $i + 2;
 				}
 			}
+			if(!$insertLn)
+				$insertLn = $n;
 			// Add blank line after last fav entry if not present
 			if($favs[$insertLn] !== '') {
 				array_splice($favs, $insertLn, 0, ['']);
@@ -241,6 +251,10 @@ function processForm($parms, &$msg) {
 			break;
 		case "Delete Favorite":
 			$msg[] = "Delete Node $node from Favorites requested";
+			if(!isset($favsFile)) {
+				$msg[] = "Favorites file does not exist.";
+				break;
+			}
 			if(!validDbID($node)) {
 				$msg[] = "Invalid node#.";
 				break;
@@ -251,7 +265,6 @@ function processForm($parms, &$msg) {
 				break;
 			$n = count($favs);
 			$msg[] = "$n lines read from $favsFile";
-			$lastCmdLn = 0;
 			for($i=0; $i < $n; $i++) {
 				if(strpos($favs[$i], 'cmd[]') == 0 && strpos($favs[$i], " $node\""))
 					$delLn = $i + 1;
@@ -278,7 +291,7 @@ function processForm($parms, &$msg) {
 			break;
 		case CREATE_FAVORITESINI_FILE:
 			$from = 'docs/favorites.ini.sample';
-			$to = favsini;
+			$to = $gCfg[favsIniLoc][0];
 			if(copy($from, $to)) {
 				$msg[] = "Copied $from to $to OK";
 				chmod($to, 0664);

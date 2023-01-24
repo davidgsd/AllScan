@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.60";
+$AllScanVersion = "v0.61";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -34,13 +34,9 @@ $asdir = '';	// eg. allscan
 $subdir = '';	// eg. '' or user
 $relpath = '';	// eg. allscan or allscan/user
 $urlbase = '';	// eg. /allscan (prepended to url paths eg. <img src=\"$urlbase/AllScan.png\">)
-// Title cfgs (read from global.inc/DB)
+// Title cfgs
 $title = '';
 $title2 = '';
-// ASL/AllMon/Supermon Files
-define('favsini', 'favorites.ini');
-define('smfavsini', '../supermon/favorites.ini');
-$favsFile = '';
 
 function asInit(&$msg) {
 	global $wwwroot, $asdir, $subdir, $relpath, $urlbase;

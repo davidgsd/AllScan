@@ -110,6 +110,9 @@ I have received many Thank You's and offers for a cup of coffee or other small d
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.61 2023-01-24**<br>
+Support 'Favorites.ini Locations' Cfgs setting. Optimizations to Favorites Add/Delete functions, support cases of blank or nonexistent file.
+
 **v0.60 2023-01-24**<br>
 Minor optimizations. Link Connection Status table node names to ASL stats page. Adjust Favs table highlight colors.
 
