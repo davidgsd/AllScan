@@ -307,12 +307,12 @@ function sortArray($list, $col, $desc) {
 	$colVals = [];
 	foreach($list as $val)
 		$colVals[] = $val[$col];
-	// Sort the column data while retaining array keys
+	// Sort column, retain keys
 	if($desc)
-		arsort($colVals);
+		arsort($colVals, SORT_STRING | SORT_FLAG_CASE);
 	else
-		asort($colVals);
-	// Reorder the input array
+		asort($colVals, SORT_STRING | SORT_FLAG_CASE);
+	// Reorder input array
 	$out = [];
 	foreach(array_keys($colVals) as $k)
 		$out[] = $list[$k];

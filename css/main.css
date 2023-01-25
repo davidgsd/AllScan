@@ -225,6 +225,9 @@ line-height:100%;
 table.favs th, table.favs td {
 padding:3px;
 }
+small {
+font:11px/1.25 "Helvetica Narrow","Arial Narrow",Verdana,Arial,Helvetica,sans-serif;
+}
 
 table.grid {
 min-width:460px;
