@@ -83,7 +83,7 @@ function showForms($newUser) {
 		}
 		// Display Edit request form, showing only users who can be edited by this user
 		if(!empty($user)) {
-			$where = "permission < $user->permission";
+			$where = superUser($user) ? "user_id != $user->user_id" : "permission < $user->permission";
 			$users = $userModel->getUsers($where, null, PERMISSION_NONE);
 			if(isset($userModel->error))
 				errMsg($userModel->error);

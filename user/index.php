@@ -24,7 +24,8 @@ $view = new UserView();
 $userModel = new UserModel($db);
 
 // Handle Login
-if(isset($_POST['name']) && isset($_POST['pass']) && $_POST['name'] && $_POST['pass'] && $_POST['Submit'] !== ADD_USER) {
+if(isset($_POST['name']) && isset($_POST['pass']) && $_POST['name'] && $_POST['pass'] &&
+   $_POST['Submit'] !== ADD_USER && $_POST['Submit'] !== EDIT_USER) {
 	processLogin($_POST); // Does not return. Redirects to main page if login OK, or displays login failed message
 }
 
@@ -80,7 +81,7 @@ function showUsers($parms) {
 	global $userModel, $view;
 	// If Submit set clear parms to prevent sort links acting as forms
 	if(isset($parms['Submit'])) {
-		unset($parms);
+		$parms = [];
 	}
 	// Sort by specified column & direction or default to last login DESC
 	if(isset($parms['sortCol']) && strlen($parms['sortCol']) == 1)
@@ -156,6 +157,10 @@ function processForm($parms) {
 	global $userModel, $userCnt;
 	$Submit = $parms['Submit'];
 	$newUser = arrayToObj($parms, ['user_id', 'name', 'email', 'location', 'nodenums', 'pass', 'permission', 'timezone_id']);
+	if($newUser->user_id == $user->user_id) {
+		p("Use Settings Page to edit your user account", 'error');
+		return;
+	}
 	$confirm = $_POST['confirm'] ?? null;
 	$newUser->edit = ($Submit === EDIT_USER);
 	$newUser->nodenums = isset($newUser->nodenums) ? parseIntList($newUser->nodenums) : [];
@@ -166,7 +171,7 @@ function processForm($parms) {
 		} elseif($confirm == 1) {
 			$userLevel = userPermission();
 			$newUserLevel = userPermission($newUser);
-			if($userLevel >= PERMISSION_ADMIN && $userLevel > $newUserLevel) {
+			if(superUser() || (adminUser() && $userLevel > $newUserLevel)) {
 				// Delete User
 				if($userModel->delete($newUser))
 					return null;
@@ -183,20 +188,17 @@ function processForm($parms) {
 	if($Submit === ADD_USER || ($newUser->edit && !empty($newUser->name))) {
 		// Get existing user data if edit request
 		if($newUser->edit) {
-			$user0 = $userModel->getUserById($newUser->user_id, PERMISSION_DELETED);
+			$user0 = $userModel->getUserById($newUser->user_id);
 			if(!isset($newUser->permission))
 				$newUserLevel = userPermission($user0);
 		}
 		// Verify user has permission to add/edit this user. To prevent there being too many Full permission users,
 		// require that user can only add users with lower permissions or user class than their own
 		$userLevel = userPermission();
-		if(!isset($newUserLevel)) {
+		if(!isset($newUserLevel))
 			$newUserLevel = userPermission($newUser);
-		}
-		$ulDiff = $userLevel - $newUserLevel;
-		// Check permissions for branch users and for Step 2 or 3 of the Add/Edit User form
-		if( $userCnt && userPermission() < PERMISSION_SUPERUSER &&
-			($ulDiff < 0 || $newUser->permission < PERMISSION_NONE || $newUser->permission > userPermission()))
+		if($userCnt && ($newUser->permission < PERMISSION_NONE || $newUser->permission > $userLevel ||
+				(!superUser() && $newUser->permission >= $userLevel)))
 			$newUser->errMsg = "Invalid permissions [$userLevel/$newUserLevel]";
 		elseif(!$newUser->edit && $newUser->permission <= PERMISSION_NONE)
 			$newUser->errMsg = 'Cannot create new user with no permissions';

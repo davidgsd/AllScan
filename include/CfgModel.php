@@ -81,6 +81,10 @@ function adminUser() {
 	global $user;
 	return (isset($user) && userPermission() >= PERMISSION_ADMIN);
 }
+function superUser() {
+	global $user;
+	return (isset($user) && userPermission() >= PERMISSION_SUPERUSER);
+}
 
 function cfgCompare($a, $b) {
 	if(is_numeric($a) && is_numeric($b))

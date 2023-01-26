@@ -14,7 +14,7 @@ function login($fp, $user, $password) {
 	$actionID = $user . $password;
 	fwrite($fp,"ACTION: LOGIN\r\nUSERNAME: $user\r\nSECRET: $password\r\nEVENTS: 0\r\nActionID: $actionID\r\n\r\n");
 	$login = $this->getResponse($fp, $actionID);
-	return (preg_match("/Authentication accepted/", $login) == 1);
+	return (strpos($login, "Authentication accepted") !== false);
 }
 
 function command($fp, $cmdString) {
@@ -29,14 +29,16 @@ function command($fp, $cmdString) {
 }
 
 function getResponse($fp, $actionID) {
-	while(1) {
+	$t0 = time();
+	$response = '';
+	while(time() - $t0 < 20) {
 		$str = fgets($fp);
 		if($str === false)
-			return;
+			return $response;
 		// Look for ActionID set in command()
 		if(trim($str) === "ActionID: $actionID") {
 			$response = $str;
-			while(1) {
+			while(time() - $t0 < 20) {
 				$str = fgets($fp);
 				if($str === "\r\n" || $str === false)
 					return $response;
@@ -44,6 +46,7 @@ function getResponse($fp, $actionID) {
 			}
 		}
 	}
+	return $response ? $response : 'Timeout';
 }
 
 }

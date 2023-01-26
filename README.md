@@ -110,6 +110,9 @@ I have received many Thank You's and offers for a cup of coffee or other small d
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.63 2023-01-26**<br>
+Update Users page to allow Superusers to edit other Superuser accounts. Various optimizations.
+
 **v0.62 2023-01-25**<br>
 Update handling of JS offline/online and EventSource error events to reinit EventSource and Stats functions rather than reload page. Update Favs table sort function to use case-insensitive string sort option.
 
