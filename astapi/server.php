@@ -45,6 +45,9 @@ foreach($passedNodes as $i => $node) {
 	}
 }
 
+// Do not time out
+set_time_limit(0);
+
 // Open a socket to each Asterisk Manager
 $ami = new AMI();
 $servers = [];
