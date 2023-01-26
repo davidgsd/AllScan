@@ -110,8 +110,11 @@ I have received many Thank You's and offers for a cup of coffee or other small d
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.62 2023-01-25**<br>
+Update handling of JS offline/online and EventSource error events to reinit EventSource and Stats functions rather than reload page. Update Favs table sort function to use case-insensitive string sort option.
+
 **v0.61 2023-01-24**<br>
-Support 'Favorites.ini Locations' Cfgs setting. Optimizations to Favorites Add/Delete functions, support cases of blank or nonexistent files. Update Favs table sort function to use case-insensitive string sort option.
+Support 'Favorites.ini Locations' Cfgs setting. Optimizations to Favorites Add/Delete functions, support cases of blank or nonexistent files.
 
 **v0.60 2023-01-24**<br>
 Minor optimizations. Link Connection Status table node names to ASL stats page. Adjust Favs table highlight colors.

@@ -2,7 +2,7 @@ const astApiDir='/allscan/astapi/';
 const statsDir='/allscan/stats/';
 const apiDir='/allscan/api/';
 var source, hbcnt=0, pgTitle, favsCnt=0, c0;
-var rldRetries=0, rldTmr;
+var rldRetries=0, rldTmr, evtSrcRldTmr, evtSrcUrl;
 var statsTmr, statsState=0, statsIdx=0, statsReqCnt=0;
 var xh, xha, xhs, xhr;
 var txCnt=[], txTim=[], txTT=[], txAvg=[];
@@ -23,8 +23,23 @@ function asInit(url) {
 	scanmsg = document.getElementById('scanmsg');
 	cputemp = document.getElementById('cputemp');
 	pgTitle = document.title;
+	// Init Event Source (Connection Status Table data source)
+	evtSrcUrl = url;
+	initEventSrc();
+	// Handle offline/online events
+	window.addEventListener('online', handleOnlineEvent);
+	window.addEventListener('offline', handleOfflineEvent);
+	// Init ASL stats & API functions
+	statsTmr = setTimeout(getStats, 250);
+}
+
+function initEventSrc() {
 	// Start SSE
-	source = new EventSource(astApiDir + url);
+	if(source) {
+		window.removeEventListener('beforeunload', function() { source.close(); });
+		source.close();
+	}
+	source = new EventSource(astApiDir + evtSrcUrl);
 	source.onerror = handleEventSourceError;
 	// Close event stream on exit
 	window.addEventListener('beforeunload', function() { source.close(); });
@@ -36,11 +51,38 @@ function asInit(url) {
 	source.addEventListener('connection', handleConnectionEvent, false);
 	// Handle error responses
 	source.addEventListener('errMsg', handleErrMsgEvent, false);
-	// Handle offline/online events
-	window.addEventListener('online', handleOnlineEvent);
-	window.addEventListener('offline', handleOfflineEvent);
-	// Init ASL stats & API functions
-	statsTmr = setTimeout(getStats, 250);
+}
+function handleEventSourceError(event) {
+	if(event !== null && typeof event === 'object')
+		event = JSON.stringify(event);
+	var msg = (event === '{"isTrusted":true}') ? 'Check internet/LAN connections and power to node' : event;
+	msg = 'Event Source error: ' + msg;
+	statMsg(msg);
+	// Try to reinit
+	evtSrcRldTmr = setTimeout(initEventSrc, 15000);
+	// statMsg('Reloading in 15 Seconds...');
+	// rldTmr = setTimeout(reloadPage, 15000);
+	// if(statsTmr !== undefined)
+	//	clearTimeout(statsTmr);
+}
+
+function handleOnlineEvent() {
+	//statMsg('Online event received. Reloading...');
+	//rldTmr = setTimeout(reloadPage, 2500);
+	statMsg('Online event received: Restarting EventSrc & Stats in 15 Seconds...');
+	evtSrcRldTmr = setTimeout(initEventSrc, 14750);
+	statsTmr = setTimeout(getStats, 15000);
+	statsReqCnt = 0;
+}
+function handleOfflineEvent() {
+	statMsg('Offline event received');
+	//rldRetries=0;
+	// if(rldTmr !== undefined)
+	//	clearTimeout(rldTmr);
+	if(evtSrcRldTmr !== undefined)
+		clearTimeout(evtSrcRldTmr);
+	if(statsTmr !== undefined)
+		clearTimeout(statsTmr);
 }
 
 function getStats() {
@@ -188,30 +230,6 @@ function calcReqIntvl() {
 	return 1000;
 }
 
-function handleEventSourceError(event) {
-	if(event !== null && typeof event === 'object')
-		event = JSON.stringify(event);
-	var msg = (event === '{"isTrusted":true}') ? 'Check internet/LAN connections and power to node' : event;
-	msg = 'Event Source error: ' + msg;
-	statMsg(msg);
-	statMsg('Reloading in 15 Seconds...');
-	rldTmr = setTimeout(reloadPage, 15000);
-	if(statsTmr !== undefined)
-		clearTimeout(statsTmr);
-}
-
-function handleOnlineEvent() {
-	statMsg('Online event received. Reloading...');
-	rldTmr = setTimeout(reloadPage, 2500);
-}
-function handleOfflineEvent() {
-	statMsg('Offline event received.');
-	rldRetries=0;
-	if(rldTmr !== undefined)
-		clearTimeout(rldTmr);
-	if(statsTmr !== undefined)
-		clearTimeout(statsTmr);
-}
 function reloadPage() {
 	// Verify node is accessible before reloading
 	if(rldRetries == 0)
@@ -276,6 +294,9 @@ function handleConnectionEvent(event) {
 	tbody0.innerHTML = '<tr><td colspan="6">' + data.status + '</td></tr>';
 }
 function handleNodesEvent(event) {
+	// Clear rdlTmr if set
+	if(evtSrcRldTmr !== undefined)
+		clearTimeout(evtSrcRldTmr);
 	var tabledata = JSON.parse(event.data);
 	for(var localNode in tabledata) {
 		var tablehtml = '';
@@ -366,6 +387,9 @@ function handleNodesEvent(event) {
 	}
 }
 function handleNodetimesEvent(event) {
+	// Clear rdlTmr if set
+	if(evtSrcRldTmr !== undefined)
+		clearTimeout(evtSrcRldTmr);
 	var tabledata = JSON.parse(event.data);
 	for(localNode in tabledata) {
 		tableID = 'table_' + localNode;
@@ -460,8 +484,10 @@ function astrestart() {
 	parms = 'button=restart' + '&localnode='+localNode;
 	xhttpSend(astApiDir + 'cmd.php', parms);
 	// Reload page
-	statMsg("Reloading in 500mS...");
-	setTimeout(function() { window.location.assign(window.location.href); }, 500);
+	//statMsg("Reloading in 500mS...");
+	//setTimeout(function() { window.location.assign(window.location.href); }, 500);
+	// Reinit Event Source
+	evtSrcRldTmr = setTimeout(initEventSrc, 1000);
 }
 function xhttpSend(url, parms) {
 	xh = new XMLHttpRequest();

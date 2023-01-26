@@ -60,6 +60,9 @@ if(!isset($node) || $astdb === false)
 if(!$gCfg[call] && adminUser())
 	p('global.inc not found. Check Supermon install or Enter Call Sign, Location and Node Title on Cfgs page');
 
+if(!isset($parms))
+	$parms = [];
+
 $remNode = (isset($parms['node']) && validDbID($parms['node']) && strlen($parms['node']) < 9) ? $parms['node'] : '';
 
 showConnStatusTable();
@@ -308,10 +311,11 @@ function sortArray($list, $col, $desc) {
 	foreach($list as $val)
 		$colVals[] = $val[$col];
 	// Sort column, retain keys
+	$opt = $col ? (SORT_STRING | SORT_FLAG_CASE) : SORT_REGULAR;
 	if($desc)
-		arsort($colVals, SORT_STRING | SORT_FLAG_CASE);
+		arsort($colVals, $opt);
 	else
-		asort($colVals, SORT_STRING | SORT_FLAG_CASE);
+		asort($colVals, $opt);
 	// Reorder input array
 	$out = [];
 	foreach(array_keys($colVals) as $k)

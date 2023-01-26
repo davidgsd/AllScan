@@ -31,12 +31,14 @@ function command($fp, $cmdString) {
 function getResponse($fp, $actionID) {
 	while(1) {
 		$str = fgets($fp);
+		if($str === false)
+			return;
 		// Look for ActionID set in command()
 		if(trim($str) === "ActionID: $actionID") {
 			$response = $str;
 			while(1) {
 				$str = fgets($fp);
-				if($str === "\r\n")
+				if($str === "\r\n" || $str === false)
 					return $response;
 				$response .= $str;
 			}
