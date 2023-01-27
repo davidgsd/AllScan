@@ -124,88 +124,88 @@ function handleStatsResponse() {
 	if(xhs.readyState != 4) {
 		return;
 	}
-	if(xhs.status == 200) {
-		// statMsg('statsResponse: ' + xhs.responseText);
-		var resp = JSON.parse(xhs.responseText);
-		// Data structure: event=stats; status=LogMsg; stats=statsStruct
-		var e = resp.event;
-		if(resp.data.stats === undefined) {
-			if(resp.data.retcode == 404) {
-				scanMsg('ASL Stats 404 response for node '+resp.data.node+'. Check node number.');
-				statsIdx++;
-				statsTmr = setTimeout(getStats, calcReqIntvl());
-				return;
-			}
-			if(resp.data.retcode != 429) {
-				scanMsg(resp.data.status + '. Will retry in 15 Seconds...');
-				statsIdx++;
-			}
-			statsTmr = setTimeout(getStats, 15000);
+	if(xhs.status != 200) {
+		statMsg('/stats/ HTTP error ' + xhs.status + '. Retrying in 15 Secs...');
+		statsTmr = setTimeout(getStats, 15000);
+		return;
+	}
+	// statMsg('statsResponse: ' + xhs.responseText);
+	var resp = JSON.parse(xhs.responseText);
+	// Data structure: event=stats; status=LogMsg; stats=statsStruct
+	var e = resp.event;
+	if(resp.data.stats === undefined) {
+		if(resp.data.retcode == 404) {
+			scanMsg('ASL Stats 404 response for node '+resp.data.node+'. Check node number.');
+			statsIdx++;
+			statsTmr = setTimeout(getStats, calcReqIntvl());
 			return;
 		}
-		statsIdx++;
-		var s = resp.data.stats;
-		var time = unixtime();
-		var row, lum;
-		// Update favs table
-		for(var r=0, n=ftbl.rows.length-1; r < n; r++) {
-			//for(var c=0, m=ftbl.rows[r].cells.length; c < m; c++) {
-			var cells = ftbl.rows[r+1].cells;
-			var node = cells[1].innerHTML;
-			if(node != s.node)
-				continue;
-			// Calculate rolling avg Tx activity indication
-			if(!txCnt[node] || s.keyups < txCnt[node] || s.txtime < txTT[node]) {
-				txCnt[node] = s.keyups;
-				txTim[node] = 0;
-				txTT[node] = s.txtime;
-				txAvg[node] = 0;
-			}
-			var txd = s.keyups - txCnt[node];
-			var ttd = s.txtime - txTT[node];
-			var dt = time - txTim[node];
-			if(ttd > 2 * dt || txd > dt / 3)
-				txd = ttd = 0;
-			txTim[node] = time;
-			var txp = dt ? Math.min(100, Math.round(100 * ttd/dt)) : 0;
-			txAvg[node] = (s.keyed == 1) ? 100 : Math.round(txAvg[node]/2 + txp/2);
-			// Highlight Fav#
-			if(c0)
-				c0.style.textDecoration = 'none';
-			c0 = cells[0];
-			c0.style.textDecoration = 'underline';
-			// Show stats
-			var s2 = (s.keyed != 1 && txAvg[node]) ? (' Tx%=' + txAvg[node] + ' ' + txd + '/' + ttd) : '';
-			scanMsg(c0.innerHTML + ': ' + resp.data.status + s2);
-			// Highlight # column red, {6-100%} -> 15%-30% lum
-			if(txAvg[node] > 5) {
-				lum = convertRange(txAvg[node], 15, 30);
-				c0.style.backgroundColor = 'hsl(0,100%,'+lum+'%)';
-			} else {
-				if(s.active == 1)
-					c0.style.backgroundColor = (s.wt == 1) ? 'hsl(150,50%,20%)' : 'hsl(150,50%,15%)';
-				else
-					c0.style.backgroundColor = 'transparent';
-			}
-			// Highlight Rx% column green, {3-50+%} -> 10%-30% lum
-			var busy = cells[5];
-			busy.innerHTML = s.busyPct;
-			lum = convertRange(2 * s.busyPct, 10, 30);
-			busy.style.backgroundColor = (s.busyPct > 2) ? 'hsl(125,40%,'+lum+'%)' : 'transparent';
-			// Highlight LCnt column blue, {3-33+} -> 15%-30% lum
-			var lcnt = cells[6];
-			lcnt.innerHTML = s.linkCnt;
-			lum = convertRange(3 * s.linkCnt, 15, 30);
-			lcnt.style.backgroundColor = (s.linkCnt > 2) ? 'hsl(240,40%,'+lum+'%)' : 'transparent';
-			// Store last Tx Cnt & total time
-			txCnt[node] = s.keyups;
-			txTT[node] = s.txtime;
+		if(resp.data.retcode != 429) {
+			scanMsg(resp.data.status + '. Will retry in 15 Seconds...');
+			statsIdx++;
 		}
-		statsTmr = setTimeout(getStats, calcReqIntvl());
-	} else {
-		statMsg('/stats/ HTTP error ' + xhs.status + '. Retrying in 60 Secs...');
-		statsTmr = setTimeout(getStats, 60000);
+		statsTmr = setTimeout(getStats, 15000);
+		return;
 	}
+	statsIdx++;
+	var s = resp.data.stats;
+	var time = unixtime();
+	var row, lum;
+	// Update favs table
+	for(var r=0, n=ftbl.rows.length-1; r < n; r++) {
+		//for(var c=0, m=ftbl.rows[r].cells.length; c < m; c++) {
+		var cells = ftbl.rows[r+1].cells;
+		var node = cells[1].innerHTML;
+		if(node != s.node)
+			continue;
+		// Calculate rolling avg Tx activity indication
+		if(!txCnt[node] || s.keyups < txCnt[node] || s.txtime < txTT[node]) {
+			txCnt[node] = s.keyups;
+			txTim[node] = 0;
+			txTT[node] = s.txtime;
+			txAvg[node] = 0;
+		}
+		var txd = s.keyups - txCnt[node];
+		var ttd = s.txtime - txTT[node];
+		var dt = time - txTim[node];
+		if(ttd > 2 * dt || txd > dt / 3)
+			txd = ttd = 0;
+		txTim[node] = time;
+		var txp = dt ? Math.min(100, Math.round(100 * ttd/dt)) : 0;
+		txAvg[node] = (s.keyed == 1) ? 100 : Math.round(txAvg[node]/2 + txp/2);
+		// Highlight Fav#
+		if(c0)
+			c0.style.textDecoration = 'none';
+		c0 = cells[0];
+		c0.style.textDecoration = 'underline';
+		// Show stats
+		var s2 = (s.keyed != 1 && txAvg[node]) ? (' Tx%=' + txAvg[node] + ' ' + txd + '/' + ttd) : '';
+		scanMsg(c0.innerHTML + ': ' + resp.data.status + s2);
+		// Highlight # column red, {6-100%} -> 15%-30% lum
+		if(txAvg[node] > 5) {
+			lum = convertRange(txAvg[node], 15, 30);
+			c0.style.backgroundColor = 'hsl(0,100%,'+lum+'%)';
+		} else {
+			if(s.active == 1)
+				c0.style.backgroundColor = (s.wt == 1) ? 'hsl(150,50%,20%)' : 'hsl(150,50%,15%)';
+			else
+				c0.style.backgroundColor = 'transparent';
+		}
+		// Highlight Rx% column green, {3-50+%} -> 10%-30% lum
+		var busy = cells[5];
+		busy.innerHTML = s.busyPct;
+		lum = convertRange(2 * s.busyPct, 10, 30);
+		busy.style.backgroundColor = (s.busyPct > 2) ? 'hsl(125,40%,'+lum+'%)' : 'transparent';
+		// Highlight LCnt column blue, {3-33+} -> 15%-30% lum
+		var lcnt = cells[6];
+		lcnt.innerHTML = s.linkCnt;
+		lum = convertRange(3 * s.linkCnt, 15, 30);
+		lcnt.style.backgroundColor = (s.linkCnt > 2) ? 'hsl(240,40%,'+lum+'%)' : 'transparent';
+		// Store last Tx Cnt & total time
+		txCnt[node] = s.keyups;
+		txTT[node] = s.txtime;
+	}
+	statsTmr = setTimeout(getStats, calcReqIntvl());
 }
 function convertRange(val, min, max) {
 	if(val > 100)
@@ -225,7 +225,7 @@ function calcReqIntvl() {
 		return 4000; // 15/min after 30min
 	if(statsReqCnt > 200)
 		return 3000; // 20/min after first 5-10 scans of table
-	if(statsReqCnt > favsCnt || statsReqCnt > 20)
+	if(statsReqCnt > 2*favsCnt || statsReqCnt > 20)
 		return 2000; // 30/min after initial scan
 	return 1000;
 }

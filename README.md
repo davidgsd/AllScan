@@ -110,6 +110,9 @@ I have received many Thank You's and offers for a cup of coffee or other small d
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.64 2023-01-26**<br>
+Fix issue in previous checkin with creating new user accounts.
+
 **v0.63 2023-01-26**<br>
 Update Users page to allow Superusers to edit other Superuser accounts. Various optimizations.
 

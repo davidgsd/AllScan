@@ -154,10 +154,10 @@ function showUsers($parms) {
 }
 
 function processForm($parms) {
-	global $userModel, $userCnt;
+	global $userModel, $userCnt, $user;
 	$Submit = $parms['Submit'];
 	$newUser = arrayToObj($parms, ['user_id', 'name', 'email', 'location', 'nodenums', 'pass', 'permission', 'timezone_id']);
-	if($newUser->user_id == $user->user_id) {
+	if(!empty($user) && isset($newUser->user_id) && $newUser->user_id == $user->user_id) {
 		p("Use Settings Page to edit your user account", 'error');
 		return;
 	}
