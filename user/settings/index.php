@@ -35,7 +35,6 @@ h1('User Account Settings');
 if(isset($userModel->error))
 	errMsg($userModel->error);
 
-
 switch($Submit) {
 	case UPDATE_SETTINGS:
 		if(!$userModel->validateFields($post)) {
@@ -54,8 +53,9 @@ switch($Submit) {
 				unset($userModel->error);
 			} else {
 				okMsg('Edit User Successful');
-				$user = $post;
 				unset($post);
+				// Read in user from DB
+				$user = $userModel->getUserById($user->user_id);
 			}
 		}
 		break;
