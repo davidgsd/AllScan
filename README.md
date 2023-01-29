@@ -110,20 +110,17 @@ I have received many Thank You's and offers for a cup of coffee or other small d
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
-**v0.64 2023-01-26**<br>
-Fix issue in previous checkin with creating new user accounts.
+**v0.65 2023-01-28**<br>
+Fix issue where Connection Status table would not update after 'Restart Asterisk' button used.
 
-**v0.63 2023-01-26**<br>
-Update Users page to allow Superusers to edit other Superuser accounts. Various optimizations.
+**v0.64 2023-01-26**<br>
+Fix issue in v0.63 with creating new user accounts. Update Users page to allow Superusers to edit other Superuser accounts. Various optimizations.
 
 **v0.62 2023-01-25**<br>
 Update handling of JS offline/online and EventSource error events to reinit EventSource and Stats functions rather than reload page. Update Favs table sort function to use case-insensitive string sort option.
 
 **v0.61 2023-01-24**<br>
-Support 'Favorites.ini Locations' Cfgs setting. Optimizations to Favorites Add/Delete functions, support cases of blank or nonexistent files.
-
-**v0.60 2023-01-24**<br>
-Minor optimizations. Link Connection Status table node names to ASL stats page. Adjust Favs table highlight colors.
+Support 'Favorites.ini Locations' Cfgs setting. Optimizations to Favorites Add/Delete functions, support cases of blank or nonexistent files. Minor optimizations. Link Connection Status table node names to ASL stats page. Adjust Favs table highlight colors.
 
 **v0.59 2023-01-23**<br>
 Support old PHP versions (< 7.3.x) setcookie function w/SameSite parameter. Fixes login issues in v0.53-0.58 on nodes with < PHP 7.3. Enable cookie options to be set with cookieSameSiteOpt and cookieUseRootPath variables in include/UserModel.php. Fix issue where allmon.ini search path used by API files could be different than used by main files. Add additional debug log messages during login process.

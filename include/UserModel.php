@@ -183,7 +183,7 @@ function validate() {
 	if(isset($this->error))
 		return null;
 	if(!isset($_GET['export']) && isset($_COOKIE['name']) && isset($_COOKIE['cpass'])) {
-		// Periodically refresh cookies if expire in 15-45 days
+		// Periodically refresh cookies if expire in 15-35 days
 		$age = ($u->lexp > 0) ? ($u->lexp - time()) / 86400.0 : 0;
 		if($u->lexp <= 0 || ($age >= 15 && $age <= 35)) {
 			$this->setLoginCookies($u->name, $u->cpass, true);
@@ -299,7 +299,7 @@ function getPermissionName($pval) {
 		$pval = PERMISSION_SUPERUSER;
 	return $this->permissionList[$pval];
 }
-// Below called from user settings page
+// Below called from Settings page
 function changePassword($post) {
 	global $user;
 	if($post['pass'] !== $post['confirm']) {
@@ -353,9 +353,9 @@ function validatePassword($p) {
 private function generatePassword($length=10) {
 	$letters = '1234567890abcdefghijklmnopqrstuvwxyz1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ._-';
 	$randomString = '';
-	$lettersLength = strlen($letters);
+	$len = strlen($letters);
 	for($i=0; $i < $length; $i++)
-		$randomString .= $letters[rand(0, $lettersLength-1)];
+		$randomString .= $letters[rand(0, $len-1)];
 	return $randomString;
 }
 private function cpass($p) {

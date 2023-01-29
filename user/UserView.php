@@ -143,8 +143,6 @@ function showForms($newUser) {
 	';
 
 	showFooterLinks();
-
-	return;
 }
 
 }

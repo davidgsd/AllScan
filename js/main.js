@@ -35,14 +35,10 @@ function asInit(url) {
 
 function initEventSrc() {
 	// Start SSE
-	if(source) {
-		window.removeEventListener('beforeunload', function() { source.close(); });
-		source.close();
-	}
 	source = new EventSource(astApiDir + evtSrcUrl);
 	source.onerror = handleEventSourceError;
 	// Close event stream on exit
-	window.addEventListener('beforeunload', function() { source.close(); });
+	window.addEventListener('beforeunload', closeEventSrc);
 	// Handle node data, update whole Conn Status table
 	source.addEventListener('nodes', handleNodesEvent, false);
 	// Handle nodetimes data, update Conn Status time columns
@@ -64,6 +60,9 @@ function handleEventSourceError(event) {
 	// rldTmr = setTimeout(reloadPage, 15000);
 	// if(statsTmr !== undefined)
 	//	clearTimeout(statsTmr);
+}
+function closeEventSrc() {
+	source.close();
 }
 
 function handleOnlineEvent() {
@@ -480,6 +479,8 @@ function dtmfCmd() {
 	xhttpSend(astApiDir + 'cmd.php', parms);
 }
 function astrestart() {
+	window.removeEventListener('beforeunload', closeEventSrc);
+	closeEventSrc();
 	var localNode = lnode.value;
 	parms = 'button=restart' + '&localnode='+localNode;
 	xhttpSend(astApiDir + 'cmd.php', parms);

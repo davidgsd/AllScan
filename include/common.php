@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.64";
+$AllScanVersion = "v0.65";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');

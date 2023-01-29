@@ -51,7 +51,6 @@ if(!empty($nodes) && !empty($hosts)) {
 	}
 }
 
-// Output headers
 pageInit($onLoad);
 
 if(!isset($node) || $astdb === false)

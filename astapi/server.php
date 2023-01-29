@@ -212,7 +212,7 @@ function parseNode($fp, $rptStatus, $sawStatus) {
 	$conns = [];
 	// Parse 'rptStat Conn:' lines
 	$lines = explode("\n", $rptStatus);
-	foreach ($lines as $line) {
+	foreach($lines as $line) {
 		if(preg_match('/Conn: (.*)/', $line, $matches)) {
 			$arr = preg_split("/\s+/", trim($matches[1]));
 			if(is_numeric($arr[0]) && $arr[0] > 3000000) {

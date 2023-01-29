@@ -80,21 +80,12 @@ asExit();
 function showUsers($parms) {
 	global $userModel, $view;
 	// If Submit set clear parms to prevent sort links acting as forms
-	if(isset($parms['Submit'])) {
+	if(isset($parms['Submit']))
 		$parms = [];
-	}
 	// Sort by specified column & direction or default to last login DESC
-	if(isset($parms['sortCol']) && strlen($parms['sortCol']) == 1)
-		$sortCol = $parms['sortCol'];
-	else
-		$sortCol = 'l';
-
-	if( (isset($parms['sortOrd']) && $parms['sortOrd'] === 'd') ||
-		(!isset($parms['sortOrd']) && $sortCol === 'l') )
-		$sortAsc = false;
-	else
-		$sortAsc = true;
-
+	$sortCol = (isset($parms['sortCol']) && strlen($parms['sortCol']) == 1) ? $parms['sortCol'] : 'l';
+	$sortAsc = !((isset($parms['sortOrd']) && $parms['sortOrd'] === 'd') ||
+				 (!isset($parms['sortOrd']) && $sortCol === 'l'));
 	// Build ORDER BY clause. Use array to support ordering by multiple cols
 	switch($sortCol) {
 		case 'n': $order = ['n']; break;
@@ -120,7 +111,7 @@ function showUsers($parms) {
 		$n++;
 	}
 	$orderBy = implode(',', $ord);
-
+	// Get sorted list from DB
 	$where = null;
 	$users = $userModel->getUsers($where, $orderBy, PERMISSION_NONE);
 	if(isset($userModel->error)) {
@@ -132,7 +123,6 @@ function showUsers($parms) {
 		echo BR;
 		return;
 	}
-
 	// Sort by name [n], email [e], location [L], last login [l] (default), timezone [t]
 	$hdrCols = ['Name', 'Email', 'Location', 'Last Login', 'Permission', 'Time Zone'];
 	if(count($users) > 1) {
@@ -192,8 +182,7 @@ function processForm($parms) {
 			if(!isset($newUser->permission))
 				$newUserLevel = userPermission($user0);
 		}
-		// Verify user has permission to add/edit this user. To prevent there being too many Full permission users,
-		// require that user can only add users with lower permissions or user class than their own
+		// Verify user has permission to add/edit this user
 		$userLevel = userPermission();
 		if(!isset($newUserLevel))
 			$newUserLevel = userPermission($newUser);
@@ -256,15 +245,13 @@ function processLogin($parms) {
 	// else login failed
 	sleep(2); // Slow crack attempts
 	if(isset($userModel->error)) {
-		$msg = 'Login Error';
-		$desc = $userModel->error;
+		$msg = "Login Error: $userModel->error";
 	} else {
-		$msg = 'Login Failed';
-		$desc = 'Invalid Name / Call Sign / Password';
+		$msg = "Login Failed: Invalid Name / Call Sign / Password";
 	}
 	pageInit('', false);
 	h1('Login Results');
-	p($desc, 'error');
+	p($msg, 'error');
 	asExit();
 }
 
