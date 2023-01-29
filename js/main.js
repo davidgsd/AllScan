@@ -34,6 +34,10 @@ function asInit(url) {
 }
 
 function initEventSrc() {
+	if(source) {
+		window.removeEventListener('beforeunload', closeEventSrc);
+		closeEventSrc();
+	}
 	// Start SSE
 	source = new EventSource(astApiDir + evtSrcUrl);
 	source.onerror = handleEventSourceError;
@@ -63,6 +67,7 @@ function handleEventSourceError(event) {
 }
 function closeEventSrc() {
 	source.close();
+	source = null;
 }
 
 function handleOnlineEvent() {
