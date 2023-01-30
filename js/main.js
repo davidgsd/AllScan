@@ -176,7 +176,12 @@ function handleStatsResponse() {
 			txd = ttd = 0;
 		txTim[node] = time;
 		var txp = dt ? Math.min(100, Math.round(100 * ttd/dt)) : 0;
-		txAvg[node] = (s.keyed == 1) ? 100 : Math.round(txAvg[node]/2 + txp/2);
+		if(s.keyed == 1)
+			txAvg[node] = 100;
+		else if(txAvg[node] + txp > 2)
+			txAvg[node] = Math.round(txAvg[node]/2 + txp/2);
+		else
+			txAvg[node] = 0;
 		// Highlight Fav#
 		if(c0)
 			c0.style.textDecoration = 'none';
