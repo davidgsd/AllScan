@@ -158,9 +158,8 @@ function readAllmonIni(&$msg, &$hosts) {
 		}
 	}
 	$cwd = getcwd();
-	$msg[] = "No valid [node#] and host definitions found. Check that you have AllMon2 or Supermon installed, "
-		.	"or place an allmon.ini file in $cwd/ containing a [YourNode#] line followed by a "
-		.	"host=[NodeIPAddr:Port] line (eg. \"host=127.0.0.1:5038\").";
+	$msg[] = "No valid [node#] and host definitions found. Check that you have AllMon2 or Supermon installed or " . BR
+		.	"an allmon.ini.php file in /etc/asterisk/ containing a [YourNode#] line followed by host and passwd defines.";
 	return false;
 }
 
