@@ -3,12 +3,12 @@ AllStar Favorites Management &amp; Scanning Web App
 
 See [screenshot.png](https://github.com/davidgsd/AllScan/blob/main/screenshot.png) for an example of the AllScan GUI. AllScan is a free and open-source web app that provides Favorites Management features, AllStarLink Stats integration, and connection monitoring and control functions.
 * Shows your favorites in a Dashboard summary table with Keyed status, Connected Node count and other statistics.
-* Continually scans the status of each favorite using ASL's Stats API data showing which favorites are active and have recently been active.
+* Continually scans the status of each favorite using ASL's Stats API and shows which favorites are active and have recently been active.
 * Allows favorites to be connected with a single click (optionally automatically disconnecting any currently connected nodes first).
 * Allows the Favorites Table to be sorted by Node#, Name, Description, Location, etc.
 * Favorites can be added/deleted simply by entering the node# and clicking a button.
 
-These features finally give AllStar nodes similar memory management and scan capabilities that analog radios have had for decades. AllScan is mobile-friendly and optimized for ease of use on both small and large screens. AllScan follows the latest web development standards, with PHP, JavaScript, HTML, and CSS cleanly partitioned, runs on both ASL and HamVOIP, and is very easy to install, configure, and update.
+These features finally give AllStar nodes similar memory management and scan capabilities that analog radios have had for decades. AllScan is mobile-friendly and optimized for ease of use on both small and large screens. AllScan follows the latest web development standards, with PHP, JavaScript, HTML, and CSS cleanly partitioned, runs on both ASL and HamVOIP, and is simple to install, configure, and update.
 
 AllScan supports multiple locations of the favorites.ini file. If no favorites.ini file is found AllScan will ask if you'd like to create the file and if so will copy the docs/favorites.ini.sample file to ./favorites.ini, which has a small list of nodes to get you started.
 
@@ -17,9 +17,9 @@ Prior to installing AllScan it is recommended that you have a working install of
 As AllScan receives data from the ASL stats server it updates the Favorites Table rows with color coded details showing the following:
 
 Color codes for '#' column:
-* Dark Green: Node Active (registered and reporting to AllStarLink Network)
-* Medium Green: Node Active, Web-Transceiver enabled (may be more likely to accept connections)
 * Red: Node is keyed or was recently keyed (transmitting audio). Brighter shades indicate a higher percentage of time keyed over the past few minutes
+* Medium Green: Node Active, Web-Transceiver enabled (may be more likely to accept connections)
+* Dark Green: Node Active (registered and reporting to AllStarLink Network)
 
 'Rx%' column: The remote node's reported TxTime divided by its Uptime, provides a general indication of how busy the node tends to be.
 
@@ -35,8 +35,10 @@ Additional screenshots:
 [users.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/users.png)
 [settings.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/settings.png)
 
+Pro-tip: Multiple copies of AllScan can be installed on one node (server) if desired, each with their own separate configuration, Favorites, and/or different node numbers.
+
 # Pre-Install Notes
-Ideally you should be using a recent (2021 or later) 2.0 Beta version of the ASL Distribution (available [here](http://downloads.allstarlink.org/index.php?b=ASL_Images_Beta)) and you should have AllMon2 or Supermon properly configured and working. AllScan works fine on HamVOIP and pre-2.0 ASL releases but ASL 2.0 is the latest open-source standard and should have better support.
+Ideally you should be using a recent (2021 or later) 2.0 Beta version of the ASL Distribution (available [here](http://downloads.allstarlink.org/index.php?b=ASL_Images_Beta)) and you should have AllMon2 or Supermon properly configured and working. AllScan works fine on HamVOIP and pre-2.0 ASL releases but ASL 2.0 is the latest open-source standard and should have better support. The ASL team has been increasingly active in 2022-23 adding significant new features and bug fixes. It is highly recommended to make sure your node is running the latest 2.0 Beta ASL software. It is a fairly simple process to update existing nodes.
 
 If you have Supermon already working, AllScan will need no additional configuration and will use the favorites.ini file in the supermon directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon. Confirm you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. Supermon is easy to set up and has some nice maintenance/debug features.
 
@@ -107,6 +109,7 @@ If you have any questions email chc_media at yahoo dot com. Also see [AllScan.in
 I have received many Thank You's and offers for a cup of coffee or other small donation, which are much appreciated, initially though I would ask that any contributions be directed to AllStarLink.org, who have put in many years of work maintaining the free & open-source ASL ecosystem, and who have a lot of overhead expenses. See [this link](https://donorbox.org/allstarlink-donations?amount=24&default_interval=a&utm_campaign=donate_4&utm_source=allscan) to donate to Allstarlink Inc. If in addition to supporting ASL you did also want to contribute to AllScan feel free to send anything by paypal or venmo to chc_media at yahoo dot com. Even $1 does help cover web server expenses and enable me to spend more time on further development. Thank you for your support, and with helping spread the word about AllScan and ASL.
 
 # Road Map
+As of version 0.65, AllScan implements all the main features I originally planned, and works very well for the use case of personal nodes that have one or two primary users and/or a small number of occasional other users. A future version of AllScan will add better support for a larger number of simultaneous web-client users (which will require ASL stats caching so that numerous web-clients would not each be making separate ASL stats requests which would significantly slow down the stats scanning functions). However this is not a common use case and I have not had any requests to support this so it's not currently a priority. AllScan will also at some point more fully support nodes with more than one node number eg. allowing the local node to be selected from a select box control, however this has also not yet been requested. Other changes planned:
 1. Enhanced Favorites management features, saving favorites in AllScan DB rather than in other folders, editing favorites text, reordering table
 2. Enhanced stats features, caching of stats data to AllScan DB
 3. Other features that are highly requested or that seem like a good fit
@@ -180,4 +183,4 @@ Q: If I ever wanted to uninstall AllScan how can this be done?<br>
 A: To uninstall just delete the allscan folder in the web server root directory (/var/www/html/ on ASL or /srv/http/ on HamVOIP). cd to that folder, then execute "sudo rm -rf allscan" to delete the AllScan folder. AllScan also keeps a database file in /etc/allscan/ that can be deleted by executing "sudo rm -rf /etc/allscan".
 
 # Thanks
-Thanks to all ASL Developers. Thanks to KK6QMS, N6ATC, KJ7T and K5LK for help with Beta testing.
+Thanks to all ASL Developers. Thanks to KK6QMS, N6ATC, KJ7T and K5LK for help with Beta testing. And thanks to all repeater owners who have integrated AllStar.
