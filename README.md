@@ -98,6 +98,8 @@ If you get a permissions error when trying to Add a Favorite, check that the /va
 	# else for HamVOIP set group to http
 	# sudo chgrp http favorites.ini favorites.ini.bak .
 
+A common fix for many issues is simply to reboot your node. You might be surprised how many issues end up being resolved with nothing more than a reboot. Nodes are complex systems running Linux and 100's of processes, and sometimes strange things happen and they need a reboot.
+
 If you are still unable to get things working after trying the above, email me at the contact info below and provide as much detail as possible on the issue you see along with the following info:
 1. All messages shown when you run the install/update script.
 2. Directory listing of the web root folder and the allscan folder. Do this by running "cd /var/www/html; ls -la . allscan" (or for HamVOIP "cd /srv/http; ls -la . allscan").
@@ -110,7 +112,7 @@ I have received many Thank You's and offers for a cup of coffee or other small d
 
 # Road Map
 As of version 0.65, AllScan implements all the main features I originally planned, and works very well for the use case of personal nodes that have one or two primary users and/or a small number of occasional other users. A future version of AllScan will add better support for a larger number of simultaneous web-client users (which will require ASL stats caching so that numerous web-clients would not each be making separate ASL stats requests which would significantly slow down the stats scanning functions). However this is not a common use case and I have not had any requests to support this so it's not currently a priority. AllScan will also at some point more fully support nodes with more than one node number eg. allowing the local node to be selected from a select box control, however this has also not yet been requested. Other changes planned:
-1. Enhanced Favorites management features, saving favorites in AllScan DB rather than in other folders, editing favorites text, reordering table
+1. Enhanced Favorites management features, saving favorites in AllScan DB rather than in other folders, editing favorites text, reordering table. Enable auto update check such that AllScan will check once every few days to see if a new version is available and highlight the Update link if so
 2. Enhanced stats features, caching of stats data to AllScan DB
 3. Other features that are highly requested or that seem like a good fit
 
