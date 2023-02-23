@@ -1,4 +1,4 @@
-Supermon Install / Update Instructions - Supermon 7.2+ (ASL version) - Nov. 27, 2022
+Supermon Install / Update Instructions - Supermon 7.3+ (ASL version) - Jan. 30, 2023
 
 Note: For ASL distributions only. For HamVOIP instructions see Supermon Groups.io page.
 
@@ -12,7 +12,7 @@ This includes all default configuration files. Any existing files will be overwr
 
 * Enter the following five commands:
 cd /usr/local/sbin
-wget "http://2577.asnode.org:44871/supermonASL_fresh_install" -O supermonASL_fresh_install
+wget http://2577.asnode.org:43856/supermonASL_fresh_install
 chmod +x supermonASL_fresh_install
 hash
 supermonASL_fresh_install
@@ -39,14 +39,16 @@ supermonASL_fresh_install
 
 UPDATE
 
-No need to download the Update script, it was installed during the Fresh-Install process shown above.
-
 * Login with SSH as root user. (Run "sudo su" if necessary to change to root.)
 
-* Run the update script as follows:
-/usr/local/sbin/supermon/supermonASL_latest_update
+* Run the latest update script as follows:
+cd /usr/local/sbin
+wget http://2577.asnode.org:43856/supermonASL_latest_update
+chmod +x supermonASL_latest_update
+hash
+supermonASL_latest_update
 
-* Go to your Supermon Web screen and force a reload with Shift-[F5]
+* Go to your Supermon Web screen and force a reload with Ctrl-[F5]
 
 ---------------------------------------------------------------
 
