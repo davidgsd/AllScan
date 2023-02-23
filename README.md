@@ -69,8 +69,12 @@ NOTES for HamVOIP only:
 	extension=sqlite3.so
 2. Then restart Lighttpd web server or restart the node
 
-# Node Notes
-If you do not yet have a node or might like to upgrade your node, check out the following How-To Guide by AllScan's author NR9V: [How To Build a High-Quality Full-Duplex AllStar Node for Under $150](https://allscan.info/docs/diy-node.php).
+# AllScan DiY and TurnKey Node Designs
+If you do not yet have a node or might like to upgrade your node, see the following Guide by AllScan's author NR9V
+
+[How To Build a High-Quality Full-Duplex AllStar Node for Under $150](https://allscan.info/docs/diy-node.php).
+
+AllScan nodes provide extensive features and excellent audio quality at a lower price than any other node on the market. They are easy to build by anyone with basic computer & electronics skills, and I also provide kits and fully assembled & tested nodes at reasonable prices. Email david at allscan.info for more info
 
 # Configuration Files and Parameters
 Most nodes already have a number of Cfg files and to simplify the install process AllScan will try to use these rather than require redundant files/data to be created/entered. These files are as follows:
@@ -105,7 +109,7 @@ If you are still unable to get things working after trying the above, email me a
 2. Directory listing of the web root folder and the allscan folder. Do this by running "cd /var/www/html; ls -la . allscan" (or for HamVOIP "cd /srv/http; ls -la . allscan").
 
 # Contact
-If you have any questions email chc_media at yahoo dot com. Also see [AllScan.info](https://AllScan.info). 73, NR9V
+If you have any questions email david at allscan.info. Also see [AllScan.info](https://AllScan.info). 73, NR9V
 
 # Donations
 I have received many Thank You's and offers for a cup of coffee or other small donation, which are much appreciated, initially though I would ask that any contributions be directed to AllStarLink.org, who have put in many years of work maintaining the free & open-source ASL ecosystem, and who have a lot of overhead expenses. See [this link](https://donorbox.org/allstarlink-donations?amount=24&default_interval=a&utm_campaign=donate_4&utm_source=allscan) to donate to Allstarlink Inc. If in addition to supporting ASL you did also want to contribute to AllScan feel free to send anything by paypal or venmo to chc_media at yahoo dot com. Even $1 does help cover web server expenses and enable me to spend more time on further development. Thank you for your support, and with helping spread the word about AllScan and ASL.
