@@ -73,7 +73,7 @@ NOTES for HamVOIP only:
 If you do not yet have a node or might like to upgrade your node, see the following Guide by AllScan's author NR9V:
 [How To - Build a High-Quality Full-Duplex AllStar Node for Under $150](https://allscan.info/docs/diy-node.php)
 
-AllScan nodes provide extensive features and excellent audio quality at a lower price than any other node on the market. They are easy to build by anyone with basic computer & electronics skills, and I also provide kits and fully assembled & tested nodes at reasonable prices
+AllScan nodes provide extensive features and excellent audio quality at a lower price than any other node on the market. They are easy to build by anyone with basic computer & electronics skills. I also provide kits and fully assembled & tested nodes at reasonable prices.
 
 # Configuration Files and Parameters
 Most nodes already have a number of Cfg files and to simplify the install process AllScan will try to use these rather than require redundant files/data to be created/entered. These files are as follows:
@@ -120,6 +120,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.66 2023-02-27**<br>
+Fix issue where DTMF command function would not accept digits A-D. Note that for mobile browsers the Node#/Command text field is specified as inputmode="tel" so that a numeric keypad with large keys appears on phones, making it easier to type in node numbers. For a standard keyboard (supporting letters ie. A-D), delete the "inputmode="tel"" text from include/viewUtils.php line 35.
+
 **v0.65 2023-01-28**<br>
 Fix issue where Connection Status table would not update after 'Restart Asterisk' button used.
 

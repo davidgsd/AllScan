@@ -32,7 +32,7 @@ function showNodeCtrlForm() {
 	echo '<form id="nodeForm" method="post" action="/allscan/"><fieldset>
 <input type=hidden id="localnode" name="localnode" value="' . $node . '">
 <input type=hidden id="conncnt" name="conncnt" value="0">
-<label for="node">Node#</label><input type="text" inputmode="tel"
+<label for="node">Node#</label><input type="text" inputmode="tel" pattern="[0-9a-dA-D\*#]*"
 	id="node" name="node" maxlength="10" value="' . $remNode . '">
 <input type=submit name="Submit" value="Add Favorite" class="small">
 <input type=submit name="Submit" value="Delete Favorite" class="small">

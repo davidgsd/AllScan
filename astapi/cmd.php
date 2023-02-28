@@ -31,7 +31,7 @@ if($ami->login($fp, $cfg[$localnode]['user'], $cfg[$localnode]['passwd']) === fa
 
 switch($button) {
 	case 'dtmf':
-		if(!preg_match("/^[\d*#,]+$/", $cmd))
+		if(!preg_match("/^[\d*#,A-Da-d]+$/", $cmd))
 			exit("Invalid command value\n");
 		echo "Executing cmd \"$cmd\" on $localnode...";
 		$ctxt = "rpt fun $localnode $cmd";
