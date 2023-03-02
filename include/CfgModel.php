@@ -228,8 +228,8 @@ function validateVal($c) {
 
 // Do not call below prior to htmlInit(), global.inc include may cause whitespace to be output
 function checkGlobalInc() {
-	global $gCfg, $subdir;
-	if($gCfg[call] && $gCfg[location])
+	global $gCfg, $subdir, $userModel;
+	if($gCfg[call] && $gCfg[location] || !isset($userModel))
 		return true;
 	// If Call and Location cfgs not set try importing from ../supermon/global.inc
 	$loc = '../supermon/global.inc';
@@ -239,8 +239,11 @@ function checkGlobalInc() {
 		$loc = "../$loc";
 	if(file_exists($loc)) {
 		include($loc);
-		if(!$CALL || !$LOCATION)
+		if(!$CALL || !$LOCATION || strlen($CALL) > 9 ||
+		   !$userModel->validateName($CALL) || !$userModel->validateLocation($LOCATION)) {
+			unset($userModel->error);
 			return false;
+		}
 		$gCfg[call] = $CALL;
 		$gCfg[location] = $LOCATION;
 		if($TITLE2)
