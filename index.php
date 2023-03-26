@@ -209,8 +209,8 @@ function processForm($parms, &$msg) {
 				$msg[] = "Invalid node#.";
 				break;
 			}
-			if(!array_key_exists($node, $astdb)) {
-				$msg[] = "Node $node not found in ASL DB. Check Node Number.";
+			if(!array_key_exists($node, $astdb) && ($nodeNum >= 2000 && $nodeNum < 3000000)) {
+				$msg[] = "Node $node not found in ASL DB. Check Node Number and that your astdb file is up-to-date.";
 				break;
 			}
 			// Parse file lines and add new favorite after last label,cmd lines.

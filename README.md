@@ -120,6 +120,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.68 2023-03-25**<br>
+Allow EchoLink Node #s to be Added to Favorites.
+
 **v0.67 2023-03-01**<br>
 If Call, Location, and Title Cfgs have not yet been set and are read in from global.inc, validate those values before saving to AllScan's Cfgs. Prevents case of invalid text being read in from a global.inc file that was not yet configured. (Note that the global.inc Call, Location, and Title Cfgs are used only in the page header menu bar and are entirely separate from any User account settings.)
 
