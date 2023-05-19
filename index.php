@@ -3,6 +3,8 @@
 // Author: David Gleason - AllScan.info
 require_once('include/common.php');
 require_once('include/hwUtils.php');
+require_once('astapi/AMI.php');
+require_once('astapi/nodeInfo.php');
 $html = new Html();
 $msg = [];
 
@@ -119,10 +121,17 @@ foreach($favs as $n => $f) {
 	if(array_key_exists($f->node, $astdb)) {
 		list($x, $call, $desc, $loc) = $astdb[$f->node];
 	} else {
-		if($f->node < 3000000)
+		if($f->node < 3000000) {
 			list($x, $call, $desc, $loc) = [$n, '-', '[Not in ASL DB]', '[Check Node Number]'];
-		else
-			list($x, $call, $desc, $loc) = [$n, '-', '[EchoLink Node]', '-'];
+		} else {
+			$info = getELInfo($f->node);
+			if(empty($info))
+				list($x, $call, $desc, $loc) = [$n, '-', '[EchoLink Node]', '-'];
+			else {
+				$info = explode(' ', $info);
+				list($x, $call, $desc, $loc) = [$n, $info[0], $info[1] . ' ' . $info[2], '-'];
+			}
+		}
 	}
 	$name = str_replace([$f->node, $call, $desc, $loc, ' ,'], ' ', $f->label);
 	foreach(['call', 'name', 'desc', 'loc'] as $var)
@@ -303,6 +312,37 @@ function processForm($parms, &$msg) {
 			}
 			break;
 	}
+}
+
+function getELInfo($n) {
+	global $node, $host, $ami;
+	static $servers, $fp, $cfg;
+	if(!$node || !$host) {
+		return;
+	}
+	if(empty($ami)) {
+		$ami = new AMI();
+		$servers = [];
+		$fp = [];
+		$cfg = readAllmonCfg();
+	}
+	// Login to AMI
+	if(!array_key_exists($host, $servers)) {
+		// msg("Connecting to Asterisk Manager $node $host...");
+		$fp[$host] = $ami->connect($host);
+		if($fp[$host] === false) {
+			//msg('Connect Failed. Check allmon.ini settings.');
+			return;
+		}
+		if($ami->login($fp[$host], $cfg[$node]['user'], $cfg[$node]['passwd']) !== false) {
+			$servers[$host] = 'y';
+			//msg('Login OK');
+		} else {
+			//msg("Login Failed. Check allmon.ini settings.");
+			return;
+		}
+	}
+	return getAstInfo($fp[$host], $n);
 }
 
 function sortArray($list, $col, $desc) {

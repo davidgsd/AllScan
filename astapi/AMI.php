@@ -1,4 +1,5 @@
 <?php
+define('AMI_DEBUG_LOG', 'log.txt');
 
 class AMI {
 
@@ -17,32 +18,42 @@ function login($fp, $user, $password) {
 	return (strpos($login, "Authentication accepted") !== false);
 }
 
-function command($fp, $cmdString) {
+function command($fp, $cmdString, $debug=false) {
 	// Generate ActionID to associate with response
 	$actionID = 'cpAction_' . mt_rand();
 	if((fwrite($fp, "ACTION: COMMAND\r\nCOMMAND: $cmdString\r\nActionID: $actionID\r\n\r\n")) > 0) {
-		$rptStatus = $this->getResponse($fp, $actionID);
-		$res = explode("\r\n", $rptStatus);
+		if($debug)
+			logToFile('CMD: ' . $cmdString . ' - ' . $actionID, AMI_DEBUG_LOG);
+		$rptStatus = $this->getResponse($fp, $actionID, $debug);
+		// Some AMI response line endings have just a NL and no CR
+		$res = explode("\n", $rptStatus);
+		array_walk($res, 'trim');
+		if($debug)
+			logToFile('RESP: ' . varDumpClean($res, true), AMI_DEBUG_LOG);
 		return (strpos($res[1], '--END COMMAND--') !== false) ? 'OK' : $res[1];
 	}
 	return "Get node $cmdString failed";
 }
 
-function getResponse($fp, $actionID) {
+function getResponse($fp, $actionID, $debug=false) {
 	$t0 = time();
 	$response = '';
 	while(time() - $t0 < 20) {
 		$str = fgets($fp);
 		if($str === false)
 			return $response;
+		if($debug)
+			logToFile('1: ' . $str, AMI_DEBUG_LOG);
 		// Look for ActionID set in command()
 		if(trim($str) === "ActionID: $actionID") {
 			$response = $str;
 			while(time() - $t0 < 20) {
 				$str = fgets($fp);
-				if($str === "\r\n" || $str === false)
+				if($str === "\r\n" || $str[0] === "\n" || $str === false)
 					return $response;
 				$response .= $str;
+				if($debug)
+					logToFile('2: ' . $str, AMI_DEBUG_LOG);
 			}
 		}
 	}
