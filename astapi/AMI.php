@@ -29,7 +29,7 @@ function command($fp, $cmdString, $debug=false) {
 		$res = explode("\n", $rptStatus);
 		array_walk($res, 'trim');
 		if($debug)
-			logToFile('RESP: ' . varDumpClean($res, true), AMI_DEBUG_LOG);
+			logToFile('RES: ' . varDumpClean($res, true), AMI_DEBUG_LOG);
 		return (strpos($res[1], '--END COMMAND--') !== false) ? 'OK' : $res[1];
 	}
 	return "Get node $cmdString failed";
