@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.69";
+$AllScanVersion = "v0.70";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -189,8 +189,13 @@ function readAstDb(&$msg) {
 	$mtime = [0, 0, 0];
 	foreach($astdbtxt as $i => $f) {
 		if(file_exists($f)) {
-			$mtime[$i] = filemtime($f);
-			$msg[] = "$f last updated " . date('Y-m-d', $mtime[$i]);
+			if(filesize($f) < 1024) {
+				$msg[] = "$f last updated " . date('Y-m-d', filemtime($f));
+				$msg[] = "$f invalid filesize - try running AllMon/Supermon astdb.php to reload";
+			} else {
+				$mtime[$i] = filemtime($f);
+				$msg[] = "$f last updated " . date('Y-m-d', $mtime[$i]);
+			}
 		}
 	}
 	arsort($mtime, SORT_NUMERIC);
@@ -232,7 +237,7 @@ function readAstDb2() {
 	// If it exists in more than one place use the newest
 	$mtime = [0, 0, 0];
 	foreach($astdbtxt as $i => $f) {
-		if(file_exists($f)) {
+		if(file_exists($f) && filesize($f) >= 1024) {
 			$mtime[$i] = filemtime($f);
 		}
 	}

@@ -40,16 +40,16 @@ function getEchoLinkInfo($fp, $echonode) {
 		$AMI = $ami->command($fp, "echolink dbget nodename $lookup"); // Get EchoLink data from Asterisk
 		$rows = explode("\n", $AMI);
 		$column = explode("|", $rows[0]);
-		$str = $column[0];
 		if($column[0] == $lookup) {
 			$column[0] = time() + 300;
 		} else {
 			$column = [];
 			$column[0] = time() + 30;
-			$column[1] = $column[2] = "No info";
+			$column[1] = $column[2] = '-';
 		}
 		$elnk_cache[$lookup] = $column;
 	}
+	// column[2] is EL node's IP Address which doesn't seem useful to show
 	//$info = $column[1] . " [EchoLink $lookup] (" . $column[2] . ")";
 	$info = $column[1] . " [EchoLink $lookup]";
 	return $info;

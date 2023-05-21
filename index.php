@@ -128,8 +128,9 @@ foreach($favs as $n => $f) {
 			if(empty($info))
 				list($x, $call, $desc, $loc) = [$n, '-', '[EchoLink Node]', '-'];
 			else {
-				$info = explode(' ', $info);
-				list($x, $call, $desc, $loc) = [$n, $info[0], $info[1] . ' ' . $info[2], '-'];
+				if(preg_match('/(.*) (\[.*\])/', $info, $m) != 1)
+					$m = [1=>'-', 2=>"[EchoLink $f->node]"];
+				list($x, $call, $desc, $loc) = [$n, $m[1], $m[2], '-'];
 			}
 		}
 	}
