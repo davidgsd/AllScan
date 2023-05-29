@@ -214,7 +214,11 @@ function handleStatsResponse() {
 		txCnt[node] = s.keyups;
 		txTT[node] = s.txtime;
 	}
-	statsTmr = setTimeout(getStats, calcReqIntvl());
+	var tms = calcReqIntvl();
+	// Don't request stats for same node more than every ~30s
+	if(tms * n < 30000 && statsReqCnt >= 2 * n)
+		tms = 30000 / n;
+	statsTmr = setTimeout(getStats, tms);
 }
 function convertRange(val, min, max) {
 	if(val > 100)

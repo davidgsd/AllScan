@@ -121,11 +121,11 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
-**v0.70 2023-05-20**<br>
-Handle issue where astdb.txt file downloads (downloaded by AllMon/Supermon astdb.php script) can sometimes fail resulting in a 0 byte file. AllScan will now detect this, show a useful log message, check other file locations or download the file if needed. Fix issue in v0.69 where if EchoLink lookup failed the 'No info' text was not properly shown.
+**v0.71 2023-05-28**<br>
+Fix php log notice on nodes/VMs with no temperature sensor. Optimize stats request timing for case when there are only a small number (<~5) of favorites in which case stats do not need to be read as often.
 
-**v0.69 2023-05-18**<br>
-Implement retrieval of EchoLink node name/callsign data from AMI for display in the Favorites and Connection Status tables.
+**v0.70 2023-05-20**<br>
+Implement retrieval of EchoLink node name/callsign data from AMI for display in the Favorites and Connection Status tables. Handle issue where astdb.txt file downloads (downloaded by AllMon/Supermon astdb.php script) can sometimes fail resulting in a 0 byte file. AllScan will now detect this, show a useful log message, check other file locations or download the file if needed.
 
 **v0.68 2023-03-25**<br>
 Allow EchoLink Node #s to be Added to Favorites.
