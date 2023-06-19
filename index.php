@@ -24,6 +24,9 @@ $user =	$userModel->validate();
 if(!readOk())
 	redirect('user/');
 
+// Check disk free space
+checkDiskSpace($msg);
+
 // Load node and host definitions
 $hosts = [];
 $onLoad = '';

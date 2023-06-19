@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.71";
+$AllScanVersion = "v0.72";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -273,6 +273,63 @@ function downloadAstDb(&$msg) {
 		$msg[] = error("Error retrieving $url.");
 	}
 	return false;
+}
+
+function checkDiskSpace(&$msg, $dir='/') {
+	$free = disk_free_space($dir);
+	$total = disk_total_space($dir);
+	if($free) {
+		$free = round($free/1073741824, 2);
+		$total = round($total/1073741824, 2);
+		$p = round(100 * $free / $total, 1);
+		if($dir === '/')
+			$msg[] = "File system space free $p% ($free/$total GB)";
+		else
+			$msg[] = "$pct% space free ($free / $total GB) in '$dir'";
+	} else {
+		$msg[] = "Error reading '$dir' disk free space";
+	}
+	// Check for log files > 50MB
+	$cwd = getcwd();
+	$d1 = '/var/log';
+	if(chdir($d1) === false) {
+		$msg[] = "Unable to cd to $d1";
+		return;
+	}
+	checkLargeFiles($msg, $d1);
+	$d1 = '/var/log/asterisk';
+	if(chdir($d1) === false) {
+		$msg[] = "Unable to cd to $d1";
+		chdir($cwd);
+		return;
+	}
+	checkLargeFiles($msg, $d1);
+	chdir($cwd);
+	// find /tmp -type f -size +50000k -delete
+}
+
+function checkLargeFiles(&$msg, $dir) {
+	$cmd = "find . -maxdepth 1 -type f -size +50000k";
+	$ret = exec($cmd, $out, $res);
+	$cnt = count($out);
+	if($cnt) {
+		$msg[] = "$cnt file(s) > 50MB found in $dir:";
+		foreach($out as $f) {
+			$size = round(filesize($f)/1048576, 1);
+			$f = str_replace('./', '', $f);
+			$msg[] = "$f $size MB";
+			if((posix_geteuid() === 0) && unlink($f))
+				$msg[] = "Deleted $f";
+		}
+	}
+}
+
+function execCmd($cmd) {
+	//msg("Executing cmd: $cmd");
+	$ret = system($cmd);
+	$s = ($ret === false) ? 'ERROR' : 'OK';
+	//msg("Return Code: $s");
+	return ($ret !== false);
 }
 
 function escapeXmlKey($key) {
