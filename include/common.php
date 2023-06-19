@@ -324,14 +324,6 @@ function checkLargeFiles(&$msg, $dir) {
 	}
 }
 
-function execCmd($cmd) {
-	//msg("Executing cmd: $cmd");
-	$ret = system($cmd);
-	$s = ($ret === false) ? 'ERROR' : 'OK';
-	//msg("Return Code: $s");
-	return ($ret !== false);
-}
-
 function escapeXmlKey($key) {
 	$key = str_replace([' ', ',', '/'], ['', '_', '_'], $key);
 	if(is_numeric($key))

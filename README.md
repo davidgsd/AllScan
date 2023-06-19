@@ -122,7 +122,7 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 
 # Release Notes
 **v0.72 2023-06-18**<br>
-Add functions for checking free and total disk space, and log files > 50MB in size and display this info in the startup messages. Add `_tools/checkFs.php` script which can be called from cron to delete any files in /var/log/ or /var/log/asterisk > 50MB in size. This script is not called from AllScan but can be called from cron by running 'sudo crontab -e' and adding a line similar to "0 * * * * (/var/www/html/allscan/_tools/checkFs.php cron)" to the bottom of the file, which would check for and delete excessively large log files once per hour. These features can help users monitor free disk space on nodes and take corrective action if space is running low.
+Add functions for checking free and total disk space, and log files > 50MB in size. Display this info in startup messages. Add _tools/checkFs.php script which can be called to delete any files in /var/log/ or /var/log/asterisk > 50MB in size. This is not called from AllScan but can be called from cron by running 'sudo crontab -e' and adding a line similar to "0 * * * * (/var/www/html/allscan/_tools/checkFs.php cron)" to the bottom of the file, to check for and delete excessively large log files once per hour. These features can help monitor free disk space and take corrective action if space is running low.
 
 **v0.71 2023-05-28**<br>
 Fix php log notice on nodes/VMs with no temperature sensor. Optimize stats request timing for case when there are only a small number (<~5) of favorites in which case stats do not need to be read as often.
