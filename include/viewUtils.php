@@ -58,7 +58,7 @@ function showFooterLinks() {
 		'AllStarLink.org' => 'https://www.allstarlink.org/',
 		'Keyed&nbsp;Nodes' => 'http://stats.allstarlink.org/stats/keyed',
 		'ASL&nbsp;Forum' => 'https://community.allstarlink.org/',
-		'QRZ&nbsp;ASL&nbsp;Forum' => 'https://forums.qrz.com/index.php?forums/echolink-irlp-tech-board.76/',
+		'AllScan FB' => 'https://www.facebook.com/groups/allscan',
 		'eHam.net' => 'https://www.eham.net/'];
 	foreach($links as $title => $url)
 		$out[] = $html->a($url, null, $title, null, '_blank');
