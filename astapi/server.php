@@ -103,21 +103,21 @@ while(1) {
 		$i = 0;
 		foreach($sortedConnectedNodes as $remoteNode => $arr) {
 			// Store remote nodes time values
-			$nodeTime[$node]['remote_nodes'][$i]['elapsed'] = $arr['elapsed'];
+			$nodeTime[$node]['remote_nodes'][$i]['elapsed'] = $arr['elapsed'] ?? 0;
 			$nodeTime[$node]['remote_nodes'][$i]['last_keyed'] = $arr['last_keyed'];
 			// Store remote nodes other than time values
 			// Array key of remote_nodes is not node number to prevent javascript (for in) sorting
 			$current[$node]['remote_nodes'][$i]['node'] = $arr['node'];
-			$current[$node]['remote_nodes'][$i]['info'] = $arr['info'];
-			$current[$node]['remote_nodes'][$i]['link'] = ucwords(strtolower($arr['link']));
-			$current[$node]['remote_nodes'][$i]['ip'] = $arr['ip'];
-			$current[$node]['remote_nodes'][$i]['direction'] = $arr['direction'];
-			$current[$node]['remote_nodes'][$i]['keyed'] = $arr['keyed'];
-			$current[$node]['remote_nodes'][$i]['mode'] = $arr['mode'];
+			$current[$node]['remote_nodes'][$i]['info'] = $arr['info'] ?? '';
+			$current[$node]['remote_nodes'][$i]['link'] = ucwords(strtolower($arr['link'] ?? ''));
+			$current[$node]['remote_nodes'][$i]['ip'] = $arr['ip'] ?? '';
+			$current[$node]['remote_nodes'][$i]['direction'] = $arr['direction'] ?? '';
+			$current[$node]['remote_nodes'][$i]['keyed'] = $arr['keyed'] ?? '';
+			$current[$node]['remote_nodes'][$i]['mode'] = $arr['mode'] ?? '';
 			$current[$node]['remote_nodes'][$i]['elapsed'] = '&nbsp;';
 			$current[$node]['remote_nodes'][$i]['last_keyed'] = $arr['last_keyed'] === 'Never' ? 'Never' : NBSP;
-			$current[$node]['remote_nodes'][$i]['cos_keyed'] = $arr['cos_keyed'];
-			$current[$node]['remote_nodes'][$i]['tx_keyed'] = $arr['tx_keyed'];
+			$current[$node]['remote_nodes'][$i]['cos_keyed'] = $arr['cos_keyed'] ?? 0;
+			$current[$node]['remote_nodes'][$i]['tx_keyed'] = $arr['tx_keyed'] ?? 0;
 			$i++;
 		}
 	}
@@ -173,7 +173,7 @@ function sortNodes($nodes) {
 	$sortedNodes = [];
 	// Build arrays of heard and unheard
 	foreach($nodes as $nodeNum => $row) {
-		if($row['last_keyed'] == '-1') {
+		if(!isset($row['last_keyed']) || $row['last_keyed'] == '-1') {
 			$notHeard[$nodeNum] = 'Never heard';
 		} else {
 			$arr[$nodeNum] = $row['last_keyed'];
@@ -193,7 +193,7 @@ function sortNodes($nodes) {
 	// Build sorted node array
 	foreach($arr as $nodeNum => $row) {
 		// Build last_keyed string. Converts seconds to hours, minutes, seconds.
-		if($nodes[$nodeNum]['last_keyed'] > -1) {
+		if(isset($nodes[$nodeNum]['last_keyed']) && $nodes[$nodeNum]['last_keyed'] > -1) {
 			$t = $nodes[$nodeNum]['last_keyed'];
 			$h = floor($t / 3600);
 			$m = floor(($t / 60) % 60);

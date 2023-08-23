@@ -137,13 +137,18 @@ foreach($favs as $n => $f) {
 			}
 		}
 	}
+	//$msg[] = '';
+	//$msg[] = "$x, $call, $desc, $loc, $f->label";
 	$name = str_replace([$f->node, $call, $desc, $loc, ' ,'], ' ', $f->label);
+	//$msg[] = "$x, $call, $desc, $loc, $f->label";
+	//$msg[] = $name;
 	foreach(['call', 'name', 'desc', 'loc'] as $var)
 		$$var = trim(str_replace('  ', ' ', $$var), " .,;\n\r\t\v\x00");
 	if(!$name)
 		$name = $call;
 	elseif(strpos($name, $call) === false && $call !== '-')
 		$name = $call . ' ' . $name;
+	//$msg[] = $name;
 	$favList[] = [$n, $f->node, $name, $desc, $loc, NBSP, NBSP];
 }
 // Sort favList by specified column if fs parm is set

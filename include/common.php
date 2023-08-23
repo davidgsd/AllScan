@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.72";
+$AllScanVersion = "v0.73";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -451,7 +451,7 @@ function validIpAddr($ipa) {
 	return (filter_var($ipa, FILTER_VALIDATE_IP) !== false);
 }
 function validEmail($email) {
-	$emailMatchString = "/^\w+[\+\.\w-]*@([\w-]+\.)*\w+[\w-]*\.([a-z]{2,4}|\d+)$/i";
+	$emailMatchString = "/^\w+[\+\.\w-]*@([\w-]+\.)*\w+[\w-]*\.([a-z]{2,10}|\d+)$/i";
 	$valid = (preg_match($emailMatchString, $email) == 1);
 	return $valid;
 }
