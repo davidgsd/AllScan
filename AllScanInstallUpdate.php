@@ -28,7 +28,7 @@ foreach($dirs as $d) {
 msg("Web Server Folder: " . (isset($webdir) ? $webdir : "Not Found."));
 
 // Determine web server group name
-$name = ['www-data', 'http'];
+$name = ['www-data', 'http', 'apache'];
 foreach($name as $n) {
 	if(`grep "^$n:" /etc/group`) {
 		$group = $n;
@@ -155,18 +155,21 @@ msg("Ready to run OS update/upgrade commands." . NL
 	."Otherwise it is recommended to ensure your system is up-to-date.");
 $s = readline("Enter 'y' to proceed, any other key to skip this step: ");
 if($s === 'y') {
-	if($group === 'www-data') {
+	if(is_executable('/usr/bin/apt-get')) {
 		execCmd("apt-get -y update");
 		execCmd("apt-get -y upgrade");
 		execCmd("apt-get install -y php-sqlite3 php-curl");
-	} else {
+	} else if(is_executable('/usr/bin/yum')) {
+		execCmd("yum -y update");
+		execCmd("yum -y upgrade");
+	} else if(is_executable('/usr/bin/pacman')) {
 		execCmd("pacman -Syu");
 		execCmd("pacman -S php-sqlite");
 	}
 
 	msg("Restarting web server...");
-	if($group === 'www-data')
-		$cmd = "service apache2 restart";
+	if(is_executable('/usr/bin/apachectl') || is_executable('/usr/sbin/apachectl'))
+		$cmd = "apachectl restart";
 	else
 		$cmd = "systemctl restart lighttpd.service";
 	if(!execCmd($cmd))

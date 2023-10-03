@@ -29,7 +29,7 @@ function copyFiles($excludes, $test=false, $toWww=true) {
 	}
 	$opts = $test ? '--list-only' : '';
 	$dirs = $toWww ? '. ' . $webRoot : $webRoot . ' .';
-	$cmd = "rsync -avC $exclude $opts $dirs";
+	$cmd = "rsync -avvC $exclude $opts $dirs";
 	passthru($cmd);
 	echo "Done\n";
 }
