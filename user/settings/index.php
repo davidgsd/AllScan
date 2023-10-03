@@ -78,10 +78,10 @@ if(isset($post->errMsg))
 $form->id = 'editUserForm';
 $permList = $userModel->getPermissionList(userPermission(), userPermission());
 $form->fields = [
-	'Name'		=> ['text'	=> ['name', $user->name]],
-	'Email' 	=> ['text' 	=> ['email', $user->email]],
-	'Location'	=> ['text' =>  ['location', $user->location]],
-	'Node #s'	=> ['text' => ['nodenums', implode(' ', $user->nodenums)]],
+	'Name'		=> ['text'	=> ['name', $user->name ?? '']],
+	'Email' 	=> ['text' 	=> ['email', $user->email ?? '']],
+	'Location'	=> ['text' =>  ['location', $user->location ?? '']],
+	'Node #s'	=> ['text' => ['nodenums', implode(' ', $user->nodenums ?? '')]],
 	'Permission' => ['select' => ['permission', $permList, userPermission()]],
 	'Time Zone' => ['select' => ['timezone_id', $timezoneDef, $user->timezone_id]]];
 $form->submit = $form->fieldsetLegend = UPDATE_SETTINGS;
