@@ -48,6 +48,7 @@ searchDir('.', $subdirs, $pattern, $recursive);
 exit(0);
 
 function searchDir($dir, $subdirs, $pattern, $recursive) {
+	global $exts;
 	if($handle = opendir($dir)) {
 		while(($file = readdir($handle)) !== false) {
 			// If is a directory, dir not excluded, and recursion enabled, call this function recursively

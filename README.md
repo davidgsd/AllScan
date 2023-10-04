@@ -72,9 +72,10 @@ NOTES for HamVOIP only:
 # AllScan DiY and TurnKey Node Designs
 If you do not yet have a node or might like to upgrade your node, see the following Guides by AllScan's author NR9V:<br>
 [How To - Build a High-Quality Radio-less AllStar Node for Under $100](https://allscan.info/docs/radioless-node.php)<br>
-[How To - Build a High-Quality Full-Duplex AllStar Node for Under $150](https://allscan.info/docs/diy-node.php)
+[How To - Build a High-Quality Full-Duplex AllStar Node for Under $150](https://allscan.info/docs/diy-node.php)<br>
+[How To - Build a Full-Duplex AllStar Node Using a Mobile Radio](https://allscan.info/docs/mobile-radio-node.php)
 
-AllScan nodes provide extensive features and excellent audio quality at a lower price than any other node on the market. They are easy to build by anyone with basic computer & electronics skills. I also provide kits and fully assembled & tested nodes at reasonable prices.
+AllScan nodes provide extensive features and excellent audio quality at a lower price than any other node on the market. They are easy to build by anyone with computer & electronics skills. I also provide kits and fully assembled & tested nodes at reasonable prices - see my [Products Page](https://allscan.info/products/) for details.
 
 # Configuration Files and Parameters
 Most nodes already have a number of Cfg files and to simplify the install process AllScan will try to use these rather than require redundant files/data to be created/entered. These files are as follows:
@@ -89,6 +90,8 @@ All AllScan Cfg parameters can be viewed and set on the Cfgs page if you are log
 For any issues including directory/file permissions issues or issues with SQLite not being available it is recommended to first always run the update script. The script will check if you have the latest version of AllScan and update your install if not, and will validate all directory and file permissions and update/upgrade any out-of-date OS packages. Refer to the "Automatic Install / Update" section above and run the update script and then see if the issue was resolved.
 
 HamVOIP users: See this [Blog Post by KJ7T](https://randomwire.substack.com/p/updating-allscan-on-the-clearnode) for detailed steps on how to enable the SQLite3 extension in php.ini.
+
+If you have somehow corrupted your install and running the install/update script does not fix it, run "sudo rm -rf /etc/allscan /var/www/html/allscan /srv/http/allscan" to completely uninstall AllScan, and then run the installer again.
 
 If you get a permissions error when trying to Add a Favorite, check that the /var/www/html/allscan and supermon dirs have 775 permissions and www-data group, and that the favorites.ini file exists in one or both directories and has 664 permissions and www-data as the group. These settings should already be that way if your Supermon install is properly working, or it would not be able to edit and save the favorites.ini file. But if not the following commands should correct the permission settings:
 
@@ -112,7 +115,7 @@ If you are still unable to get things working after trying the above, email me a
 If you have any questions email david at allscan.info. Also see [AllScan.info](https://AllScan.info), and the [AllScan FB Group](https://www.facebook.com/groups/allscan).
 
 # Donations
-I have received many Thank You's and offers for a cup of coffee and other donations, which are much appreciated. I would also encourage contributions to AllStarLink.org, who have put in many years of work maintaining the free & open-source ASL ecosystem. See [this link](https://donorbox.org/allstarlink-donations?amount=24&default_interval=a&utm_campaign=donate_4&utm_source=allscan) to donate to Allstarlink Inc. To contribute to AllScan feel free to send any amount by paypal or venmo to chc_media at yahoo.com. Even $1 does help cover web server expenses and enable me to spend more time on further development. Thank you for your support, and with helping spread the word about AllScan and ASL.
+I have received many Thank You's and offers for a cup of coffee and other donations, which are much appreciated. I would also encourage contributions to AllStarLink.org, who have put in many years of work maintaining the free & open-source ASL ecosystem. See [this link](https://donorbox.org/allstarlink-donations?amount=24&default_interval=a&utm_campaign=donate_4&utm_source=allscan) to donate to Allstarlink Inc. To contribute to AllScan feel free to send any amount by paypal or venmo to chc_media at yahoo.com. Even $5 does help cover web server expenses and enable me to spend more time on further development. Thank you for your support, and with helping spread the word about AllScan and ASL.
 
 # Road Map
 As of version 0.65, AllScan implements the main features I originally planned, and works very well for the use case of personal nodes that have one or two primary users and/or a small number of occasional other users. A future version of AllScan will add enhanced support for a larger number of simultaneous web-client users (which will require ASL stats caching so that numerous web-clients would not each be making separate ASL stats requests which would significantly slow down the stats scanning functions). However this is not a common use case and I have not had any requests to support this so it's not a current priority. AllScan will also at some point more fully support nodes with more than one node number eg. allowing the local node to be selected from a select box control, however this has also not yet been requested. Other changes planned:
@@ -121,6 +124,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.74 2023-10-03**<br>
+Support reading temp sensor on RPi2's. Readme updates.
+
 **v0.73 2023-08-23**<br>
 Allow account email addresses from domain names with long suffixes eg. user@ham.network. Add checks to prevent some possible "Undefined array key" PHP warning messages.
 
