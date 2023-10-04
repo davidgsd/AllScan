@@ -72,7 +72,7 @@ NOTES for HamVOIP only:
 # AllScan DiY and TurnKey Node Designs
 If you do not yet have a node or might like to upgrade your node, see the following Guides by AllScan's author NR9V:<br>
 [How To - Build a High-Quality Radio-less AllStar Node for Under $100](https://allscan.info/docs/radioless-node.php)<br>
-[How To - Build a High-Quality Full-Duplex AllStar Node for Under $150](https://allscan.info/docs/diy-node.php)
+[How To - Build a High-Quality Full-Duplex AllStar Node for Under $150](https://allscan.info/docs/diy-node.php)<br>
 [How To - Build a Full-Duplex AllStar Node Using a Mobile Radio](https://allscan.info/docs/mobile-radio-node.php)
 
 AllScan nodes provide extensive features and excellent audio quality at a lower price than any other node on the market. They are easy to build by anyone with computer & electronics skills. I also provide kits and fully assembled & tested nodes at reasonable prices - see my [Products Page](https://allscan.info/products/) for details.
