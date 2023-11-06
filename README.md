@@ -69,6 +69,9 @@ NOTES for HamVOIP only:
 	extension=sqlite3.so
 2. Then restart Lighttpd web server or restart the node
 
+# Cloud/VM Server Install
+See github.com/Allan-N/ASL-Install for a script that can be used to install ASL on various cloud server platforms.
+
 # AllScan DiY and TurnKey Node Designs
 If you do not yet have a node or might like to upgrade your node, see the following Guides by AllScan's author NR9V:<br>
 [How To - Build a High-Quality Radio-less AllStar Node for Under $100](https://allscan.info/docs/radioless-node.php)<br>
@@ -124,6 +127,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.75 2023-11-05**<br>
+Update install/update script with changes from WA3WCO to support additional Linux versions, see github.com/Allan-N/AllScan for details.
+
 **v0.74 2023-10-03**<br>
 Support reading temp sensor on RPi2's. Readme updates.
 

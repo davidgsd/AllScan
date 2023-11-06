@@ -107,7 +107,7 @@ while(1) {
 			$nodeTime[$node]['remote_nodes'][$i]['last_keyed'] = $arr['last_keyed'];
 			// Store remote nodes other than time values
 			// Array key of remote_nodes is not node number to prevent javascript (for in) sorting
-			$current[$node]['remote_nodes'][$i]['node'] = $arr['node'];
+			$current[$node]['remote_nodes'][$i]['node'] = $arr['node'] ?? '';
 			$current[$node]['remote_nodes'][$i]['info'] = $arr['info'] ?? '';
 			$current[$node]['remote_nodes'][$i]['link'] = ucwords(strtolower($arr['link'] ?? ''));
 			$current[$node]['remote_nodes'][$i]['ip'] = $arr['ip'] ?? '';
