@@ -69,8 +69,8 @@ NOTES for HamVOIP only:
 	extension=sqlite3.so
 2. Then restart Lighttpd web server or restart the node
 
-# Cloud/VM Server Install
-See github.com/Allan-N/ASL-Install for a script that can be used to install ASL on various cloud server platforms.
+NOTES for Cloud/VM Server Installation:
+See https://github.com/Allan-N/ASL-Install for a script that can be used to install ASL on various cloud server platforms.
 
 # AllScan DiY and TurnKey Node Designs
 If you do not yet have a node or might like to upgrade your node, see the following Guides by AllScan's author NR9V:<br>
@@ -134,7 +134,7 @@ Update install/update script with changes from WA3WCO to support additional Linu
 Support reading temp sensor on RPi2's. Readme updates.
 
 **v0.73 2023-08-23**<br>
-Allow account email addresses from domain names with long suffixes eg. user@ham.network. Add checks to prevent some possible "Undefined array key" PHP warning messages.
+Allow account email addresses from domain names with long suffixes. Add checks to prevent some possible "Undefined array key" PHP warning messages.
 
 **v0.72 2023-06-18**<br>
 Add functions for checking free and total disk space, and log files > 50MB in size. Display this info in startup messages. Add _tools/checkFs.php script which can be called to delete any files in /var/log/ or /var/log/asterisk > 50MB in size. This is not called from AllScan but can be called from cron by running 'sudo crontab -e' and adding a line similar to "0 * * * * (/var/www/html/allscan/_tools/checkFs.php cron)" to the bottom of the file, to check for and delete excessively large log files once per hour. These features can help monitor free disk space and take corrective action if space is running low.
