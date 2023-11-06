@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-$AllScanInstallerUpdaterVersion = "v1.17";
+$AllScanInstallerUpdaterVersion = "v1.18";
 define('NL', "\n");
 // Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory. The script will then determine
 // the location of the web root folder on your system, cd to that folder, check if you have AllScan installed and install
@@ -169,9 +169,9 @@ if($s === 'y') {
 
 	msg("Restarting web server...");
 	if(is_executable('/usr/bin/apachectl') || is_executable('/usr/sbin/apachectl'))
-		$cmd = "apachectl restart";
+		$cmd = "apachectl restart 2> /dev/null";
 	else
-		$cmd = "systemctl restart lighttpd.service";
+		$cmd = "systemctl restart lighttpd.service 2> /dev/null";
 	if(!execCmd($cmd))
 		msg("Restart webserver or restart node now");
 }
