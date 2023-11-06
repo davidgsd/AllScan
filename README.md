@@ -69,9 +69,6 @@ NOTES for HamVOIP only:
 	extension=sqlite3.so
 2. Then restart Lighttpd web server or restart the node
 
-NOTES for Cloud/VM Server Installation:
-See https://github.com/Allan-N/ASL-Install for a script that can be used to install ASL on various cloud server platforms.
-
 # AllScan DiY and TurnKey Node Designs
 If you do not yet have a node or might like to upgrade your node, see the following Guides by AllScan's author NR9V:<br>
 [How To - Build a High-Quality Radio-less AllStar Node for Under $100](https://allscan.info/docs/radioless-node.php)<br>
@@ -128,7 +125,7 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 
 # Release Notes
 **v0.75 2023-11-05**<br>
-Update install/update script with changes from WA3WCO to support additional Linux versions, see github.com/Allan-N/AllScan for details.
+Update install/update script with changes from WA3WCO to support additional Linux versions, see github.com/Allan-N/ for details.
 
 **v0.74 2023-10-03**<br>
 Support reading temp sensor on RPi2's. Readme updates.
@@ -229,4 +226,4 @@ Q: If I ever wanted to uninstall AllScan how can this be done?<br>
 A: To uninstall just delete the allscan folder in the web server root directory (/var/www/html/ on ASL or /srv/http/ on HamVOIP). cd to that folder, then execute "sudo rm -rf allscan" to delete the AllScan folder. AllScan also keeps a database file in /etc/allscan/ that can be deleted by executing "sudo rm -rf /etc/allscan".
 
 # Thanks
-Thanks to all ASL Developers. Thanks to KK6QMS, N6ATC, KJ7T and K5LK for help with Beta testing. And thanks to all repeater owners who have integrated AllStar.
+Thanks to all ASL Developers. Thanks to KK6QMS, N6ATC, KJ7T, WA3WCO, and K5LK for help with Beta testing. And thanks to all repeater owners who have integrated AllStar.
