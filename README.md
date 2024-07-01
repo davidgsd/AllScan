@@ -35,10 +35,12 @@ Additional screenshots:
 [users.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/users.png)
 [settings.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/settings.png)
 
-Pro-tip: Multiple copies of AllScan can be installed on one node (server) if desired, each with their own separate configuration, Favorites, and/or different node numbers.
+Pro-tip: Multiple copies of AllScan can be installed on one node (server) if desired, each with their own separate configuration, Favorites, and/or different node numbers. Just make copies of the /var/www/html/allscan/ dir eg. "allscan2" and put copies of allmon.inc and favorites.ini with your desired configuration in the new folder. (All copies will use the same user/login credentials.)
 
 # Pre-Install Notes
-Ideally you should be using a recent (2021 or later) 2.0 Beta version of the ASL Distribution (available [here](http://downloads.allstarlink.org/index.php?b=ASL_Images_Beta)) and you should have AllMon2 or Supermon properly configured and working. AllScan works fine on HamVOIP and pre-2.0 ASL releases but ASL 2.0 is the latest open-source standard and should have better support. The ASL team has been increasingly active in 2022-23 adding significant new features and bug fixes. It is highly recommended to make sure your node is running the latest 2.0 Beta ASL software. It is a fairly simple process to update existing nodes.
+Ideally you should be using a recent version of the ASL Distribution and you should have AllMon or Supermon properly configured and working. AllScan works fine on HamVOIP and pre-2.0 ASL releases but ASL is the latest open-source standard. The ASL team has been increasingly active in recent years adding significant new features and bug fixes. It is recommended to make sure your node is running the latest ASL software. It is a fairly simple process to update existing nodes. ASL3 is fully supported.
+
+For new nodes I recommend using the install script at [Allan-N/ASL-Install](https://github.com/Allan-N/ASL-Install) which installs not only ASL but also AllScan, Allmon, and Supermon - making for a super quick and easy install of everything needed for a full-featured node.
 
 If you have Supermon already working, AllScan will need no additional configuration and will use the favorites.ini file in the supermon directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon. Confirm you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. Supermon is easy to set up and has some nice maintenance/debug features.
 
@@ -125,7 +127,7 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 
 # Release Notes
 **v0.76 2024-06-30**<br>
-Updates to support use of ASL3, and Allmon3 .ini file. If you do not have Allmon2 or Supermon installed, AllSan will now also check /etc/allmon3/allmon3.ini for the AMI credentials (note: may be necessary to execute "sudo chmod o+r /etc/allmon3/allmon3.ini" so the file is readable).
+Updates to support use of ASL3, and Allmon3 .ini file. If you do not have Allmon2 or Supermon installed, AllScan will now also check /etc/allmon3/allmon3.ini for the AMI credentials (note: may be necessary to execute "sudo chmod o+r /etc/allmon3/allmon3.ini" so the file is readable).
 
 **v0.75 2023-11-05**<br>
 Update install/update script with changes from WA3WCO to support additional Linux versions, see github.com/Allan-N/ for details.
