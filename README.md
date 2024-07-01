@@ -124,6 +124,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.76 2024-06-30**<br>
+Updates to support use of ASL3, and Allmon3 .ini file. If you do not have Allmon2 or Supermon installed, AllSan will now also check /etc/allmon3/allmon3.ini for the AMI credentials (note: may be necessary to execute "sudo chmod o+r /etc/allmon3/allmon3.ini" so the file is readable).
+
 **v0.75 2023-11-05**<br>
 Update install/update script with changes from WA3WCO to support additional Linux versions, see github.com/Allan-N/ for details.
 

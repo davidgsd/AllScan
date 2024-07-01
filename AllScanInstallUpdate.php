@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-$AllScanInstallerUpdaterVersion = "v1.18";
+$AllScanInstallerUpdaterVersion = "v1.19";
 define('NL', "\n");
 // Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory. The script will then determine
 // the location of the web root folder on your system, cd to that folder, check if you have AllScan installed and install
