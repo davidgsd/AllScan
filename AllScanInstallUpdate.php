@@ -176,6 +176,13 @@ if($s === 'y') {
 		msg("Restart webserver or restart node now");
 }
 
+// if ASL3, make sure that "astdb.txt" is available
+if(is_file('/etc/systemd/system/asl3-update-astdb.service')) {
+	execCmd("systemctl enable asl3-update-astdb.service 2> /dev/null");
+	execCmd("systemctl enable asl3-update-astdb.timer 2> /dev/null");
+	execCmd("systemctl start asl3-update-astdb.timer 2> /dev/null");
+}
+
 msg("Install/Update Complete.");
 
 // Show URLs where AllScan can be accessed and other notes
