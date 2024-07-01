@@ -12,7 +12,7 @@ These features finally give AllStar nodes similar memory management and scan cap
 
 AllScan supports multiple locations of the favorites.ini file. If no favorites.ini file is found AllScan will ask if you'd like to create the file and if so will copy the docs/favorites.ini.sample file to ./favorites.ini, which has a small list of nodes to get you started.
 
-Prior to installing AllScan it is recommended that you have a working install of SuperMon or AllMon2. AllScan can automatically read their config files. Currently AllScan supports favorites.ini entries that refer to connecting to nodes eg. 'cmd[] = "rpt cmd %node% ilink 3 [node#]"' but may also support other types of commands in the future.
+Prior to installing AllScan it is recommended that you have a working install of Supermon or Allmon (2 or 3). AllScan can automatically read their config files. Currently AllScan supports favorites.ini entries that refer to connecting to nodes eg. 'cmd[] = "rpt cmd %node% ilink 3 [node#]"' but may also support other types of commands in the future.
 
 As AllScan receives data from the ASL stats server it updates the Favorites Table rows with color coded details showing the following:
 
