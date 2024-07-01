@@ -69,7 +69,12 @@ foreach($nodes as $node) {
 			$data['status'] .= 'Connect Failed. Check allmon.ini settings.';
 		} else {
 			// Try to login
-			if($ami->login($fp[$host], $cfg[$node]['user'], $cfg[$node]['passwd']) !== false) {
+			$user = $cfg[$node]['user'];
+			$pass = $cfg[$node]['passwd'];
+			if (!$pass) {
+				$pass = $cfg[$node]['pass'];
+			}
+			if($ami->login($fp[$host], $user, $pass) !== false) {
 				$servers[$host] = 'y';
 				$data['status'] .= 'Login OK';
 			} else {

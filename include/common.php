@@ -126,7 +126,7 @@ function msg($txt, $class=null) {
 	echo $txt . NL;
 }
 
-$allmonini = ['allmon.ini', '../supermon/allmon.ini', '/etc/asterisk/allmon.ini.php', '../allmon2/allmon.ini.php'];
+$allmonini = ['allmon.ini', '../supermon/allmon.ini', '/etc/asterisk/allmon.ini.php', '../allmon2/allmon.ini.php', '/etc/allmon3/allmon3.ini'];
 
 // Get nodes list and host IP(s)
 function readAllmonIni(&$msg, &$hosts) {
