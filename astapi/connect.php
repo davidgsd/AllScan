@@ -31,7 +31,12 @@ $fp = $ami->connect($cfg[$localnode]['host']);
 if($fp === false)
 	exit("Could not connect\n");
 
-if($ami->login($fp, $cfg[$localnode]['user'], $cfg[$localnode]['passwd']) === false)
+$user = $cfg[$localnode]['user'];
+$pass = $cfg[$localnode]['passwd'] ?? '';
+if (!$pass) {
+	$pass = $cfg[$localnode]['pass'];
+}
+if($ami->login($fp, $user, $pass) === false)
 	exit("Could not login\n");
 
 switch($button) {

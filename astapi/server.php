@@ -70,7 +70,7 @@ foreach($nodes as $node) {
 		} else {
 			// Try to login
 			$user = $cfg[$node]['user'];
-			$pass = $cfg[$node]['passwd'];
+			$pass = $cfg[$node]['passwd'] ?? '';
 			if (!$pass) {
 				$pass = $cfg[$node]['pass'];
 			}
