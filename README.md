@@ -38,7 +38,7 @@ Additional screenshots:
 Pro-tip: Multiple copies of AllScan can be installed on one node (server) if desired, each with their own separate configuration, Favorites, and/or different node numbers. Just make copies of the /var/www/html/allscan/ dir eg. "allscan2" and put copies of allmon.inc and favorites.ini with your desired configuration in the new folder. (All copies will use the same user/login credentials.)
 
 # Pre-Install Notes
-Ideally you should be using a recent version of the ASL Distribution and you should have AllMon or Supermon properly configured and working. AllScan works fine on HamVOIP and pre-2.0 ASL releases but ASL is the latest open-source standard. The ASL team has been increasingly active in recent years adding significant new features and fixes. ASL3 is fully supported.
+Ideally you should be using a recent version of the ASL Distribution and you should have Allmon or Supermon properly configured and working. AllScan works fine on HamVOIP and pre-2.0 ASL releases but ASL is the latest open-source standard. The ASL team has been increasingly active in recent years adding significant new features and fixes. ASL3 is fully supported.
 
 If you have Supermon already working, AllScan will need no additional configuration and will use the favorites.ini file in the supermon directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon. Confirm you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. Supermon is easy to set up and has some nice maintenance/debug features.
 
@@ -63,6 +63,9 @@ If you did a new install or upgraded from pre-v0.45, AllScan will prompt you to 
 
 If you did an update, **be sure to force a browser reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.
 
+NOTES for ASL3:
+1. Be sure you have Allmon3 properly set up and fully working before installing AllScan. Otherwise AllScan may not work either, as it will by default refer to the allmon3.ini file for the Asterisk Manager (AMI) credentials.
+
 NOTES for HamVOIP only:
 1. You may need to uncomment/add the following lines in /etc/php/php.ini (make sure they do not have a ';' in front)<br>
 	extension=pdo_sqlite.so<br>
@@ -79,7 +82,7 @@ AllScan nodes provide extensive features and excellent audio quality at a lower 
 
 # Configuration Files and Parameters
 Most nodes already have a number of Cfg files and to simplify the install process AllScan will try to use these rather than require redundant files/data to be created/entered. These files are as follows:
-1. **astdb.txt**: The ASL database file with the list of all nodes provisioned on the AllStarLink network. This file should already exist in ../supermon/astdb.txt or /var/log/asterisk/astdb.txt. If the file is not found it will be automatically downloaded into the allscan directory. If you have a properly configured node you should have a cron entry that downloads the latest astdb file at least once per week. AllScan shows the status of the above files and their last modification time in the status messages box (below the Favorites Table). If you see there is no recent astdb file (less than 1 week old) you should review your cron settings (which should have been configured when you installed ASL/AllMon and Supermon).
+1. **astdb.txt**: The ASL database file with the list of all nodes provisioned on the AllStarLink network. This file should already exist in ../supermon/astdb.txt or /var/log/asterisk/astdb.txt. If the file is not found it will be automatically downloaded into the allscan directory. If you have a properly configured node you should have a cron entry that downloads the latest astdb file at least once per week. AllScan shows the status of the above files and their last modification time in the status messages box (below the Favorites Table). If you see there is no recent astdb file (less than 1 week old) you should review your cron settings (which should have been configured when you installed ASL/Allmon and Supermon).
 2. **allmon.ini**: This defines your node number(s) and the Asterisk Manager credentials. It can usually be found in any of the following locations: ../supermon/allmon.ini, /etc/asterisk/allmon.ini.php, ../allmon2/allmon.ini.php, or /etc/allmon3/allmon3.ini. AllScan will search those locations in that order and use the first file found. If you see connection/stats error messages check those file locations and verify they have the correct data. If you have multiple Nodes defined in allmon.ini, AllScan will use the first Node# in the file. (A future version of AllScan may support multiple Node#s and allow these cfgs to be stored in AllScan's database.) You can also place an allmon.ini file in AllScan's web root folder, which will take precedence over other file locations.
 3. **global.inc**: Cfg file in the supermon directory with user settings such as your name, call sign, node title, etc. AllScan will automatically import the following variables from global.inc if found: $CALL, $LOCATION, and $TITLE2. Otherwise, go to the AllScan Cfgs Page and enter your Call Sign, Location and Node Title parameters there. Once these parms have been imported or set AllScan will not read from global.inc again. The Call Sign and Location parameters are shown in the AllScan Page Header, and the Node Title parameter is shown in the Connection Status Table header.
 4. **favorites.ini**: The favorites file can be found in the supermon directory or in the allscan directory. Or if you have the file somewhere else (eg. ../supermon2/) you can set that location in the 'Favorites.ini Locations' Cfgs Parameter. If not found in any of those locations you will be prompted to create a new favorites.ini file in the allscan directory. A future version of AllScan will store the favorites in its database instead of in a file but will still support import/export functions.
@@ -115,7 +118,7 @@ If you are still unable to get things working after trying the above, email me a
 If you have any questions email david at allscan.info. Also see [AllScan.info](https://AllScan.info), and the [AllScan FB Group](https://www.facebook.com/groups/allscan).
 
 # Donations
-I have received many Thank You's and offers for a cup of coffee and other donations, which are much appreciated. I would also encourage contributions to AllStarLink.org, who have put in many years of work maintaining the free & open-source ASL ecosystem. See [this link](https://donorbox.org/allstarlink-donations?amount=24&default_interval=a&utm_campaign=donate_4&utm_source=allscan) to donate to Allstarlink Inc. To contribute to AllScan feel free to send any amount by paypal or venmo to chc_media at yahoo.com. Even $5 does help cover web server expenses and enable me to spend more time on further development. Thank you for your support, and with helping spread the word about AllScan and ASL.
+To contribute to AllScan feel free to send any amount by paypal or venmo to chc_media at yahoo.com. Even $5 does help cover expenses and enable me to spend more time on further development and new features. Thank you for your support, and with helping spread the word about AllScan and ASL.
 
 # Road Map
 As of version 0.65, AllScan implements the main features I originally planned, and works very well for the use case of personal nodes that have one or two primary users and/or a small number of occasional other users. A future version of AllScan will add enhanced support for a larger number of simultaneous web-client users (which will require ASL stats caching so that numerous web-clients would not each be making separate ASL stats requests which would significantly slow down the stats scanning functions). However this is not a common use case and I have not had any requests to support this so it's not a current priority. AllScan will also at some point more fully support nodes with more than one node number eg. allowing the local node to be selected from a select box control, however this has also not yet been requested. Other changes planned:
@@ -124,6 +127,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.78 2024-08-11**<br>
+Update install script for ASL3 to make a readable copy of the allmon3.ini file (outside of the web server root folder with 660 permissions) to ensure AMI credentials are available to AllScan. Note: Be sure you have Allmon3 fully working before installing/updating AllScan. This update is not needed for ASL2/HV nodes.
+
 **v0.77 2024-07-01**<br>
 Updates to support use of ASL3, and Allmon3 .ini file. If you do not have Allmon2 or Supermon installed, AllScan will now also check /etc/allmon3/allmon3.ini for the AMI credentials (note: may be necessary to execute "sudo chmod o+r /etc/allmon3/allmon3.ini" so the file is readable).
 
@@ -143,7 +149,7 @@ Add functions for checking free and total disk space, and log files > 50MB in si
 Fix php log notice on nodes/VMs with no temperature sensor. Optimize stats request timing for case when there are only a small number (<~5) of favorites in which case stats do not need to be read as often.
 
 **v0.70 2023-05-20**<br>
-Implement retrieval of EchoLink node name/callsign data from AMI for display in the Favorites and Connection Status tables. Handle issue where astdb.txt file downloads (downloaded by AllMon/Supermon astdb.php script) can sometimes fail resulting in a 0 byte file. AllScan will now detect this, show a useful log message, check other file locations or download the file if needed.
+Implement retrieval of EchoLink node name/callsign data from AMI for display in the Favorites and Connection Status tables. Handle issue where astdb.txt file downloads (downloaded by Allmon/Supermon astdb.php script) can sometimes fail resulting in a 0 byte file. AllScan will now detect this, show a useful log message, check other file locations or download the file if needed.
 
 **v0.68 2023-03-25**<br>
 Allow EchoLink Node #s to be Added to Favorites.

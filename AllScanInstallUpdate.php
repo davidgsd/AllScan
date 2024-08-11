@@ -1,13 +1,13 @@
 #!/usr/bin/php
 <?php
-$AllScanInstallerUpdaterVersion = "v1.19";
+$AllScanInstallerUpdaterVersion = "v1.20";
 define('NL', "\n");
 // Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory. The script will then determine
 // the location of the web root folder on your system, cd to that folder, check if you have AllScan installed and install
 // it if not, or if already installed will check the version and update the install if a newer version is available.
 //
 // NOTE: Updating can result in modified files being overwritten. This script will make a backup copy of the allscan
-// folder to ./allscan-old/ You may then need to copy any cfgs you added/modified back into the allscan folder.
+// folder to allscan.bak.[ver#]/ You may then need to copy any files you added/modified back into the allscan folder.
 //
 msg("AllScan Installer/Updater Version: $AllScanInstallerUpdaterVersion");
 
@@ -176,11 +176,19 @@ if($s === 'y') {
 		msg("Restart webserver or restart node now");
 }
 
-// if ASL3, make sure that "astdb.txt" is available
+// if ASL3, make sure astdb.txt is available
 if(is_file('/etc/systemd/system/asl3-update-astdb.service')) {
 	execCmd("systemctl enable asl3-update-astdb.service 2> /dev/null");
 	execCmd("systemctl enable asl3-update-astdb.timer 2> /dev/null");
 	execCmd("systemctl start asl3-update-astdb.timer 2> /dev/null");
+	// Make a readable copy of allmon3.ini (Allmon3 updates can reset the file permissions)
+	$fname = '/etc/allmon3/allmon3.ini';
+	if(file_exists($fname)) {
+		$fname2 = '/etc/asterisk/allmon.ini.php';
+		execCmd("cp $fname $fname2");
+		execCmd("chmod 660 $fname2");
+		execCmd("chgrp $group $fname2");
+	}
 }
 
 msg("Install/Update Complete.");
@@ -210,7 +218,7 @@ function execCmd($cmd) {
 
 function checkDbDir() {
 	global $group, $ver;
-	// Confirm /etc/allscan dir exists and is writeable by web server
+	// Confirm /etc/allscan dir exists and is writable by web server
 	$asdbdir = '/etc/allscan';
 	if(!is_dir($asdbdir)) {
 		msg("Creating $asdbdir dir with 0775 permissions and $group group");
