@@ -40,6 +40,8 @@ Pro-tip: Multiple copies of AllScan can be installed on one node (server) if des
 # Pre-Install Notes
 Ideally you should be using a recent version of the ASL Distribution and you should have Allmon or Supermon properly configured and working. AllScan works fine on HamVOIP and pre-2.0 ASL releases but ASL is the latest open-source standard. The ASL team has been increasingly active in recent years adding significant new features and fixes. ASL3 is fully supported.
 
+NOTE: Some ASL3 or Debian images may not include PHP by default. To check if PHP is installed run "php -v". If that returns a "command not found" error, PHP can be installed by running "sudo apt install php".
+
 If you have Supermon already working, AllScan will need no additional configuration and will use the favorites.ini file in the supermon directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon. Confirm you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. Supermon is easy to set up and has some nice maintenance/debug features.
 
 If you use Supermon2 instead of Supermon or want to put your favorites.ini file in some other folder, the favorites.ini search location(s) can be set on the AllScan Cfgs Page.
@@ -109,6 +111,8 @@ If you get a permissions error when trying to Add a Favorite, check that the /va
 	# sudo chgrp http favorites.ini favorites.ini.bak .
 
 A common fix for many issues is simply to reboot your node. You might be surprised how many issues end up being resolved with nothing more than a reboot. Nodes are complex systems running Linux and 100's of processes, and sometimes strange things happen and they need a reboot.
+
+Be sure to check out the [Ham Radio Crusader YouTube channel AllScan videos](https://www.youtube.com/@HamRadioCrusader/search?query=AllScan) for more details and a walkthrough of how to install, set up and use AllScan on ASL3, HamVOIP, or DVSwitch.
 
 If you are still unable to get things working after trying the above, email me at the contact info below and provide as much detail as possible on the issue you see along with the following info:
 1. All messages shown when you run the install/update script.
