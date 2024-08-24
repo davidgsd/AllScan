@@ -40,8 +40,6 @@ Pro-tip: Multiple copies of AllScan can be installed on one node (server) if des
 # Pre-Install Notes
 Ideally you should be using a recent version of the ASL Distribution and you should have Allmon or Supermon properly configured and working. AllScan works fine on HamVOIP and pre-2.0 ASL releases but ASL is the latest open-source standard. The ASL team has been increasingly active in recent years adding significant new features and fixes. ASL3 is fully supported.
 
-NOTE: Some ASL3 or Debian images may not include PHP by default. To check if PHP is installed run "php -v". If that returns a "command not found" error, PHP can be installed by running "sudo apt install php".
-
 If you have Supermon already working, AllScan will need no additional configuration and will use the favorites.ini file in the supermon directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon. Confirm you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. Supermon is easy to set up and has some nice maintenance/debug features.
 
 If you use Supermon2 instead of Supermon or want to put your favorites.ini file in some other folder, the favorites.ini search location(s) can be set on the AllScan Cfgs Page.
@@ -55,6 +53,7 @@ Log into your node by SSH and run the following commands:
 	sudo rm AllScanInstallUpdate.php
 	wget 'https://raw.githubusercontent.com/davidgsd/AllScan/main/AllScanInstallUpdate.php'
 	chmod 755 AllScanInstallUpdate.php
+ 	sudo apt update; sudo apt install php -y
 	sudo ./AllScanInstallUpdate.php
 
 The Install/Update script will provide detailed status messages on each step of the process.
@@ -207,7 +206,7 @@ JavaScript optimizations. Update page Title with node PTT/COS status to allow st
 Only show CPU Temp if data is available. Reduce favs table CSS cell padding from 4 to 3 px. Update InstallUpdate script to verify favorites.ini file in supermon dir is writeable by web server if dir exists. Readme updates. Minor optimizations. Add API to eventually support stats caching and additional stats features. Update CPU temp data once per minute.
 
 **v0.38 2022-12-24**<br>
-For EchoLink nodes don't link node Name text to ASL stats page. Revise Green/Yellow CPU Temp range threshold from 120 to 130 °F. Support 7-digit (EchoLink) node numbers when reading in favorites.ini. Fix issue where stats request scanning would stop once it reached an EchoLink node number in the Favorites Table. Properly handle case of invalid node number in favorites file. Download ASTDB file if not found in allscan, allmon or supermon locations.
+For EchoLink nodes don't link node Name text to ASL stats page. Revise Green/Yellow CPU Temp range threshold from 120 to 130 Â°F. Support 7-digit (EchoLink) node numbers when reading in favorites.ini. Fix issue where stats request scanning would stop once it reached an EchoLink node number in the Favorites Table. Properly handle case of invalid node number in favorites file. Download ASTDB file if not found in allscan, allmon or supermon locations.
 
 **v0.35 2022-12-21**<br>
 Optimize stats request timing to more quickly populate the favorites table after page load, then go to a reduced request rate over time, to reduce the chance of the ASL stats request limit (30 per minute) being exceeded if there are multiple AllScan web clients on a node. Link Favorites table Names text to the ASL stats page. Add default global.inc file docs/global.inc.sample and give user option to configure and save this to ./global.inc if file was not found in . or ../supermon/. Documentation updates. GUI optimizations. Add default favorites file docs/favorites.ini.sample and give user option to copy this to ./favorites.ini if file was not found in . or ../supermon/.
