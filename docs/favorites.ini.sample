@@ -19,9 +19,6 @@ cmd[] = "rpt cmd %node% ilink 3 46969"
 label[] = "East Coast Reflector 27339"
 cmd[] = "rpt cmd %node% ilink 3 27339"
 
-label[] = "FullStar World Full-Duplex (ENG), *Full-Duplex (English)* 403280"
-cmd[] = "rpt cmd %node% ilink 3 403280"
-
 label[] = "GB3CR North Wales UK 512511"
 cmd[] = "rpt cmd %node% ilink 3 512511"
 
@@ -114,6 +111,9 @@ cmd[] = "rpt cmd %node% ilink 3 472440"
 
 label[] = "W8MW SOUTHCARS HUB, US 27404"
 cmd[] = "rpt cmd %node% ilink 3 27404"
+
+label[] = "W9BMK P25 Bridge Astro DIU, Chicago, IL 598730"
+cmd[] = "rpt cmd %node% ilink 3 598730"
 
 label[] = "W9HHX 145.270-, Milwaukee, WI 42742"
 cmd[] = "rpt cmd %node% ilink 3 42742"

@@ -76,7 +76,7 @@ function getResponse($fp, $actionID, $debug=false) {
 				if($str === "\r\n" || $str[0] === "\n" || $str === false)
 					return $response;
 				$str = trim($str);
-				if($str === '' || strpos($str, $ignore) === 0)
+				if($str === '' || in_array($str, $ignore))
 					continue;
 				$response[] = $str;
 				if($debug)
