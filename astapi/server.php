@@ -144,7 +144,6 @@ function getNode($fp, $node) {
 	$actionRand = mt_rand(); // Asterisk Manger Interface an actionID so we can find our own response
 	$actionID = 'xstat' . $actionRand;
 	if(fwrite($fp, "ACTION: RptStatus\r\nCOMMAND: XStat\r\nNODE: $node\r\nActionID: $actionID\r\n\r\n") !== false) {
-		// Get RptStatus
 		$rptStatus = $ami->getResponse($fp, $actionID);
 	} else {
 		sendData(['status'=>'XStat failed!']);
@@ -152,7 +151,6 @@ function getNode($fp, $node) {
 	// format of Conn lines: Node# isKeyed lastKeySecAgo lastUnkeySecAgo
 	$actionID = 'sawstat' . $actionRand;
 	if(fwrite($fp, "ACTION: RptStatus\r\nCOMMAND: SawStat\r\nNODE: $node\r\nActionID: $actionID\r\n\r\n") !== false) {
-		// Get RptStatus
 		$sawStatus = $ami->getResponse($fp, $actionID);
 	} else {
 		sendData(['status'=>'sawStat failed!']);
@@ -213,8 +211,7 @@ function parseNode($fp, $rptStatus, $sawStatus) {
 	$curNodes = [];
 	$conns = [];
 	// Parse 'rptStat Conn:' lines
-	$lines = explode("\n", $rptStatus);
-	foreach($lines as $line) {
+	foreach($rptStatus as $line) {
 		if(preg_match('/Conn: (.*)/', $line, $matches)) {
 			$arr = preg_split("/\s+/", trim($matches[1]));
 			if(is_numeric($arr[0]) && $arr[0] > 3000000) {
@@ -224,28 +221,26 @@ function parseNode($fp, $rptStatus, $sawStatus) {
 				$conns[] = $arr;
 			}
 		}
-		if(preg_match('/Var: RPT_RXKEYED=./', $line, $matches)) {
-			$rxKeyed = substr($matches[0], strpos($matches[0], "=") + 1);
+		if(preg_match('/Var: RPT_RXKEYED=(.)/', $line, $matches)) {
+			$rxKeyed = $matches[1];
 		}
-		if(preg_match('/Var: RPT_TXKEYED=./', $line, $matches)) {
-			$txKeyed = substr($matches[0], strpos($matches[0], "=") + 1);
+		if(preg_match('/Var: RPT_TXKEYED=(.)/', $line, $matches)) {
+			$txKeyed = $matches[1];
+		}
+		if(preg_match("/LinkedNodes: (.*)/", $line, $matches)) {
+			$longRangeLinks = preg_split("/, /", trim($matches[1]));
+			foreach($longRangeLinks as $line) {
+				$n = substr($line,1);
+				$modes[$n]['mode'] = substr($line,0,1);
+			}
 		}
 	}
 	// Parse 'sawStat Conn:' lines
 	$keyups = [];
-	$lines = explode("\n", $sawStatus);
-	foreach($lines as $line) {
+	foreach($sawStatus as $line) {
 		if(preg_match('/Conn: (.*)/', $line, $matches)) {
 			$arr = preg_split("/\s+/", trim($matches[1]));
 			$keyups[$arr[0]] = ['node' => $arr[0], 'isKeyed' => $arr[1], 'keyed' => $arr[2], 'unkeyed' => $arr[3]];
-		}
-	}
-	// Parse 'LinkedNodes:' line
-	if(preg_match("/LinkedNodes: (.*)/", $rptStatus, $matches)) {
-		$longRangeLinks = preg_split("/, /", trim($matches[1]));
-		foreach($longRangeLinks as $line) {
-			$n = substr($line,1);
-			$modes[$n]['mode'] = substr($line,0,1);
 		}
 	}
 	// Combine above arrays

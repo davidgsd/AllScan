@@ -14,8 +14,9 @@ function connect($host) {
 function login($fp, $user, $password) {
 	$actionID = $user . $password;
 	fwrite($fp,"ACTION: LOGIN\r\nUSERNAME: $user\r\nSECRET: $password\r\nEVENTS: 0\r\nActionID: $actionID\r\n\r\n");
-	$login = $this->getResponse($fp, $actionID);
-	return (strpos($login, "Authentication accepted") !== false);
+	$res = $this->getResponse($fp, $actionID);
+	// logToFile('RES: ' . varDumpClean($res, true), AMI_DEBUG_LOG);
+	return (strpos($res[2], "Authentication accepted") !== false);
 }
 
 function command($fp, $cmdString, $debug=false) {
@@ -24,67 +25,69 @@ function command($fp, $cmdString, $debug=false) {
 	if((fwrite($fp, "ACTION: COMMAND\r\nCOMMAND: $cmdString\r\nActionID: $actionID\r\n\r\n")) > 0) {
 		if($debug)
 			logToFile('CMD: ' . $cmdString . ' - ' . $actionID, AMI_DEBUG_LOG);
-		$rptStatus = $this->getResponse($fp, $actionID, $debug);
-		// Some AMI response line endings have just a NL and no CR
-		$res = explode("\n", $rptStatus);
-		foreach($res as $i => &$r) {
-			$r = trim($r);
-			if(!$r)
-				unset($res[$i]);
-		}
-		unset($r);
+		$res = $this->getResponse($fp, $actionID, $debug);
+		if(!is_array($res))
+			return $res;
 		if($debug)
 			logToFile('RES: ' . varDumpClean($res, true), AMI_DEBUG_LOG);
-		// Check for Asterisk AMI Success response (ASL3)
-		if(isset($res[0]) && $res[0] === 'Response: Success')
+		// Check for Asterisk AMI Success response
+		if(strpos($res[0], 'Response: ') === 0)
 			return 'OK';
-		// Check for old Asterisk AMI OK response (ASL2/HV)
-		if(isset($res[1]) && strpos($res[1], '--END COMMAND--') !== false)
-			return 'OK';
-		// else return text received or Error if none
-		if(isset($res[1]))
-			return $res[1];
-		if(isset($res[0]))
-			return $res[0];
-		return 'Error';
+		// else return text received
+		return $res[0];
 	}
 	return "Get node $cmdString failed";
 }
 
+/* 	Example ASL2 AMI response: 
+		Response: Follows
+		Privilege: Command
+		ActionID: cpAction_...
+		--END COMMAND--
+	Example ASL3 AMI response:
+		Response: Success
+		Command output follows
+		Output:
+		ActionID: cpAction_...
+	=> "Response:" line indicates success of associated ActionID.
+*/
+
 function getResponse($fp, $actionID, $debug=false) {
+	$ignore = ['Privilege: Command', 'Command output follows', 'Output:'];
 	$t0 = time();
-	$response = '';
+	$response = [];
 	if($debug)
 		$sn = getScriptName();
 	while(time() - $t0 < 20) {
 		$str = fgets($fp);
 		if($str === false)
 			return $response;
+		$str = trim($str);
+		if($str === '')
+			continue;
 		if($debug)
 			logToFile("$sn 1: $str", AMI_DEBUG_LOG);
-		// ASL3: new Asterisk sends Success response before ActionID
 		if(strpos($str, 'Response: ') === 0) {
-			$response .= $str;
-		}
-		// Look for ActionID set in command()
-		elseif(trim($str) === "ActionID: $actionID") {
-			$response .= $str;
+			$response[] = $str;
+		} elseif($str === "ActionID: $actionID") {
+			$response[] = $str;
 			while(time() - $t0 < 20) {
 				$str = fgets($fp);
 				if($str === "\r\n" || $str[0] === "\n" || $str === false)
 					return $response;
-				// Filter extra messages returned from ASL3 AMI
-				if(strpos($str, 'Command output follows') !== false)
+				$str = trim($str);
+				if($str === '' || strpos($str, $ignore) === 0)
 					continue;
-				if(strpos($str, 'Output:') !== false)
-					continue;
-				$response .= $str;
+				$response[] = $str;
 				if($debug)
 					logToFile("$sn 2: $str", AMI_DEBUG_LOG);
 			}
 		}
 	}
-	return $response ? $response : 'Timeout';
+	if(count($response))
+		return $response;
+	logToFile("$sn: Timeout", AMI_DEBUG_LOG);
+	return 'Timeout';
 }
 
 }

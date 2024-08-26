@@ -3,38 +3,135 @@
 ;
 [general]
 ;
+
 label[] = " === SELECT ==="
 cmd[] = " "
+
+label[] = "AA6DP, Catalina, CA 51597"
+cmd[] = "rpt cmd %node% ilink 3 51597"
+
+label[] = "AB9S HUB1-ASL2, Chicago,IL 47487"
+cmd[] = "rpt cmd %node% ilink 3 47487"
+
+label[] = "AG4VA SOTA Hub, Cloud, VA 46969"
+cmd[] = "rpt cmd %node% ilink 3 46969"
 
 label[] = "East Coast Reflector 27339"
 cmd[] = "rpt cmd %node% ilink 3 27339"
 
+label[] = "FullStar World Full-Duplex (ENG), *Full-Duplex (English)* 403280"
+cmd[] = "rpt cmd %node% ilink 3 403280"
+
+label[] = "GB3CR North Wales UK 512511"
+cmd[] = "rpt cmd %node% ilink 3 512511"
+
+label[] = "GB3EG 430.9125, wigan, greater manchester 54318"
+cmd[] = "rpt cmd %node% ilink 3 54318"
+
+label[] = "GB3PI Barkway, Hertfordshire, UK 50683"
+cmd[] = "rpt cmd %node% ilink 3 50683"
+
+label[] = "GB3ZB 430.825, Dundry, Bristol 2514"
+cmd[] = "rpt cmd %node% ilink 3 2514"
+
+label[] = "GB7SJ 433.175 Northwich Cheshire UK 41360"
+cmd[] = "rpt cmd %node% ilink 3 41360"
+
+label[] = "K4JDR 441.725+Backbone HUB, Raleigh, NC 42235"
+cmd[] = "rpt cmd %node% ilink 3 42235"
+
+label[] = "K6RRR San Diego Hangout 28404"
+cmd[] = "rpt cmd %node% ilink 3 28404"
+
+label[] = "K6TZ SBARC Hub, Santa Barbara, CA 43763"
+cmd[] = "rpt cmd %node% ilink 3 43763"
+
+label[] = "K9IIK Schaumburg, IL 27833"
+cmd[] = "rpt cmd %node% ilink 3 27833"
+
+label[] = "K9SA 443.250, Round Lake, IL 59246"
+cmd[] = "rpt cmd %node% ilink 3 59246"
+
+label[] = "K9TAY CFMC 144 - 146.760, Chicago, IL 555491"
+cmd[] = "rpt cmd %node% ilink 3 555491"
+
+label[] = "K9TAY CFMC 440 - 443.750, Chicago, IL 555492"
+cmd[] = "rpt cmd %node% ilink 3 555492"
+
+label[] = "KR8T 443.800+, Grand Rapids, MI 47243"
+cmd[] = "rpt cmd %node% ilink 3 47243"
+
+label[] = "KR9RK 442.000, Racine,Wisconsin 511681"
+cmd[] = "rpt cmd %node% ilink 3 511681"
+
 label[] = "M0HOY HUBNet, Manchester, UK 51288"
 cmd[] = "rpt cmd %node% ilink 3 51288"
 
-label[] = "WW7PSR 146.960 Seattle, WA 2462"
-cmd[] = "rpt cmd %node% ilink 3 2462"
+label[] = "M0JKT FreeSTAR UK HUB 1 2196"
+cmd[] = "rpt cmd %node% ilink 3 2196"
 
-label[] = "KB8ZGL SOUTHCARS HUB, US 27404"
-cmd[] = "rpt cmd %node% ilink 3 27404"
+label[] = "N0ECT HUB/Server, Glenwood Springs, Colorado 45479"
+cmd[] = "rpt cmd %node% ilink 3 45479"
+
+label[] = "N4LMC W4GTA 145.350, Lookout Mtn, GA - EL W4EDP-R 46331"
+cmd[] = "rpt cmd %node% ilink 3 46331"
+
+label[] = "N6LXX MAIN HUB 29833"
+cmd[] = "rpt cmd %node% ilink 3 29883"
+
+label[] = "N8UKF 443.200 Fusion, Muskegon Michigan 54576"
+cmd[] = "rpt cmd %node% ilink 3 54576"
+
+label[] = "N9GMT FM38 Network Hub, Milwaukee, WI 2495"
+cmd[] = "rpt cmd %node% ilink 3 2495"
+
+label[] = "NWAG NW AllStar Group, Morecambe, UK 53573"
+cmd[] = "rpt cmd %node% ilink 3 53573"
+
+label[] = "Parrot+ enhanced parrot, Dallas, TX 55553"
+cmd[] = "rpt cmd %node% ilink 3 55553"
 
 label[] = "W2JLD Hub 1, Rochester, NY 47620"
 cmd[] = "rpt cmd %node% ilink 3 47620"
 
-label[] = "N5ZLW Route66 52613"
-cmd[] = "rpt cmd %node% ilink 3 52613"
+label[] = "W3QV/R 147.03 PMRC, Roxborough Philadelphia PA 47970"
+cmd[] = "rpt cmd %node% ilink 3 47970"
 
-label[] = "W7YRC YARC Hub, Prescott, AZ 502370"
-cmd[] = "rpt cmd %node% ilink 3 502370"
+label[] = "W4KEV/ R 145.370 Knoxville, TN 50015"
+cmd[] = "rpt cmd %node% ilink 3 50015"
 
-label[] = "N8UKF 443.200 Fusion, Muskegon MI 54576"
-cmd[] = "rpt cmd %node% ilink 3 54576"
+label[] = "W6EK 145.430, Auburn, CA 51018"
+cmd[] = "rpt cmd %node% ilink 3 51018"
 
-label[] = "N6LXX MAIN HUB, HARVARD HUB 29833"
-cmd[] = "rpt cmd %node% ilink 3 29883"
+label[] = "W7HEN HUB, Henderson, NV 44045"
+cmd[] = "rpt cmd %node% ilink 3 44045"
 
-label[] = "K6RRR San Diego Hangout 28404"
-cmd[] = "rpt cmd %node% ilink 3 28404"
+label[] = "W7YRC 146.880, Prescott, AZ 603231"
+cmd[] = "rpt cmd %node% ilink 3 603231"
+
+label[] = "W8IRA 147.160+, Grand Rapids, MI 472440"
+cmd[] = "rpt cmd %node% ilink 3 472440"
+
+label[] = "W8MW SOUTHCARS HUB, US 27404"
+cmd[] = "rpt cmd %node% ilink 3 27404"
+
+label[] = "W9HHX 145.270-, Milwaukee, WI 42742"
+cmd[] = "rpt cmd %node% ilink 3 42742"
+
+label[] = "W9SBE Lkpt Hub, Lockport, IL 43628"
+cmd[] = "rpt cmd %node% ilink 3 43628"
+
+label[] = "WA5AIR HUB#1, SouthCoastReflector.com [USA] 48752"
+cmd[] = "rpt cmd %node% ilink 3 48752"
+
+label[] = "WB9YPA/R 223.980 (-1.6MHz), South Bend, Indiana 51560"
+cmd[] = "rpt cmd %node% ilink 3 51560"
+
+label[] = "WM9W Chicago 458800"
+cmd[] = "rpt cmd %node% ilink 3 458800"
+
+label[] = "WW7PSR 146.960 Seattle, WA 2462"
+cmd[] = "rpt cmd %node% ilink 3 2462"
 
 ;
 ; Put favorites for specific nodes here.

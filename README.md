@@ -130,8 +130,11 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.80 2024-08-26**<br>
+Updates to AMI parser for consistency with ASL2&3. Update default favorites.ini file.
+
 **v0.79 2024-08-25**<br>
-Update AMI parser for ASL3 to handle newer format OK/Error responses. Fix some php log warning messages.
+Update ASL3 AMI response parser. Fix some php log warning messages.
 
 **v0.78 2024-08-11**<br>
 Update install script for ASL3 to make a readable copy of the allmon3.ini file (outside of the web server root folder with 660 permissions) to ensure AMI credentials are available to AllScan. Note: Be sure you have Allmon3 fully working before installing/updating AllScan. This update is not needed for ASL2/HV nodes.
