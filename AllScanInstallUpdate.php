@@ -265,8 +265,6 @@ function checkSmDir() {
 		execCmd("chmod 775 .");
 		execCmd("chgrp $group $favsini $favsbak .");
 		chdir('..');
-	} else {
-		msg("No $smdir/ directory found. Supermon is not required but is recommended.");
 	}
 }
 
