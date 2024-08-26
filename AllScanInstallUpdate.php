@@ -61,7 +61,7 @@ if(is_dir($asdir)) {
 	msg("$asdir dir exists. Checking if update needed...");
 	$fname = 'common.php';
 	if(($s = `grep '^\$AllScanVersion' $asdir/include/$fname`)) {
-		if(preg_match('/"v([0-9\.]{3,4})"/', $s, $m) == 1)
+		if(preg_match('/"v([0-9\.]{3,5})"/', $s, $m) == 1)
 			$ver = $m[1];
 	}
 	if(empty($ver))
@@ -79,7 +79,7 @@ if(is_dir($asdir)) {
 		errExit("wget $fname failed.");
 
 	if(($s = `grep '^\$AllScanVersion' $fname`)) {
-		if(preg_match('/"v([0-9\.]{3,4})"/', $s, $m) == 1)
+		if(preg_match('/"v([0-9\.]{3,5})"/', $s, $m) == 1)
 			$gver = $m[1];
 	}
 	unlink($fname);
