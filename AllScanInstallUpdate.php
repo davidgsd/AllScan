@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-$AllScanInstallerUpdaterVersion = "v1.20";
+$AllScanInstallerUpdaterVersion = "v1.21";
 define('NL', "\n");
 // Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory. The script will then determine
 // the location of the web root folder on your system, cd to that folder, check if you have AllScan installed and install
@@ -125,6 +125,13 @@ if($dlfiles) {
 	unlink($fname);
 	if(!rename($zdir, $asdir))
 		msg("ERROR: mv($zdir, $asdir) failed");
+	// Copy any user .ini files from old version backup folder
+	if(isset($bak) && is_dir($bak)) {
+		msg("Checking for .ini files in $bak/...");
+		execCmd("cp $bak/*.ini $asdir/");
+		execCmd("chmod 664 $asdir/*.ini");
+		execCmd("chgrp $group $asdir/*.ini");
+	}
 }
 
 msg("Verifying $asdir dir has 0775 permissions and $group group");
@@ -195,9 +202,12 @@ msg("Install/Update Complete.");
 
 // Show URLs where AllScan can be accessed and other notes
 $ip = exec("wget -t 1 -T 3 -q -O- http://checkip.dyndns.org:8245 | cut -d':' -f2 | cut -d' ' -f2 | cut -d'<' -f1");
-$lanip = exec("ifconfig | grep inet | head -1 | awk '{print $2}'");
-if($lanip === '127.0.0.1')
-	$lanip = exec("ifconfig | grep inet | tail -1 | awk '{print $2}'");
+$lanip = exec('hostname --all-ip-addresses');
+if(!filter_var($lanip, FILTER_VALIDATE_IP)) {
+	$lanip = exec("ifconfig | grep inet | head -1 | awk '{print $2}'");
+	if($lanip === '127.0.0.1')
+		$lanip = exec("ifconfig | grep inet | tail -1 | awk '{print $2}'");
+}
 
 msg("AllScan can be accessed at:\n\thttp://$lanip/$asdir/ on the local network, or\n"
 	."\thttp://$ip/$asdir/ remotely if your router has a port forwarded to this node.");
