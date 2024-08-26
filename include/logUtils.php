@@ -30,6 +30,9 @@ function br($n=1) {
 }
 function logToFile($msg, $file=null) {
 	global $user;
+	$msg = trim($msg);
+	if(!$msg)
+		return;
 	if($file === null)
 		$file = 'errLog.txt';
 	if($msg === null)

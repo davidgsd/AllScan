@@ -24,13 +24,15 @@ $user =	$userModel->validate();
 if(!readOk())
 	redirect('user/');
 
+$msg[] = "User: $user->name, IP: $user->ip_addr";
+
 // Check disk free space
 checkDiskSpace($msg);
 
 // Load node and host definitions
 $hosts = [];
 $onLoad = '';
-$nodes = readAllmonIni($msg, $hosts);
+$nodes = getNodeCfg($msg, $hosts);
 if(!empty($nodes) && !empty($hosts)) {
 	$node = $nodes[0];
 	$host = $hosts[0];
@@ -79,7 +81,7 @@ h2('Favorites');
 $favs = [];
 $favcmds = [];
 if(!isset($favsFile)) {
-	msg('favorites.ini not found. Check Supermon install or click below to create ' . $gCfg[favsIniLoc][0]);
+	msg('favorites.ini not found. Click below to create ' . $gCfg[favsIniLoc][0]);
 	showFavsIniForm();
 } else {
 	$favsIni = parse_ini_file($favsFile, true);
@@ -137,8 +139,6 @@ foreach($favs as $n => $f) {
 			}
 		}
 	}
-	//$msg[] = '';
-	//$msg[] = "$x, $call, $desc, $loc, $f->label";
 	$name = str_replace([$f->node, $call, $desc, $loc, ' ,'], ' ', $f->label);
 	//$msg[] = "$x, $call, $desc, $loc, $f->label";
 	//$msg[] = $name;
@@ -333,7 +333,7 @@ function getELInfo($n) {
 		$ami = new AMI();
 		$servers = [];
 		$fp = [];
-		$cfg = readAllmonCfg();
+		$cfg = readNodeCfg();
 	}
 	// Login to AMI
 	if(!array_key_exists($host, $servers)) {
@@ -343,12 +343,9 @@ function getELInfo($n) {
 			//msg('Connect Failed. Check allmon.ini settings.');
 			return;
 		}
-		$user = $cfg[$node]['user'];
-		$pass = $cfg[$node]['passwd'] ?? '';
-		if (!$pass) {
-			$pass = $cfg[$node]['pass'];
-		}
-		if($ami->login($fp[$host], $user, $pass) !== false) {
+		$amiuser = $cfg[$node]['user'];
+		$pass = $cfg[$node]['passwd'];
+		if($ami->login($fp[$host], $amiuser, $pass) !== false) {
 			$servers[$host] = 'y';
 			//msg('Login OK');
 		} else {

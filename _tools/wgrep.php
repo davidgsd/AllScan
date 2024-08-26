@@ -11,6 +11,7 @@ alias d='ls -lart'
 alias grw='php -q ~/wgrep.php'
 alias gr='php -q ~/wgrep.php -r'
 alias gv='grep -v'
+alias phperr='sudo tail -n 25 /var/log/apache2/error.log'
 */
 if(isset($_SERVER['REMOTE_ADDR']) || isset($_SERVER['HTTP_HOST']))
 {

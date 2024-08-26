@@ -6,11 +6,11 @@ if(!modifyOk())
 	exit("Insufficient user permission to execute commands\n");
 
 // Filter and validate user input
-$remotenode = trim(strip_tags($_POST['remotenode']));
-$button = trim(strip_tags($_POST['button']));
-$localnode = trim(strip_tags($_POST['localnode']));
-$perm = (trim(strip_tags($_POST['perm'])) === 'true');
-$autodisc = (trim(strip_tags($_POST['autodisc'])) === 'true');
+$fields = ['remotenode', 'button', 'localnode', 'perm', 'autodisc'];
+foreach($fields as $f)
+	$$f = isset($_POST[$f]) ? trim(strip_tags($_POST[$f])) : '';
+$perm = ($perm === 'true');
+$autodisc = ($autodisc === 'true');
 
 if(!preg_match("/^\d+$/", $localnode) || !$localnode)
 	exit("Invalid local node number\n");
@@ -21,7 +21,7 @@ if(!preg_match("/^\d+$/", $remotenode) || (!$remotenode && $button !== 'disconne
 chdir('..');
 
 // Load allmon.ini
-$cfg = readAllmonCfg();
+$cfg = readNodeCfg();
 if($cfg === false)
 	exit("allmon.ini not found\n");
 
@@ -31,12 +31,9 @@ $fp = $ami->connect($cfg[$localnode]['host']);
 if($fp === false)
 	exit("Could not connect\n");
 
-$user = $cfg[$localnode]['user'];
-$pass = $cfg[$localnode]['passwd'] ?? '';
-if (!$pass) {
-	$pass = $cfg[$localnode]['pass'];
-}
-if($ami->login($fp, $user, $pass) === false)
+$amiuser = $cfg[$localnode]['user'];
+$pass = $cfg[$localnode]['passwd'];
+if($ami->login($fp, $amiuser, $pass) === false)
 	exit("Could not login\n");
 
 switch($button) {

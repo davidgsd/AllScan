@@ -16,7 +16,7 @@ if(!$localnode || !preg_match("/^\d+$/", $localnode))
 chdir('..');
 
 // Load allmon.ini
-$cfg = readAllmonCfg();
+$cfg = readNodeCfg();
 if($cfg === false)
 	exit("allmon.ini not found\n");
 
@@ -26,12 +26,9 @@ $fp = $ami->connect($cfg[$localnode]['host']);
 if($fp === false)
 	exit("Could not connect\n");
 
-$user = $cfg[$localnode]['user'];
-$pass = $cfg[$localnode]['passwd'] ?? '';
-if (!$pass) {
-	$pass = $cfg[$localnode]['pass'];
-}
-if($ami->login($fp, $user, $pass) === false)
+$amiuser = $cfg[$localnode]['user'];
+$pass = $cfg[$localnode]['passwd'];
+if($ami->login($fp, $amiuser, $pass) === false)
 	exit("Could not login\n");
 
 switch($button) {

@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.78";
+$AllScanVersion = "v0.79";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -126,10 +126,12 @@ function msg($txt, $class=null) {
 	echo $txt . NL;
 }
 
-$allmonini = ['allmon.ini', '../supermon/allmon.ini', '/etc/asterisk/allmon.ini.php', '../allmon2/allmon.ini.php', '/etc/allmon3/allmon3.ini'];
+$allmonini = ['allmon.ini', '../supermon/allmon.ini', '/etc/asterisk/allmon.ini.php', '../allmon2/allmon.ini.php',
+				'/etc/allmon3/allmon3.ini', '../supermon2/user_files/allmon.ini'];
+//'/etc/asterisk/manager.conf'
 
 // Get nodes list and host IP(s)
-function readAllmonIni(&$msg, &$hosts) {
+function getNodeCfg(&$msg, &$hosts) {
 	global $allmonini;
 	// Check for file in our directory and if not found look in the asterisk, supermon and allmon2 dirs
 	foreach($allmonini as $f) {
@@ -158,21 +160,27 @@ function readAllmonIni(&$msg, &$hosts) {
 		}
 	}
 	$cwd = getcwd();
-	$msg[] = "No valid [node#] and host definitions found. Check that you have AllMon2 or Supermon installed or " . BR
+	$msg[] = "No valid [node#] and host definitions found. Check that you have AllMon or Supermon installed or " . BR
 		.	"an allmon.ini.php file in /etc/asterisk/ containing a [YourNode#] line followed by host and passwd defines.";
 	return false;
 }
 
 // Below called by astapi files, which should only happen if controller file eg. index.php already called
-// readAllmonIni() above which confirms there is a valid file available
-function readAllmonCfg() {
+// getNodeCfg() above which confirms there is a valid file available
+function readNodeCfg() {
 	global $allmonini;
-	// Check for file in our directory and if not found look in the asterisk, supermon and allmon2 dirs
+	// Check for file in our directory and if not found look in the asterisk, supermon and allmon dirs
 	foreach($allmonini as $f) {
 		if(file_exists($f)) {
 			$cfg = parse_ini_file($f, true);
 			if($cfg === false)
 				continue;
+			// Allmon3 uses 'pass' instead of 'passwd' cfg name, convert here
+			foreach($cfg as &$c) {
+				if(isset($c['pass']) && !isset($c['passwd']))
+					$c['passwd'] = $c['pass'];
+			}
+			unset($c);
 			return $cfg;
 		}
 	}
@@ -230,7 +238,7 @@ function readAstDb(&$msg) {
 }
 
 // Below called by astapi files, which should only happen if controller file eg. index.php already called
-// readAllmonIni() above which confirms there is a valid file available
+// getNodeCfg() above which confirms there is a valid file available
 function readAstDb2() {
 	global $astdbtxt;
 	// Check for file in our directory and if not found look in the asterisk, supermon and allmon2 dirs

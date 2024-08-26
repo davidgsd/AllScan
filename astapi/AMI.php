@@ -27,10 +27,26 @@ function command($fp, $cmdString, $debug=false) {
 		$rptStatus = $this->getResponse($fp, $actionID, $debug);
 		// Some AMI response line endings have just a NL and no CR
 		$res = explode("\n", $rptStatus);
-		array_walk($res, 'trim');
+		foreach($res as $i => &$r) {
+			$r = trim($r);
+			if(!$r)
+				unset($res[$i]);
+		}
+		unset($r);
 		if($debug)
 			logToFile('RES: ' . varDumpClean($res, true), AMI_DEBUG_LOG);
-		return (strpos($res[1], '--END COMMAND--') !== false) ? 'OK' : $res[1];
+		// Check for Asterisk AMI Success response (ASL3)
+		if(isset($res[0]) && $res[0] === 'Response: Success')
+			return 'OK';
+		// Check for old Asterisk AMI OK response (ASL2/HV)
+		if(isset($res[1]) && strpos($res[1], '--END COMMAND--') !== false)
+			return 'OK';
+		// else return text received or Error if none
+		if(isset($res[1]))
+			return $res[1];
+		if(isset($res[0]))
+			return $res[0];
+		return 'Error';
 	}
 	return "Get node $cmdString failed";
 }
@@ -38,22 +54,33 @@ function command($fp, $cmdString, $debug=false) {
 function getResponse($fp, $actionID, $debug=false) {
 	$t0 = time();
 	$response = '';
+	if($debug)
+		$sn = getScriptName();
 	while(time() - $t0 < 20) {
 		$str = fgets($fp);
 		if($str === false)
 			return $response;
 		if($debug)
-			logToFile('1: ' . $str, AMI_DEBUG_LOG);
+			logToFile("$sn 1: $str", AMI_DEBUG_LOG);
+		// ASL3: new Asterisk sends Success response before ActionID
+		if(strpos($str, 'Response: ') === 0) {
+			$response .= $str;
+		}
 		// Look for ActionID set in command()
-		if(trim($str) === "ActionID: $actionID") {
-			$response = $str;
+		elseif(trim($str) === "ActionID: $actionID") {
+			$response .= $str;
 			while(time() - $t0 < 20) {
 				$str = fgets($fp);
 				if($str === "\r\n" || $str[0] === "\n" || $str === false)
 					return $response;
+				// Filter extra messages returned from ASL3 AMI
+				if(strpos($str, 'Command output follows') !== false)
+					continue;
+				if(strpos($str, 'Output:') !== false)
+					continue;
 				$response .= $str;
 				if($debug)
-					logToFile('2: ' . $str, AMI_DEBUG_LOG);
+					logToFile("$sn 2: $str", AMI_DEBUG_LOG);
 			}
 		}
 	}

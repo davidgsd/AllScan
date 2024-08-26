@@ -26,7 +26,7 @@ $passedNodes = explode(',', trim(strip_tags($_GET['nodes'])));
 chdir('..');
 
 // Load allmon.ini
-$cfg = readAllmonCfg();
+$cfg = readNodeCfg();
 if($cfg === false) {
 	sendData(['status' => "allmon.ini not found."]);
 	exit();
@@ -69,12 +69,9 @@ foreach($nodes as $node) {
 			$data['status'] .= 'Connect Failed. Check allmon.ini settings.';
 		} else {
 			// Try to login
-			$user = $cfg[$node]['user'];
-			$pass = $cfg[$node]['passwd'] ?? '';
-			if (!$pass) {
-				$pass = $cfg[$node]['pass'];
-			}
-			if($ami->login($fp[$host], $user, $pass) !== false) {
+			$amiuser = $cfg[$node]['user'];
+			$pass = $cfg[$node]['passwd'];
+			if($ami->login($fp[$host], $amiuser, $pass) !== false) {
 				$servers[$host] = 'y';
 				$data['status'] .= 'Login OK';
 			} else {
