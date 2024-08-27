@@ -6,9 +6,9 @@ if(!writeOk())
 	exit("Insufficient user permission to execute commands\n");
 
 // Filter and validate input data
-$button = trim(strip_tags($_POST['button']));
-$localnode = trim(strip_tags($_POST['localnode']));
-$cmd = trim(strip_tags($_POST['cmd']));
+$fields = ['button', 'localnode', 'cmd'];
+foreach($fields as $f)
+	$$f = isset($_POST[$f]) ? trim(strip_tags($_POST[$f])) : '';
 
 if(!$localnode || !preg_match("/^\d+$/", $localnode))
 	exit("Invalid local node number\n");
@@ -40,7 +40,7 @@ switch($button) {
 		break;
 	case 'restart':
 		echo "Restarting Asterisk...";
-		$ctxt = "restart now";
+		$ctxt = ($ami->aslver >= 3) ? "core restart now" : "restart now";
 		break;
 	default:
 		exit("Invalid command\n");

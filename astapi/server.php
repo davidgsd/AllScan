@@ -77,6 +77,8 @@ foreach($nodes as $node) {
 			} else {
 				$data['status'] .= "Login Failed. Check allmon.ini settings.";
 			}
+			//if($ami->aslver >= 3)
+				$data['status'] .= "<br>ASL Ver: $ami->aslver";
 		}
 		sendData($data, 'connection');
 	}
@@ -141,12 +143,17 @@ exit();
 // Get status for this $node
 function getNode($fp, $node) {
 	global $ami;
+	static $errCnt=0;
 	$actionRand = mt_rand(); // Asterisk Manger Interface an actionID so we can find our own response
 	$actionID = 'xstat' . $actionRand;
 	if(fwrite($fp, "ACTION: RptStatus\r\nCOMMAND: XStat\r\nNODE: $node\r\nActionID: $actionID\r\n\r\n") !== false) {
 		$rptStatus = $ami->getResponse($fp, $actionID);
 	} else {
 		sendData(['status'=>'XStat failed!']);
+		// On ASL3 if Asterisk restarts we get above error repeated indefinitely. Exit and let
+		// client JS reinit connection.
+		if(++$errCnt > 9)
+			exit();
 	}
 	// format of Conn lines: Node# isKeyed lastKeySecAgo lastUnkeySecAgo
 	$actionID = 'sawstat' . $actionRand;
@@ -154,6 +161,10 @@ function getNode($fp, $node) {
 		$sawStatus = $ami->getResponse($fp, $actionID);
 	} else {
 		sendData(['status'=>'sawStat failed!']);
+		// On ASL3 if Asterisk restarts we get above error repeated indefinitely. Exit and let
+		// client JS reinit connection.
+		if(++$errCnt > 9)
+			exit();
 	}
 	// Parse this $node. Returns an array of currently connected nodes
 	$current = parseNode($fp, $rptStatus, $sawStatus);

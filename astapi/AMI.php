@@ -2,6 +2,7 @@
 define('AMI_DEBUG_LOG', 'log.txt');
 
 class AMI {
+public $aslver = '2.0/unknown';
 
 function connect($host) {
 	// Set default port if not provided
@@ -16,25 +17,37 @@ function login($fp, $user, $password) {
 	fwrite($fp,"ACTION: LOGIN\r\nUSERNAME: $user\r\nSECRET: $password\r\nEVENTS: 0\r\nActionID: $actionID\r\n\r\n");
 	$res = $this->getResponse($fp, $actionID);
 	// logToFile('RES: ' . varDumpClean($res, true), AMI_DEBUG_LOG);
-	return (strpos($res[2], "Authentication accepted") !== false);
+	$ok = (strpos($res[2], "Authentication accepted") !== false);
+	// Determine App-rpt version. ASL3 and Asterisk 20 have some differences in AMI commands
+	// eg. in ASL2 restart command is "restart now" but in ASL3 it's "core restart now".
+	$s = $this->command($fp, 'rpt show version');
+	if(preg_match('/app_rpt version: ([0-9\.]{1,9})/', $s, $m) == 1)
+		$this->aslver = $m[1];
 }
 
 function command($fp, $cmdString, $debug=false) {
 	// Generate ActionID to associate with response
 	$actionID = 'cpAction_' . mt_rand();
+	$ok = true;
+	$msg = '';
 	if((fwrite($fp, "ACTION: COMMAND\r\nCOMMAND: $cmdString\r\nActionID: $actionID\r\n\r\n")) > 0) {
 		if($debug)
 			logToFile('CMD: ' . $cmdString . ' - ' . $actionID, AMI_DEBUG_LOG);
 		$res = $this->getResponse($fp, $actionID, $debug);
 		if(!is_array($res))
 			return $res;
-		if($debug)
-			logToFile('RES: ' . varDumpClean($res, true), AMI_DEBUG_LOG);
-		// Check for Asterisk AMI Success response
-		if(strpos($res[0], 'Response: ') === 0)
+		// Check for Asterisk AMI Success/Error response
+		foreach($res as $r) {
+			if($r === 'Response: Error')
+				$ok = false;
+			elseif(preg_match('/Output: (.*)/', $r, $m) == 1)
+				$msg = $m[1];
+		}
+		if($msg)
+			return $msg;
+		if($ok)
 			return 'OK';
-		// else return text received
-		return $res[0];
+		return 'ERROR';
 	}
 	return "Get node $cmdString failed";
 }
@@ -53,7 +66,7 @@ function command($fp, $cmdString, $debug=false) {
 */
 
 function getResponse($fp, $actionID, $debug=false) {
-	$ignore = ['Privilege: Command', 'Command output follows', 'Output:'];
+	$ignore = ['Privilege: Command', 'Command output follows'];
 	$t0 = time();
 	$response = [];
 	if($debug)
