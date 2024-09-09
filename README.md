@@ -130,6 +130,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.82 2024-09-08**<br>
+Show additional messages in the log window at startup including which ASL channel driver is enabled, audio gain settings, and ASL RxAudioStats support.
+
 **v0.81 2024-08-26**<br>
 Updates to AMI parser to auto-detect Asterisk version and support differences in some commands in ASL2/3. Restart Asterisk button now works with ASL3. Display ASL version in messages window at startup. Fix issue where in ASL3 after Asterisk restart AMI stats error messages could repeat indefinitely, in this event AllScan will now reload.
 

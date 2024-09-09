@@ -29,7 +29,7 @@ function command($fp, $cmdString, $debug=false) {
 	// Generate ActionID to associate with response
 	$actionID = 'cpAction_' . mt_rand();
 	$ok = true;
-	$msg = '';
+	$msg = [];
 	if((fwrite($fp, "ACTION: COMMAND\r\nCOMMAND: $cmdString\r\nActionID: $actionID\r\n\r\n")) > 0) {
 		if($debug)
 			logToFile('CMD: ' . $cmdString . ' - ' . $actionID, AMI_DEBUG_LOG);
@@ -41,10 +41,10 @@ function command($fp, $cmdString, $debug=false) {
 			if($r === 'Response: Error')
 				$ok = false;
 			elseif(preg_match('/Output: (.*)/', $r, $m) == 1)
-				$msg = $m[1];
+				$msg[] = $m[1];
 		}
-		if($msg)
-			return $msg;
+		if(_count($msg))
+			return implode(NL, $msg);
 		if($ok)
 			return 'OK';
 		return 'ERROR';

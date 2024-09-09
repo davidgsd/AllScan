@@ -52,6 +52,8 @@ set_time_limit(0);
 $ami = new AMI();
 $servers = [];
 $fp = [];
+$chandriver = 'Unknown';
+$rxstatssupported = false;
 
 foreach($nodes as $node) {
 	$host = $cfg[$node]['host'];
@@ -77,11 +79,72 @@ foreach($nodes as $node) {
 			} else {
 				$data['status'] .= "Login Failed. Check allmon.ini settings.";
 			}
-			//if($ami->aslver >= 3)
-				$data['status'] .= "<br>ASL Ver: $ami->aslver";
+			// Log version info
+			$data['status'] .= "<br>ASL Ver: $ami->aslver, AllScan Ver: "
+					. substr($AllScanVersion, 1);
+			// Check if rxaudiostats supported
+			$msg = checkRxStatsSupport($ami, $fp[$host]);
+			if(_count($msg))
+				$data['status'] .= BR . implode(BR, $msg);
 		}
 		sendData($data, 'connection');
 	}
+}
+
+function checkRxStatsSupport($ami, $fp) {
+	global $chandriver, $rxstatssupported;
+	$msg = [];
+	/* Request "radio show settings"
+	   to determine which channel driver is in use on the node.
+			If returns "...Card is -1..." usbradio driver is not active.
+	   Then request "[susb|radio] show settings" and show output, eg.:
+			...
+			Rx Level currently set to 150
+			Tx A Level currently set to 800
+			Tx B Level currently set to 800
+			---
+			Output A is currently set to voice.
+			Output B is currently set to voice.
+			Tx Voice Level currently set to 800
+			Tx Tone Level currently set to 200
+			Rx Squelch currently set to 500
+	   Then request "[susb|radio] tune menu-support Y" to determine if rxstats are supported.
+	        RxAudioStats: Pk  -8.3  Avg Pwr -37  Min -59  Max -24  dBFS  ClipCnt 0
+	   */
+	$res = $ami->command($fp, 'radio show settings');
+	if(preg_match('/Card is ([-0-9]{1,2})/', $res, $m) == 1 && $m[1] >= 0) {
+		$chandriver = 'Usbradio';
+		$cd = 'radio';
+		$msg[] = $chandriver . " channel driver enabled. Settings:";
+		$ra = explode(NL, $res);
+		foreach($ra as $m) {
+			if(strposa($m, ['Output ', 'Rx ', 'Tx ']))
+				$msg[] = $m;
+		}
+	} else {
+		$res = $ami->command($fp, 'susb show settings');
+		if(preg_match('/Card is ([-0-9]{1,2})/', $res, $m) == 1 && $m[1] >= 0) {
+			$chandriver = 'Simpleusb';
+			$cd = 'susb';
+			$msg[] = $chandriver . " channel driver enabled. Settings:";
+			$ra = explode(NL, $res);
+			foreach($ra as $m) {
+				if(strposa($m, ['Output ', 'Rx ', 'Tx ']))
+					$msg[] = $m;
+			}
+		}
+	}
+	if(isset($cd)) {
+		$res = $ami->command($fp, "$cd tune menu-support Y");
+		if(strpos($res, 'RxAudioStats') === 0) {
+			$rxstatssupported = true;
+			$msg[] = "RxAudioStats supported";
+		} else {
+			$msg[] = "ASL version does not support RxAudioStats";
+		}
+		$msg[] = "\"Thou Shalt Not Clip The ADC\" - The <i>1st Law</i> of AllStar";
+	}
+	return $msg;
 }
 
 // Main loop - build $data array and output as a json object

@@ -80,7 +80,6 @@ switch($button) {
 		}
 		break;
 }
-
 $resp = $ami->command($fp, "rpt cmd $localnode ilink $ilink $remotenode");
 fclose($fp);
 echo $resp;

@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.81";
+$AllScanVersion = "v0.82";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -330,6 +330,14 @@ function checkLargeFiles(&$msg, $dir) {
 				$msg[] = "Deleted $f";
 		}
 	}
+}
+
+function strposa(string $haystack, array $needles, int $offset=0) {
+	foreach($needles as $needle) {
+		if(strpos($haystack, $needle, $offset) !== false)
+			return true;
+	}
+	return false;
 }
 
 function escapeXmlKey($key) {

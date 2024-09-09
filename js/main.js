@@ -60,10 +60,6 @@ function handleEventSourceError(event) {
 	statMsg(msg);
 	// Try to reinit
 	evtSrcRldTmr = setTimeout(initEventSrc, 15000);
-	// statMsg('Reloading in 15 Seconds...');
-	// rldTmr = setTimeout(reloadPage, 15000);
-	// if(statsTmr !== undefined)
-	//	clearTimeout(statsTmr);
 }
 function closeEventSrc() {
 	source.close();
@@ -71,8 +67,6 @@ function closeEventSrc() {
 }
 
 function handleOnlineEvent() {
-	//statMsg('Online event received. Reloading...');
-	//rldTmr = setTimeout(reloadPage, 2500);
 	statMsg('Online event received: Restarting EventSrc & Stats in 15 Seconds...');
 	evtSrcRldTmr = setTimeout(initEventSrc, 14750);
 	statsTmr = setTimeout(getStats, 15000);
@@ -80,9 +74,6 @@ function handleOnlineEvent() {
 }
 function handleOfflineEvent() {
 	statMsg('Offline event received');
-	//rldRetries=0;
-	// if(rldTmr !== undefined)
-	//	clearTimeout(rldTmr);
 	if(evtSrcRldTmr !== undefined)
 		clearTimeout(evtSrcRldTmr);
 	if(statsTmr !== undefined)
@@ -97,7 +88,6 @@ function getStats() {
 		case 0: // init
 			// Parse favorites table for node numbers
 			for(var r=1, i=0; r < ftbl.rows.length; r++) {
-				//for(var c=0, m=ftbl.rows[r].cells.length; c < m; c++) {
 				node = ftbl.rows[r].cells[1].innerHTML
 				if(node >= 2000 && node < 3000000) // Skip EchoLink / invalid node#s
 					rnodes[i++] = ftbl.rows[r].cells[1].innerHTML;
@@ -498,9 +488,6 @@ function astrestart() {
 	var localNode = lnode.value;
 	parms = 'button=restart' + '&localnode='+localNode;
 	xhttpSend(astApiDir + 'cmd.php', parms);
-	// Reload page
-	//statMsg("Reloading in 500mS...");
-	//setTimeout(function() { window.location.assign(window.location.href); }, 500);
 	// Reinit Event Source
 	evtSrcRldTmr = setTimeout(initEventSrc, 1000);
 }

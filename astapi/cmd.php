@@ -45,8 +45,6 @@ switch($button) {
 	default:
 		exit("Invalid command\n");
 }
-
 $resp = $ami->command($fp, $ctxt);
 fclose($fp);
-
-echo $resp ? $resp : "OK\n";
+echo $resp;
