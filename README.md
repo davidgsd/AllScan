@@ -130,6 +130,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.83 2024-09-12**<br>
+Improve detection of enabled ASL channel driver and RxAudioStats support.
+
 **v0.82 2024-09-08**<br>
 Show additional messages in the log window at startup including which ASL channel driver is enabled, audio gain settings, and ASL RxAudioStats support.
 

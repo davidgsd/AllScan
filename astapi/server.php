@@ -53,6 +53,7 @@ $ami = new AMI();
 $servers = [];
 $fp = [];
 $chandriver = 'Unknown';
+$amicd = '';
 $rxstatssupported = false;
 
 foreach($nodes as $node) {
@@ -92,57 +93,35 @@ foreach($nodes as $node) {
 }
 
 function checkRxStatsSupport($ami, $fp) {
-	global $chandriver, $rxstatssupported;
-	$msg = [];
-	/* Request "radio show settings"
-	   to determine which channel driver is in use on the node.
-			If returns "...Card is -1..." usbradio driver is not active.
-	   Then request "[susb|radio] show settings" and show output, eg.:
-			...
-			Rx Level currently set to 150
-			Tx A Level currently set to 800
-			Tx B Level currently set to 800
-			---
-			Output A is currently set to voice.
-			Output B is currently set to voice.
-			Tx Voice Level currently set to 800
-			Tx Tone Level currently set to 200
-			Rx Squelch currently set to 500
-	   Then request "[susb|radio] tune menu-support Y" to determine if rxstats are supported.
-	        RxAudioStats: Pk  -8.3  Avg Pwr -37  Min -59  Max -24  dBFS  ClipCnt 0
-	   */
-	$res = $ami->command($fp, 'radio show settings');
-	if(preg_match('/Card is ([-0-9]{1,2})/', $res, $m) == 1 && $m[1] >= 0) {
-		$chandriver = 'Usbradio';
-		$cd = 'radio';
-		$msg[] = $chandriver . " channel driver enabled. Settings:";
-		$ra = explode(NL, $res);
-		foreach($ra as $m) {
-			if(strposa($m, ['Output ', 'Rx ', 'Tx ']))
-				$msg[] = $m;
+	global $chandriver, $amicd, $rxstatssupported;
+	$msg = ["\"Thou Shalt Not Clip The ADC\" - The <i>1st Law</i> of AllStar"];
+	$res = $ami->command($fp, "susb tune menu-support Y");
+	if(strpos($res, 'RxAudioStats') === 0) {
+		$rxstatssupported = true;
+		$chandriver = 'Simpleusb';
+		$amicd = 'susb';
+	}
+	if(!$rxstatssupported) {
+		$res = $ami->command($fp, "radio tune menu-support Y");
+		if(strpos($res, 'RxAudioStats') === 0) {
+			$rxstatssupported = true;
+			$chandriver = 'Usbradio';
+			$amicd = 'radio';
 		}
+	}
+	if(!$rxstatssupported) {
+		$msg[] = "ASL version does not support RxAudioStats";
 	} else {
-		$res = $ami->command($fp, 'susb show settings');
+		$msg[] = "RxAudioStats supported, $chandriver driver";
+		$res = $ami->command($fp, "$amicd show settings");
 		if(preg_match('/Card is ([-0-9]{1,2})/', $res, $m) == 1 && $m[1] >= 0) {
-			$chandriver = 'Simpleusb';
-			$cd = 'susb';
-			$msg[] = $chandriver . " channel driver enabled. Settings:";
+			$msg[] = "Channel driver settings:";
 			$ra = explode(NL, $res);
 			foreach($ra as $m) {
 				if(strposa($m, ['Output ', 'Rx ', 'Tx ']))
 					$msg[] = $m;
 			}
 		}
-	}
-	if(isset($cd)) {
-		$res = $ami->command($fp, "$cd tune menu-support Y");
-		if(strpos($res, 'RxAudioStats') === 0) {
-			$rxstatssupported = true;
-			$msg[] = "RxAudioStats supported";
-		} else {
-			$msg[] = "ASL version does not support RxAudioStats";
-		}
-		$msg[] = "\"Thou Shalt Not Clip The ADC\" - The <i>1st Law</i> of AllStar";
 	}
 	return $msg;
 }
