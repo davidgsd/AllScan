@@ -38,9 +38,9 @@ Additional screenshots:
 Pro-tip: Multiple copies of AllScan can be installed on one node (server) if desired, each with their own separate configuration, Favorites, and/or different node numbers. Just make copies of the /var/www/html/allscan/ dir eg. "allscan2" and put copies of allmon.inc and favorites.ini with your desired configuration in the new folder. (All copies will use the same user/login credentials.)
 
 # Pre-Install Notes
-Ideally you should be using a recent version of the ASL Distribution and you should have Allmon or Supermon properly configured and working. AllScan works fine on HamVOIP and older ASL releases but ASL3 is highly recommended as it has numerous major improvements over HV and ASL2.
+Ideally you should be using ASL3 and you should have Allmon or Supermon properly configured and working. AllScan works great on HamVOIP and older ASL versions but ASL3 is highly recommended as it has numerous major improvements.
 
-Before running the install commands in the next section confirm that you have PHP installed. This can be done by running "sudo apt update; sudo apt install php -y" on ASL, or "sudo pacman update; sudo pacman install php -y" on HV nodes.
+Confirm that you have PHP installed before running the install commands in the next section. This can be done by running "sudo apt update; sudo apt install php -y" on ASL, or "sudo pacman update; sudo pacman install php -y" on HV nodes.
 
 If you have Supermon already working, AllScan will need no additional configuration and will use the favorites.ini file in the supermon directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon. Confirm you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. If you use Supermon2 instead of Supermon or want to put your favorites.ini file in some other folder, the favorites.ini search location(s) can be set on the AllScan Cfgs Page.
 
