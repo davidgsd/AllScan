@@ -38,14 +38,16 @@ Additional screenshots:
 Pro-tip: Multiple copies of AllScan can be installed on one node (server) if desired, each with their own separate configuration, Favorites, and/or different node numbers. Just make copies of the /var/www/html/allscan/ dir eg. "allscan2" and put copies of allmon.inc and favorites.ini with your desired configuration in the new folder. (All copies will use the same user/login credentials.)
 
 # Pre-Install Notes
-Ideally you should be using a recent version of the ASL Distribution and you should have Allmon or Supermon properly configured and working. AllScan works fine on HamVOIP and pre-2.0 ASL releases but ASL is the latest open-source standard. The ASL team has been increasingly active in recent years adding significant new features and fixes. ASL3 is fully supported.
+Ideally you should be using a recent version of the ASL Distribution and you should have Allmon or Supermon properly configured and working. AllScan works fine on HamVOIP and older ASL releases but ASL3 is highly recommended as it has numerous major improvements over HV and ASL2.
+
+Before running the install commands in the next section confirm that you have PHP installed. This can be done by running `sudo apt update; sudo apt install php -y` on ASL, or `sudo pacman update; sudo pacman install php -y` on HV nodes.
 
 If you have Supermon already working, AllScan will need no additional configuration and will use the favorites.ini file in the supermon directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon. Confirm you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. Supermon is easy to set up and has some nice maintenance/debug features.
 
 If you use Supermon2 instead of Supermon or want to put your favorites.ini file in some other folder, the favorites.ini search location(s) can be set on the AllScan Cfgs Page.
 
 # Automatic Install / Update
-The AllScan Install/Update script automatically checks all system configuration details, changes to the web server root folder, checks if AllScan is already Installed and if so what version, and if not installed or a newer version is available will prompt you to continue with the Install/Update. Just enter 'y' and seconds later the install/update will be complete. If you prefer to install/update manually see the [Manual Install / Update Instructions](https://github.com/davidgsd/AllScan/blob/main/docs/manualInstallUpdate.md).
+The AllScan Install/Update script automatically checks system configuration details, changes to the web server root folder, checks if AllScan is already installed and if so what version, and if not or a newer version is available will prompt you to continue with the Install/Update. Just enter 'y' and seconds later the install/update will be complete. If you prefer to install/update manually see the [Manual Install / Update Instructions](https://github.com/davidgsd/AllScan/blob/main/docs/manualInstallUpdate.md).
 
 Log into your node by SSH and run the following commands:
 
@@ -53,19 +55,18 @@ Log into your node by SSH and run the following commands:
 	sudo rm AllScanInstallUpdate.php
 	wget 'https://raw.githubusercontent.com/davidgsd/AllScan/main/AllScanInstallUpdate.php'
 	chmod 755 AllScanInstallUpdate.php
- 	sudo apt update; sudo apt install php -y
 	sudo ./AllScanInstallUpdate.php
 
 The Install/Update script will provide detailed status messages on each step of the process.
 
-Now open a browser and go to your node's IP address followed by /allscan/, eg. `http://192.168.1.23/allscan/` and be sure to add a bookmark in your browser.
+Now open a browser and go to your node's IP address followed by /allscan/, eg. `http://192.168.1.23/allscan/` and be sure to add a browser bookmark.
 
 If you did a new install AllScan will prompt you to create an admin account. Be sure to do this right away. You can then configure the permission settings for AllScan. These default to Read-Only for public (not logged-in) users. This setting can be changed on the "Cfgs" page.
 
 If you did an update, **be sure to force a browser reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.
 
 NOTES for ASL3:
-1. Be sure you have Allmon3 properly set up and fully working before installing AllScan. AllScan by default uses the allmon3.ini file for the Asterisk Manager credentials.
+1. Be sure you have Allmon3 properly set up and fully working before installing AllScan. AllScan by default uses the allmon3.ini file Asterisk Manager credentials.
 
 NOTES for HamVOIP only:
 1. You may need to uncomment/add the following lines in /etc/php/php.ini (make sure they do not have a ';' in front)<br>
@@ -137,13 +138,7 @@ Improve detection of enabled ASL channel driver and RxAudioStats support.
 Show additional messages in the log window at startup including which ASL channel driver is enabled, audio gain settings, and ASL RxAudioStats support.
 
 **v0.81 2024-08-26**<br>
-Updates to AMI parser to auto-detect Asterisk version and support differences in some commands in ASL2/3. Restart Asterisk button now works with ASL3. Display ASL version in messages window at startup. Fix issue where in ASL3 after Asterisk restart AMI stats error messages could repeat indefinitely, in this event AllScan will now reload.
-
-**v0.80 2024-08-26**<br>
-Updates to AMI parser for consistency with ASL2&3. Update default favorites.ini file.
-
-**v0.79 2024-08-25**<br>
-Update ASL3 AMI response parser. Fix some php log warning messages.
+Updates to AMI parser to auto-detect Asterisk version and support differences in some commands in ASL2/3. Restart Asterisk button now works with ASL3. Display ASL version in messages window at startup. Fix issue where in ASL3 after Asterisk restart AMI stats error messages could repeat indefinitely, in this event AllScan will now reload. Update default favorites.ini file. Fix some php log warning messages.
 
 **v0.78 2024-08-11**<br>
 Update install script for ASL3 to make a readable copy of the allmon3.ini file (outside of the web server root folder with 660 permissions) to ensure AMI credentials are available to AllScan. Note: Be sure you have Allmon3 fully working before installing/updating AllScan. This update is not needed for ASL2/HV nodes.
@@ -179,10 +174,7 @@ If Call, Location, and Title Cfgs have not yet been set and are read in from glo
 Fix issue where DTMF command function would not accept digits A-D. Note that for mobile browsers the Node#/Command text field is specified as inputmode="tel" so that a numeric keypad with large keys appears on phones, making it easier to type in node numbers. For a standard keyboard (supporting letters ie. A-D), delete the "inputmode="tel"" text from include/viewUtils.php line 35.
 
 **v0.65 2023-01-28**<br>
-Fix issue where Connection Status table would not update after 'Restart Asterisk' button used.
-
-**v0.64 2023-01-26**<br>
-Fix issue in v0.63 with creating new user accounts. Update Users page to allow Superusers to edit other Superuser accounts. Various optimizations.
+Fix issue where Connection Status table would not update after 'Restart Asterisk' button used. Various optimizations.
 
 **v0.62 2023-01-25**<br>
 Update handling of JS offline/online and EventSource error events to reinit EventSource and Stats functions rather than reload page. Update Favs table sort function to use case-insensitive string sort option.
@@ -199,9 +191,6 @@ Optimizations to Keyed node status detection. ASL stats API data for many nodes 
 **v0.53 2023-01-21**<br>
 Performance optimizations. Fix issue that would cause an unnecessary database write on every page load/stats request for logged-in users. Fix JS console warning re. no SameSite cookie parameter. Specify AllScan's dir ($urlbase/) for cookie paths.
 
-**v0.52 2023-01-19**<br>
-Minor bug fix: If after a new install or update an error was detected in dbInit(), an error would occur resulting in a blank page rather than normal page load and a useful error message being displayed.
-
 **v0.51 2023-01-18**<br>
 Optimizations to Cfgs module. Add 'DiscBeforeConn Default' Cfg parameter which determines if the 'Disconnect Before Connect checkbox' is checked by default. To have the checkbox be Off by default, go to the Cfgs page and set 'DiscBeforeConn Default' to Off.
 
@@ -212,10 +201,7 @@ Add 'Node Stats' button. Implement Call Sign, Location and Node Title Cfgs, thes
 Add user authentication and permissions checks to all API files. Add DTMF command button. Updates and optimizations to installer/updater: Fix issue where updater would exit prior to completing all checks if install was up-to-date, provide more detail about all commands executed, prompt user before executing any apt-get/pacman update/upgrade actions.
 
 **v0.48 2023-01-11**<br>
-Implement User Authentication, User Admin, Login/Logout, User Settings and Cfg Management functions. Major refactoring and additions. AllScan now defaults public (not logged-in) users to Read-Only access. This can be changed to None (no public access), Read/Modify, or to Full (no logins needed). Upon install of this version, AllScan will automatically verify the system configuration, create its Database and necessary tables, and when you first visit the allscan url it will prompt you to create an Admin user account, with detailed usage notes. Add additional log messages to dbUtils checkTables(). Change default order of possible allmon.ini locations to look in ../supermon/ prior to /etc/asterisk/ as supermon may be more likely to have valid AMI credentials. Update install/update script to update & upgrade OS packages (fixes issue seen on RPi4 w/latest ASL 2.0 where failed to find SQLite php extension).
-
-**v0.42 2023-01-08**<br>
-JavaScript optimizations. Update page Title with node PTT/COS status to allow status to be seen when browser tab is not active.
+Implement User Authentication, User Admin, Login/Logout, User Settings and Cfg Management functions. Major refactoring and additions. AllScan now defaults public (not logged-in) users to Read-Only access. This can be changed to None (no public access), Read/Modify, or to Full (no logins needed). Upon install of this version, AllScan will automatically verify the system configuration, create its Database and necessary tables, and when you first visit the allscan url it will prompt you to create an Admin user account, with detailed usage notes. Add additional log messages to dbUtils checkTables(). Change default order of possible allmon.ini locations to look in ../supermon/ prior to /etc/asterisk/ as supermon may be more likely to have valid AMI credentials. Update install/update script to update & upgrade OS packages (fixes issue seen on RPi4 w/latest ASL 2.0 where failed to find SQLite php extension). JavaScript optimizations.
 
 **v0.4 2023-01-02**<br>
 Only show CPU Temp if data is available. Reduce favs table CSS cell padding from 4 to 3 px. Update InstallUpdate script to verify favorites.ini file in supermon dir is writeable by web server if dir exists. Readme updates. Minor optimizations. Add API to eventually support stats caching and additional stats features. Update CPU temp data once per minute.
