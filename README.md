@@ -40,11 +40,9 @@ Pro-tip: Multiple copies of AllScan can be installed on one node (server) if des
 # Pre-Install Notes
 Ideally you should be using a recent version of the ASL Distribution and you should have Allmon or Supermon properly configured and working. AllScan works fine on HamVOIP and older ASL releases but ASL3 is highly recommended as it has numerous major improvements over HV and ASL2.
 
-Before running the install commands in the next section confirm that you have PHP installed. This can be done by running `sudo apt update; sudo apt install php -y` on ASL, or `sudo pacman update; sudo pacman install php -y` on HV nodes.
+Before running the install commands in the next section confirm that you have PHP installed. This can be done by running "sudo apt update; sudo apt install php -y" on ASL, or "sudo pacman update; sudo pacman install php -y" on HV nodes.
 
-If you have Supermon already working, AllScan will need no additional configuration and will use the favorites.ini file in the supermon directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon. Confirm you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. Supermon is easy to set up and has some nice maintenance/debug features.
-
-If you use Supermon2 instead of Supermon or want to put your favorites.ini file in some other folder, the favorites.ini search location(s) can be set on the AllScan Cfgs Page.
+If you have Supermon already working, AllScan will need no additional configuration and will use the favorites.ini file in the supermon directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon. Confirm you are able to properly execute various functions in Supermon such as connecting and disconnecting remote nodes. If you use Supermon2 instead of Supermon or want to put your favorites.ini file in some other folder, the favorites.ini search location(s) can be set on the AllScan Cfgs Page.
 
 # Automatic Install / Update
 The AllScan Install/Update script automatically checks system configuration details, changes to the web server root folder, checks if AllScan is already installed and if so what version, and if not or a newer version is available will prompt you to continue with the Install/Update. Just enter 'y' and seconds later the install/update will be complete. If you prefer to install/update manually see the [Manual Install / Update Instructions](https://github.com/davidgsd/AllScan/blob/main/docs/manualInstallUpdate.md).
