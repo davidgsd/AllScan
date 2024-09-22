@@ -72,10 +72,10 @@ NOTES for HamVOIP only:
 	extension=sqlite3.so
 2. Then restart Lighttpd web server or restart the node
 
-# AllScan DiY and TurnKey Node Designs
+# AllScan Nodes, Interfaces, Accessories, and How-To-Guides
 If you do not yet have a node or might like to upgrade your node, see [AllScan.info](https://allscan.info/) for How-To Guides, Nodes, USB Interfaces, Accessories, and more.
 
-AllScan nodes and USB radio/audio interfaces provide extensive features and excellent audio quality - see the [Products Page](https://allscan.info/products/) for more info.
+AllScan nodes and USB radio/audio interfaces provide extensive features and excellent audio quality - see my [Products Page](https://allscan.info/products/) for details.
 
 # Configuration Files and Parameters
 Most nodes already have a number of Cfg files and to simplify the install process AllScan will try to use these rather than require redundant files/data to be created/entered. These files are as follows:
