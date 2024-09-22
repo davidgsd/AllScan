@@ -72,7 +72,7 @@ NOTES for HamVOIP only:
 	extension=sqlite3.so
 2. Then restart Lighttpd web server or restart the node
 
-# AllScan Nodes, Interfaces, Accessories, and How-To-Guides
+# AllScan Nodes, Accessories and How-To-Guides
 If you do not yet have a node or might like to upgrade your node, see [AllScan.info](https://allscan.info/) for How-To Guides, Nodes, USB Interfaces, Accessories, and more.
 
 AllScan nodes and USB radio/audio interfaces provide extensive features and excellent audio quality - see my [Products Page](https://allscan.info/products/) for details.
