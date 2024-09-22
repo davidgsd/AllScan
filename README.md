@@ -73,12 +73,9 @@ NOTES for HamVOIP only:
 2. Then restart Lighttpd web server or restart the node
 
 # AllScan DiY and TurnKey Node Designs
-If you do not yet have a node or might like to upgrade your node, see the following Guides by AllScan's author NR9V:<br>
-[How To - Build a High-Quality Radio-less AllStar Node for Under $100](https://allscan.info/docs/radioless-node.php)<br>
-[How To - Build a High-Quality Full-Duplex AllStar Node for Under $150](https://allscan.info/docs/diy-node.php)<br>
-[How To - Build a Full-Duplex AllStar Node Using a Mobile Radio](https://allscan.info/docs/mobile-radio-node.php)
+If you do not yet have a node or might like to upgrade your node, see [AllScan.info](https://allscan.info/) for How-To Guides, Nodes, USB Interfaces, Accessories, and more.
 
-AllScan nodes provide extensive features and excellent audio quality, and can be built by anyone with intermediate-level computer & electronics skills. I also provide kits and fully assembled & tested nodes at reasonable prices - see my [Products Page](https://allscan.info/products/) for details.
+AllScan nodes and USB radio/audio interfaces provide extensive features and excellent audio quality - see the [Products Page](https://allscan.info/products/) for more info.
 
 # Configuration Files and Parameters
 Most nodes already have a number of Cfg files and to simplify the install process AllScan will try to use these rather than require redundant files/data to be created/entered. These files are as follows:

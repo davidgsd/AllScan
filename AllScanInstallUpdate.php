@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-$AllScanInstallerUpdaterVersion = "v1.21";
+$AllScanInstallerUpdaterVersion = "v1.22";
 define('NL', "\n");
 // Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory. The script will then determine
 // the location of the web root folder on your system, cd to that folder, check if you have AllScan installed and install
@@ -184,6 +184,9 @@ if($s === 'y') {
 }
 
 // if ASL3, make sure astdb.txt is available
+if(is_executable('/usr/bin/apt-get') && !is_file('/etc/systemd/system/asl3-update-astdb.service')) {
+	execCmd("sudo apt install -y asl3-update-nodelist 2> /dev/null");
+}
 if(is_file('/etc/systemd/system/asl3-update-astdb.service')) {
 	execCmd("systemctl enable asl3-update-astdb.service 2> /dev/null");
 	execCmd("systemctl enable asl3-update-astdb.timer 2> /dev/null");
