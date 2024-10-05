@@ -50,7 +50,7 @@ The AllScan Install/Update script automatically checks system configuration deta
 Log into your node by SSH and run the following commands:
 
 	cd ~
-	sudo rm AllScanInstallUpdate.php
+	sudo rm AllScanInstallUpdate.php 2>/dev/null
 	wget 'https://raw.githubusercontent.com/davidgsd/AllScan/main/AllScanInstallUpdate.php'
 	chmod 755 AllScanInstallUpdate.php
 	sudo ./AllScanInstallUpdate.php
