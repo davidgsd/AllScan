@@ -2,7 +2,7 @@ const astApiDir='/allscan/astapi/';
 const statsDir='/allscan/stats/';
 const apiDir='/allscan/api/';
 var source, hbcnt=0, pgTitle, favsCnt=0, c0;
-var rldRetries=0, rldTmr, evtSrcRldTmr, evtSrcUrl, lastEvtTime;
+var rldRetries=0, rldTmr, evtSrcRldTmr, evtSrcUrl;
 var statsTmr, statsState=0, statsIdx=0, statsReqCnt=0;
 var xh, xha, xhs, xhr;
 var txCnt=[], txTim=[], txTT=[], txAvg=[];
@@ -182,7 +182,7 @@ function handleStatsResponse() {
 		scanMsg(c0.innerHTML + ': ' + resp.data.status + s2);
 		// Highlight # column red, {6-100%} -> 15%-30% lum
 		if(txAvg[node] > 5) {
-			lum = convertRange(txAvg[node], 15, 30);
+			lum = convertRange(txAvg[node], 15, 29);
 			c0.style.backgroundColor = 'hsl(0,100%,'+lum+'%)';
 		} else {
 			if(s.active == 1)
@@ -297,10 +297,9 @@ function handleConnectionEvent(event) {
 	tbody0.innerHTML = '<tr><td colspan="6">' + data.status + '</td></tr>';
 }
 function handleNodesEvent(event) {
-	// Clear rdlTmr if set
+	// Clear rldTmr if set
 	if(evtSrcRldTmr !== undefined)
 		clearTimeout(evtSrcRldTmr);
-	lastEvtTime = unixtime();
 	var tabledata = JSON.parse(event.data);
 	for(var localNode in tabledata) {
 		var tablehtml = '';
@@ -415,9 +414,6 @@ function handleNodetimesEvent(event) {
 	// Update CPU Temp once per ~minute
 	if(cputemp && ++hbcnt % 120 == 0)
 		xhttpApiInit('f=getCpuTemp');
-	// If no recent evtSrc data try restarting
-	if(lastEvtTime && unixtime() > lastEvtTime + 15)
-		evtSrcRldTmr = setTimeout(initEventSrc, 500);
 }
 
 function xhttpApiInit(parms) {

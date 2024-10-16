@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-$AllScanInstallerUpdaterVersion = "v1.22";
+$AllScanInstallerUpdaterVersion = "v1.23";
 define('NL', "\n");
 // Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory. The script will then determine
 // the location of the web root folder on your system, cd to that folder, check if you have AllScan installed and install
@@ -215,7 +215,8 @@ if(!filter_var($lanip, FILTER_VALIDATE_IP)) {
 msg("AllScan can be accessed at:\n\thttp://$lanip/$asdir/ on the local network, or\n"
 	."\thttp://$ip/$asdir/ remotely if your router has a port forwarded to this node.");
 
-msg("Be sure to bookmark the above URL(s) in your browser, and if you have just done an update do a CTRL-F5 in the browser (or long-press the reload button in mobile browsers) to reload all CSS and JavaScript files.");
+msg("Be sure to bookmark the above URL(s) in your browser.");
+msg("IMPORTANT: After updates do a CTRL-F5 in your browser (or long-press the reload button in mobile browsers), or clear the browser cache, so that all CSS and JavaScript files will properly update.");
 
 exit();
 
@@ -223,10 +224,12 @@ exit();
 // Execute command, show the command, show the output and return val
 function execCmd($cmd) {
 	msg("Executing cmd: $cmd");
-	$ret = system($cmd);
-	$s = ($ret === false) ? 'ERROR' : 'OK';
+	$out = '';
+	$res = 0;
+	$ok = (exec($cmd, $out, $res) !== false && !$res);
+	$s = $ok ? 'OK' : 'ERROR';
 	msg("Return Code: $s");
-	return ($ret !== false);
+	return $ok;
 }
 
 function checkDbDir() {
@@ -256,12 +259,12 @@ function checkDbDir() {
 
 function checkSmDir() {
 	global $group;
-	// Verify supermon folder favorites.ini and favorites.ini.bak are writeable by web server
+	// Verify supermon folder favorites.ini and favorites.ini.bak are writable by web server
 	$smdir = 'supermon';
 	if(is_dir($smdir)) {
 		$favsini = 'favorites.ini';
 		$favsbak = $favsini . '.bak';
-		msg("Confirming supermon $favsini and $favsbak are writeable by web server");
+		msg("Confirming supermon $favsini and $favsbak are writable by web server");
 		chdir($smdir);
 		execCmd("touch $favsini $favsbak");
 		execCmd("chmod 664 $favsini $favsbak");
