@@ -119,7 +119,7 @@ if($dlfiles) {
 	if(is_dir($zdir))
 		exec("rm -rf $zdir");
 	if(!execCmd("wget -q '$url'") || !file_exists($fname))
-		errExit("Retrieve $fname from github failed. Try executing \"wget '$url'\" and check error messages.");
+		errExit("Retrieve $fname from github failed. Try executing \"wget '$url'\" and check error messages. Also confirm that your node supports https and that its system time/RTC is set correctly.");
 	if(!execCmd("unzip -q $fname"))
 		errExit('Unzip failed. Check that you have unzip installed. Try "sudo apt-get install unzip" to install');
 	unlink($fname);
@@ -128,7 +128,7 @@ if($dlfiles) {
 	// Copy any user .ini files from old version backup folder
 	if(isset($bak) && is_dir($bak)) {
 		msg("Checking for .ini files in $bak/...");
-		execCmd("cp $bak/*.ini $asdir/");
+		execCmd("cp -n $bak/*.ini $asdir/");
 		execCmd("chmod 664 $asdir/*.ini");
 		execCmd("chgrp $group $asdir/*.ini");
 	}
@@ -163,15 +163,15 @@ msg("Ready to run OS update/upgrade commands." . NL
 $s = readline("Enter 'y' to proceed, any other key to skip this step: ");
 if($s === 'y') {
 	if(is_executable('/usr/bin/apt-get')) {
-		execCmd("apt-get -y update");
-		execCmd("apt-get -y upgrade");
-		execCmd("apt-get install -y php-sqlite3 php-curl");
+		passthruCmd("apt-get -y update");
+		passthruCmd("apt-get -y upgrade");
+		passthruCmd("apt-get install -y php-sqlite3 php-curl");
 	} else if(is_executable('/usr/bin/yum')) {
-		execCmd("yum -y update");
-		execCmd("yum -y upgrade");
+		passthruCmd("yum -y update");
+		passthruCmd("yum -y upgrade");
 	} else if(is_executable('/usr/bin/pacman')) {
-		execCmd("pacman -Syu");
-		execCmd("pacman -S php-sqlite");
+		passthruCmd("pacman -Syu");
+		passthruCmd("pacman -S php-sqlite");
 	}
 
 	msg("Restarting web server...");
@@ -185,12 +185,12 @@ if($s === 'y') {
 
 // if ASL3, make sure astdb.txt is available
 if(is_executable('/usr/bin/apt-get') && !is_file('/etc/systemd/system/asl3-update-astdb.service')) {
-	execCmd("sudo apt install -y asl3-update-nodelist 2> /dev/null");
+	passthruCmd("sudo apt install -y asl3-update-nodelist 2> /dev/null");
 }
 if(is_file('/etc/systemd/system/asl3-update-astdb.service')) {
-	execCmd("systemctl enable asl3-update-astdb.service 2> /dev/null");
-	execCmd("systemctl enable asl3-update-astdb.timer 2> /dev/null");
-	execCmd("systemctl start asl3-update-astdb.timer 2> /dev/null");
+	passthruCmd("systemctl enable asl3-update-astdb.service 2> /dev/null");
+	passthruCmd("systemctl enable asl3-update-astdb.timer 2> /dev/null");
+	passthruCmd("systemctl start asl3-update-astdb.timer 2> /dev/null");
 	// Make a readable copy of allmon3.ini (Allmon3 updates can reset the file permissions)
 	$fname = '/etc/allmon3/allmon3.ini';
 	if(file_exists($fname)) {
@@ -227,6 +227,15 @@ function execCmd($cmd) {
 	$out = '';
 	$res = 0;
 	$ok = (exec($cmd, $out, $res) !== false && !$res);
+	$s = $ok ? 'OK' : 'ERROR';
+	msg("Return Code: $s");
+	return $ok;
+}
+
+function passthruCmd($cmd) {
+	msg("Executing cmd: $cmd");
+	$res = 0;
+	$ok = (passthru($cmd, $res) !== false && !$res);
 	$s = $ok ? 'OK' : 'ERROR';
 	msg("Return Code: $s");
 	return $ok;
