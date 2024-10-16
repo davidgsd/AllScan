@@ -36,7 +36,7 @@ Additional screenshots:
 [users.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/users.png)
 [settings.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/settings.png)
 
-Multiple copies of AllScan can be installed on one node (server) if desired, each with their own separate configuration, Favorites, and/or different node numbers. Just make copies of the /var/www/html/allscan/ dir eg. "allscan2" and put copies of allmon.ini and favorites.ini with your desired configuration in the new folder. (All copies will use the same user/login credentials.)
+Multiple copies of AllScan can be installed on one node (server) if desired, each with their own separate configuration, Favorites, and/or different node numbers. Just make copies of the /var/www/html/allscan/ dir eg. to "allscan2" and put copies of allmon.ini and favorites.ini with your desired configuration in the new folder. Each copy of AllScan will store its user/login credentials in /etc/allscan/ in a .db file named the same as the name of its web folder, eg. "allscan2.db". (To have other copies use the same user credentials make a symbolic link from eg. allscan2.db to allscan.db.)
 
 # Pre-Install Notes
 Ideally you should be using ASL3 and you should have Allmon or Supermon properly configured and working. Confirm you are able to properly execute various functions in Allmon or Supermon such as connecting and disconnecting remote nodes. AllScan works great on HamVOIP and older ASL versions but ASL3 is highly recommended as it has numerous major improvements, and also supports x64 platforms (such as Dell Wyse 3040s which work much better than RPi's yet cost half as much).
@@ -194,7 +194,7 @@ Optimizations to Keyed node status detection. ASL stats API data for many nodes 
 Performance optimizations. Fix issue that would cause an unnecessary database write on every page load/stats request for logged-in users. Fix JS console warning re. no SameSite cookie parameter. Specify AllScan's dir ($urlbase/) for cookie paths.
 
 **v0.51 2023-01-18**<br>
-Optimizations to Cfgs module. Add 'DiscBeforeConn Default' Cfg parameter which determines if the 'Disconnect Before Connect checkbox' is checked by default. To have the checkbox be Off by default, go to the Cfgs page and set 'DiscBeforeConn Default' to Off.
+Optimizations to Cfgs module. Add 'DiscBeforeConn Default' Cfg parameter which determines if the 'Disconnect Before Connect' checkbox is checked by default. To have the checkbox be Off by default, go to the Cfgs page and set 'DiscBeforeConn Default' to Off.
 
 **v0.50 2023-01-17**<br>
 Add 'Node Stats' button. Implement Call Sign, Location and Node Title Cfgs, these are automatically imported from global.inc as before but once imported they are now managed on the Cfgs page and global.inc will no longer be read (unless these cfgs are later deleted). Fix issue where API files would require a logged in user prior to checking the 'Public Permission' cfg, resulting in Connection Status data not being shown for non-logged in users.
