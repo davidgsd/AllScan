@@ -55,7 +55,7 @@ if(!empty($nodes) && !empty($hosts)) {
 			$parms = ['favsfile' => $favsFile];
 	}
 
-	// Determine favorites.ini file location(s)
+	// Determine favorites file location(s)
 	$favsFile = '';
 	$favsFiles = findFavsFiles($favsFile);
 	if(!empty($favsFiles)) {
@@ -71,8 +71,10 @@ pageInit($onLoad);
 if(!isset($node) || $astdb === false)
 	asExit(implode(BR, $msg));
 
-if(!$gCfg[call] && adminUser())
-	p('global.inc not found. Check Supermon install or Enter Call Sign, Location and Node Title on Cfgs page');
+if(!$gCfg[call] && adminUser()) {
+	p('Node Call Sign, Location and/or Title have not yet been set. Enter these below:');
+	showSetNodeInfoForm();
+}
 
 if(!isset($parms))
 	$parms = [];
@@ -229,7 +231,7 @@ asExit();
 
 // ---------------------------------------------------
 function processForm($parms, &$msg) {
-	global $astdb, $favsFile, $gCfg;
+	global $astdb, $favsFile, $gCfg, $cfgModel;
 	$node = $parms['node'];
 	switch($parms['Submit']) {
 		case "Add Favorite":
@@ -319,6 +321,18 @@ function processForm($parms, &$msg) {
 			if(!writeFileLines($favsFile, $favs, $msg))
 				break;
 			$msg[] = "Successfully wrote $n lines to $favsFile";
+			break;
+		case SET_NODE_INFO_CFGS:
+			if(!isset($parms['call']) || !isset($parms['location']) || !isset($parms['title']))
+				break;
+			$gCfg[call] = $parms['call'];
+			$gCfg[location] = $parms['location'];
+			$gCfg[title] = $parms['title'];
+			$cfgModel->saveCfgs();
+			if($cfgModel->error)
+				$msg[] = error('Error saving Node Info Cfgs: ' . $cfgModel->error);
+			else
+				$msg[] = 'Saved Node Info Cfgs OK';
 			break;
 		case CREATE_FAVORITESINI_FILE:
 			$from = 'docs/favorites.ini.sample';

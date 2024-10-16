@@ -45,7 +45,7 @@ function showCfgs($cfgs) {
 
 function showFiles($files, $activeFile) {
 	global $html, $wwwroot, $asdir;
-	$hdrCols = ['File Name', 'Size (Bytes)', 'Last Modified', 'Options'];
+	$hdrCols = ['File', 'Size (Bytes)', 'Last Modified', 'Options'];
 	$out = $html->tableOpen($hdrCols, null, 'favs', null);
 	foreach($files as $f) {
 		$parms = ['Submit'=>DOWNLOAD_FILE, 'file'=>$f->name];

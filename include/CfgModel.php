@@ -12,7 +12,6 @@ define('call', 3);
 define('location', 4);
 define('title', 5);
 define('autodisc_def', 6);
-//define('', );
 
 // Global Cfgs Default Values
 $gCfgDef = [

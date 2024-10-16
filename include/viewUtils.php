@@ -3,6 +3,8 @@
 // Author: David Gleason - AllScan.info
 require_once('commonForms.php');
 
+define('SET_NODE_INFO_CFGS', 'Set Node Info Cfgs');
+
 function showConnStatusTable() {
 	global $node, $title2;
 	echo '<h2>Connection Status</h2>
@@ -42,6 +44,20 @@ function showNodeCtrlForm() {
 	for="autodisc">Disconnect before Connect</label>
 </fieldset></form>
 ';
+}
+
+function showSetNodeInfoForm() {
+	global $html, $user, $gCfgName, $gCfg;
+	$form = new stdClass();
+	$form->fieldsetLegend = SET_NODE_INFO_CFGS;
+	$form->submit = SET_NODE_INFO_CFGS;
+	$form->fields = [
+		$gCfgName[call] =>     ['t' => ['call', $gCfg[call]]],
+		$gCfgName[location] => ['t' => ['location', $gCfg[location]]],
+		$gCfgName[title] =>    ['t' => ['title', $gCfg[title]]],
+	];
+	$form->id = 'nodeInfoForm';
+	echo htmlForm($form) . BR;
 }
 
 function showFooterLinks() {

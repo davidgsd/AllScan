@@ -70,7 +70,7 @@ if(adminUser()) {
 	if(!$cnt) {
 		p("No Favorites files found.");
 	} else {
-		h2("Copy/Backup/Restore Favorites Files");
+		h2("Copy/Backup Favorites Files");
 
 		p('To enable Favorites Groups save a copy of an existing file or upload a new favorites file. Favorites files can be stored either in the AllScan web folder or in the global /etc/allscan/ folder. If more than one Favorites file is found in these locations or other configured <i>Favorites.ini Locations</i> a select box is shown on the main page enabling the active favorites file to be switched.', 'w900', false);
 

@@ -7,12 +7,13 @@ See [screenshot.png](https://github.com/davidgsd/AllScan/blob/main/screenshot.pn
 * Allows favorites to be connected with a single click (optionally automatically disconnecting any currently connected nodes first).
 * Allows the Favorites Table to be sorted by Node#, Name, Description, Location, etc.
 * Favorites can be added/deleted simply by entering the node# and clicking a button.
+* Favorites files/groups can be easily created, copied, backed up, uploaded, downloaded and switched between
 
 These features finally give AllStar nodes similar memory management and scan capabilities that analog radios have had for decades. AllScan is mobile-friendly and optimized for ease of use on both small and large screens. AllScan follows the latest web development standards, with PHP, JavaScript, HTML, and CSS cleanly partitioned, runs on both ASL and HamVOIP, and is simple to install, configure, and update.
 
-AllScan supports multiple locations of the favorites.ini file. If no favorites.ini file is found AllScan will ask if you'd like to create the file and if so will copy the docs/favorites.ini.sample file to ./favorites.ini, which has a small list of nodes to get you started.
+AllScan supports multiple locations of the favorites.ini file. If no favorites.ini file is found AllScan will ask if you'd like to create the file and if so will copy the docs/favorites.ini.sample file to ./favorites.ini, which has a list of well-known nodes to get you started.
 
-Prior to installing AllScan it is recommended that you have a working install of Supermon or Allmon (2 or 3). AllScan can automatically read their config files. Currently AllScan supports favorites.ini entries that refer to connecting to nodes eg. 'cmd[] = "rpt cmd %node% ilink 3 [node#]"' but may also support other types of commands in the future.
+Prior to installing AllScan it is recommended that you have a working install of Supermon or Allmon. AllScan can automatically read their config files. Currently AllScan supports favorites.ini entries that refer to connecting to nodes eg. 'cmd[] = "rpt cmd %node% ilink 3 [node#]"' but may also support other types of commands in the future.
 
 As AllScan receives data from the ASL stats server it updates the Favorites Table rows with color coded details showing the following:
 
@@ -27,7 +28,7 @@ Color codes for '#' column:
 
 ASL's stats APIs are limited to 30 requests/minute per IP Address. AllScan uses a dynamic request timing algorithm to prevent exceeding this limit, even if multiple web clients are using AllScan on a node.
 
-AllScan also implements User Authentication, User Account Administration, Login/Logout, User Settings and Cfg Management functions. After installing (or upgrading from pre-v0.45) AllScan will automatically create its Database and necessary tables, and when you first visit the allscan/ url will prompt you to create an Admin user account. By default, public (not logged-in) users will have Read-Only access and will be able to see the Connection Status and Favorites data, but will not be able to make changes or view any admin (Cfgs / Users) pages. To change this setting, Log in, click the "Cfgs" link, and edit the "Public Permission" parameter.
+AllScan also implements User Authentication, User Account Administration, Login/Logout, User Settings and Cfg Management functions. After install AllScan will automatically create its database and necessary tables, and when you first visit the allscan/ url will prompt you to create an Admin user account. By default, public (not logged-in) users will have Read-Only access and will be able to see the Connection Status and Favorites data, but will not be able to make changes or view any admin (Cfgs / Users) pages. To change this setting, Log in, click the "Cfgs" link, and edit the "Public Permission" parameter.
 
 Additional screenshots:
 [init.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/init.png)
@@ -35,17 +36,17 @@ Additional screenshots:
 [users.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/users.png)
 [settings.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/settings.png)
 
-Pro-tip: Multiple copies of AllScan can be installed on one node (server) if desired, each with their own separate configuration, Favorites, and/or different node numbers. Just make copies of the /var/www/html/allscan/ dir eg. "allscan2" and put copies of allmon.inc and favorites.ini with your desired configuration in the new folder. (All copies will use the same user/login credentials.)
+Multiple copies of AllScan can be installed on one node (server) if desired, each with their own separate configuration, Favorites, and/or different node numbers. Just make copies of the /var/www/html/allscan/ dir eg. "allscan2" and put copies of allmon.ini and favorites.ini with your desired configuration in the new folder. (All copies will use the same user/login credentials.)
 
 # Pre-Install Notes
-Ideally you should be using ASL3 and you should have Allmon or Supermon properly configured and working. Confirm you are able to properly execute various functions in Allmon or Supermon such as connecting and disconnecting remote nodes. AllScan works great on HamVOIP and older ASL versions but ASL3 is highly recommended as it has numerous major improvements.
+Ideally you should be using ASL3 and you should have Allmon or Supermon properly configured and working. Confirm you are able to properly execute various functions in Allmon or Supermon such as connecting and disconnecting remote nodes. AllScan works great on HamVOIP and older ASL versions but ASL3 is highly recommended as it has numerous major improvements, and also supports x64 platforms (such as Dell Wyse 3040s which work much better than RPi's yet cost half as much).
 
-Confirm that you have PHP and unzip installed before running the install commands in the next section. This can be done by running "sudo apt update; sudo apt install php unzip -y" on ASL, or "sudo pacman update; sudo pacman install php unzip -y" on HV nodes.
+IMPORTANT: Confirm that you have PHP and unzip installed before running the install commands in the next section. This can be done by running "sudo apt update; sudo apt install php unzip -y" on ASL, or "sudo pacman update; sudo pacman install php unzip -y" on HV nodes.
 
-If you have Supermon installed AllScan will use the favorites.ini file in the supermon directory. See [supermon-install.txt](https://github.com/davidgsd/AllScan/blob/main/docs/supermon-install.txt) or the Supermon groups.io page for details on how to install Supermon. If you use Supermon2 instead of Supermon or want to put your favorites.ini file in some other folder, the favorites.ini search location(s) can be set on the AllScan Cfgs Page.
+If you have Supermon installed AllScan will use the favorites.ini file in the supermon directory. See the Supermon groups.io page for details on how to install Supermon. If you use Supermon2 instead of Supermon or want to put your favorites.ini file in some other folder, the favorites.ini search location(s) can be set on the AllScan Cfgs Page.
 
 # Automatic Install / Update
-The AllScan Install/Update script automatically checks system configuration details, changes to the web server root folder, checks if AllScan is already installed and if so what version, and if not or a newer version is available will prompt you to continue with the Install/Update. Just enter 'y' and seconds later the install/update will be complete. If you prefer to install/update manually see the [Manual Install / Update Instructions](https://github.com/davidgsd/AllScan/blob/main/docs/manualInstallUpdate.md).
+The AllScan Install/Update script automatically checks system configuration details, changes to the web server root folder, checks if AllScan is already installed and if so what version, and if not or a newer version is available will prompt you to continue with the Install/Update. Just enter 'y' and seconds later the install/update will be complete. If you prefer to install/update manually see the [Manual Install / Update Instructions](https://github.com/davidgsd/AllScan/blob/main/docs/manualInstallUpdate.md) however this may be out-of-date and would have no advantage over the automated install.
 
 Log into your node by SSH and run the following commands:
 
@@ -55,13 +56,13 @@ Log into your node by SSH and run the following commands:
 	chmod 755 AllScanInstallUpdate.php
 	sudo ./AllScanInstallUpdate.php
 
-The Install/Update script will provide detailed status messages on each step of the process.
+The Install/Update script will provide detailed status messages on each step of the process. Carefully review all output messages and confirm no errors occur.
 
 Now open a browser and go to your node's IP address followed by /allscan/, eg. `http://192.168.1.23/allscan/` and be sure to add a browser bookmark.
 
 If you did a new install AllScan will prompt you to create an admin account. Be sure to do this right away. You can then configure the permission settings for AllScan. These default to Read-Only for public (not logged-in) users. This setting can be changed on the "Cfgs" page.
 
-If you did an update, **be sure to force a browser reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.
+If you did an update, **force a browser reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.
 
 NOTES for ASL3:
 1. Be sure you have Allmon3 properly set up and fully working before installing AllScan. AllScan by default uses the allmon3.ini file Asterisk Manager credentials.
@@ -79,10 +80,10 @@ AllScan nodes and USB radio/audio interfaces provide extensive features and exce
 
 # Configuration Files and Parameters
 Most nodes already have a number of Cfg files and to simplify the install process AllScan will try to use these rather than require redundant files/data to be created/entered. These files are as follows:
-1. **astdb.txt**: The ASL database file with the list of all nodes provisioned on the AllStarLink network. This file should already exist in ../supermon/astdb.txt or /var/log/asterisk/astdb.txt. If the file is not found it will be automatically downloaded into the allscan directory. If you have a properly configured node you should have a cron entry that downloads the latest astdb file at least once per week. AllScan shows the status of the above files and their last modification time in the status messages box (below the Favorites Table). If you see there is no recent astdb file (less than 1 week old) you should review your cron settings (which should have been configured when you installed ASL/Allmon and Supermon).
+1. **astdb.txt**: The ASL database file with the list of all nodes provisioned on the AllStarLink network. This file should already exist in ../supermon/astdb.txt or /var/log/asterisk/astdb.txt. If the file is not found it will be automatically downloaded into the allscan directory. If you have a properly configured node you should have a cron entry that downloads the latest astdb file at least once per week. AllScan shows the status of the above files and their last modification time in the status messages box (below the Favorites Table). If you see there is no recent astdb file (less than 1 week old) you should review your cron settings (which should have been configured when you installed Allmon or Supermon).
 2. **allmon.ini**: This defines your node number(s) and the Asterisk Manager credentials. It can usually be found in any of the following locations: ../supermon/allmon.ini, /etc/asterisk/allmon.ini.php, ../allmon2/allmon.ini.php, or /etc/allmon3/allmon3.ini. AllScan will search those locations in that order and use the first file found. If you see connection/stats error messages check those file locations and verify they have the correct data. If you have multiple Nodes defined in allmon.ini, AllScan will use the first Node# in the file. (A future version of AllScan may support multiple Node#s and allow these cfgs to be stored in AllScan's database.) You can also place an allmon.ini file in AllScan's web root folder, which will take precedence over other file locations.
 3. **global.inc**: Cfg file in the supermon directory with user settings such as your name, call sign, node title, etc. AllScan will automatically import the following variables from global.inc if found: $CALL, $LOCATION, and $TITLE2. Otherwise, go to the AllScan Cfgs Page and enter your Call Sign, Location and Node Title parameters there. Once these parms have been imported or set AllScan will not read from global.inc again. The Call Sign and Location parameters are shown in the AllScan Page Header, and the Node Title parameter is shown in the Connection Status Table header.
-4. **favorites.ini**: The favorites file can be found in the supermon directory or in the allscan directory. Or if you have the file somewhere else (eg. ../supermon2/) you can set that location in the 'Favorites.ini Locations' Cfgs Parameter. If not found in any of those locations you will be prompted to create a new favorites.ini file in the allscan directory. A future version of AllScan will store the favorites in its database instead of in a file but will still support import/export functions.
+4. **favorites.ini**: The favorites file can be found in the supermon directory or in the allscan directory. Or if you have the file somewhere else (eg. ../supermon2/) you can set that location in the 'Favorites.ini Locations' Cfgs Parameter. If not found in any of those locations you will be prompted to create a new favorites.ini file in the allscan directory.
 
 All AllScan Cfg parameters can be viewed and set on the Cfgs page if you are logged in as an Admin user. Just click the 'Cfgs' link and all Cfgs are then shown along with an Edit form.
 
@@ -91,7 +92,7 @@ For any issues including directory/file permissions issues or issues with SQLite
 
 HamVOIP users: See this [Blog Post by KJ7T](https://randomwire.substack.com/p/updating-allscan-on-the-clearnode) for detailed steps on how to enable the SQLite3 extension in php.ini.
 
-If you have somehow corrupted your install and running the install/update script does not fix it, run "sudo rm -rf /etc/allscan /var/www/html/allscan /srv/http/allscan" to completely uninstall AllScan, and then run the installer again.
+If you have somehow corrupted your install and running the install/update script does not fix it, run "sudo rm -rf /etc/allscan /var/www/html/allscan /srv/http/allscan 2>/dev/null" to completely uninstall AllScan, and then run the installer again.
 
 If you get a permissions error when trying to Add a Favorite, check that the /var/www/html/allscan and supermon dirs have 775 permissions and www-data group, and that the favorites.ini file exists in one or both directories and has 664 permissions and www-data as the group. These settings should already be that way if your Supermon install is properly working, or it would not be able to edit and save the favorites.ini file. But if not the following commands should correct the permission settings:
 
@@ -120,13 +121,16 @@ If you have any questions email david at allscan.info. Also see [AllScan.info](h
 To contribute to AllScan feel free to send any amount by paypal or venmo to chc_media at yahoo.com. Even $5 does help cover expenses and enable me to spend more time on further development and new features. Thank you for your support, and with helping spread the word about AllScan and ASL.
 
 # Road Map
-As of version 0.65, AllScan implements the main features I originally planned, and works very well for the use case of personal nodes that have one or two primary users and/or a small number of occasional other users. A future version of AllScan will add enhanced support for a larger number of simultaneous web-client users (which will require ASL stats caching so that numerous web-clients would not each be making separate ASL stats requests which would significantly slow down the stats scanning functions). However this is not a common use case and I have not had any requests to support this so it's not a current priority. AllScan will also at some point more fully support nodes with more than one node number eg. allowing the local node to be selected from a select box control, however this has also not yet been requested. Other changes planned:
+As of version 0.65, AllScan implements the main features I originally planned, and works very well for the use case of personal nodes that have one or two primary users and/or a small number of occasional other users. A future version of AllScan will add enhanced support for a larger number of simultaneous web-client users (which will require ASL stats caching so that numerous web-clients would not each be making separate ASL stats requests which would significantly slow down the stats scanning functions). However this is not a common use case and is not a current priority. AllScan will also at some point more fully support nodes with more than one node number eg. allowing the local node to be selected from a select box control. Other changes planned:
 1. Enhanced Favorites management features, saving favorites in AllScan DB rather than in other folders, editing favorites text, reordering table. Enable auto update check such that AllScan will check once every few days to see if a new version is available and highlight the Update link if so
 2. Enhanced stats features, caching of stats data to AllScan DB
-3. Other features that are highly requested or that seem like a good fit
+3. Other features that are highly requested or that seem like a good idea
 
 # Release Notes
-**v0.84 2024-10-15**<br>
+**v0.86 2024-10-15**<br>
+Simplify entry of node Call Sign, Location and Title configs for installs that do not have a Supermon global.inc file from which these can be imported. In this case a form is now shown where these settings can be easily entered.
+
+**v0.85 2024-10-15**<br>
 Add Favorites File Management functions to the Cfgs Tab, and a Favorites File Select control to the main page. These functions support viewing, downloading, copying, deleting, renaming and uploading favorites files, and enable simple switching between them.
 
 **v0.83 2024-09-12**<br>
@@ -227,14 +231,14 @@ Q: How can the Admin user password be reset?<br>
 A: If you have only one admin user defined (Superuser permission level) and lose the password, the only way to reset it is to delete the AllScan database file. This can be done by executing "sudo rm /etc/allscan/allscan.db" by SSH. This will delete ALL AllScan User accounts and Cfgs.
 
 Q: Will AllScan at some point be able to directly scan nodes ie. by connecting to nodes in the Favorites list and scanning through the list until activity is found?<br>
-A: I had originally intended to implement such a feature but it turns out that it is not needed, and could cause issues. Unlike a radio which can scan any number of memory channels quickly and easily, making connections on AllStar requires IAX connections to be opened, which results in connection announcements on some nodes and systems. I would not want AllScan to be the cause of any annoyance to repeater system admins or users if frequent "Node X Connected" messages were broadcast every time an AllScan user enabled scanning. ASL's excellent statistics database and API enables AllScan to show highly reliable Tx & Rx activity stats without needing to directly connect to any nodes, and this has enabled my original goals for AllScan to be achieved in a simple way that does not result in any extra load being placed on other nodes.<br>
-Also, checking a list of nodes for activity can be done in a more direct way using the Local Monitor function. For example you could set up a 2nd node where you do a permanent Local Monitor connect to all nodes you want to monitor, and then monitor that on a separate frequency or with an IAX/SIP phone/app. You can then monitor the "monitoring" node and if you hear a call, a net or something else interesting then switch to your main node and connect to the active node there. This would be easy to set up. You probably wouldn't want to connect to more than a handful of nodes at a time in Local Monitor mode but it could be a good way to monitor 5 or so nodes simultaneously and not miss any activity. The 2nd node could even be a cloud Linux server with no node hardware needed. Just monitor it through a VOIP phone app such as "Linphone" or "GS Wave" which are excellent free SIP phone apps.
+A: I had originally intended to implement such a feature but it turns out that it is not needed, and could cause issues. Unlike a radio which can scan any number of memory channels quickly and easily, making connections on AllStar requires IAX connections to be opened, which results in connection announcements on some nodes and systems. I would not want AllScan to be the cause of any annoyance to repeater system admins or users if frequent "Node X Connected" messages were broadcast every time a user enabled scanning. ASL's statistics database and API enables AllScan to show reliable Tx & Rx activity stats without needing to directly connect to any nodes, and this has enabled my original goals for AllScan to be achieved in a simple and efficient way.<br>
+Also, checking a list of nodes for activity can be done in a more direct way using the Local Monitor function. For example you could set up a 2nd node where you do a permanent Local Monitor connect to all nodes you want to monitor, and then monitor that on a separate node or with an IAX/SIP phone/app. You can then monitor the "monitoring" node and if you hear a call, a net or something else interesting then switch to your main node and connect to the active node there. You probably wouldn't want to connect to more than a handful of nodes at a time in Local Monitor mode but it could be a good way to monitor 5 or so nodes simultaneously and not miss any activity. The 2nd node could even be a cloud Linux server with no node hardware needed. Just monitor it through a VOIP phone app such as "Linphone".
 
 Q: What is the blinking icon for?<br>
-A: AllScan's blinking 'lighting bolt' icon is a status indicator similar the 'spinny' in supermon or the blinking asterisk ('*') in allmon, which toggles on/off as each Connection Status event message is received from the node (ie. from AllScan's astapi/server.php file who reads status info from a socket connection to Asterisk on the node and then forwards that data every 500mS to AllScan's JavaScript in the browser.) If it stops blinking that means there is a communication issue between the browser and your node.
+A: AllScan's blinking 'lighting bolt' icon toggles on/off as each Connection Status event message is received from the node (ie. from AllScan's astapi/server.php file which reads status info from a socket connection to Asterisk on the node and then forwards that data every 500mS to AllScan's JavaScript in the browser.) If it stops blinking that means there is a communication issue between the browser and your node.
 
 Q: If I ever wanted to uninstall AllScan how can this be done?<br>
-A: To uninstall just delete the allscan folder in the web server root directory (/var/www/html/ on ASL or /srv/http/ on HamVOIP). cd to that folder, then execute "sudo rm -rf allscan" to delete the AllScan folder. AllScan also keeps a database file in /etc/allscan/ that can be deleted by executing "sudo rm -rf /etc/allscan".
+A: To uninstall, delete the allscan folder in the web server root directory (/var/www/html/ on ASL or /srv/http/ on HamVOIP). cd to that folder, then execute "sudo rm -rf allscan" to delete the AllScan folder. AllScan also keeps a database file in /etc/allscan/ that can be deleted by executing "sudo rm -rf /etc/allscan".
 
 # Thanks
-Thanks to all ASL Developers. Thanks to KK6QMS, N6ATC, KJ7T, WA3WCO, and K5LK for help with Beta testing. And thanks to all repeater owners who have integrated AllStar.
+Thanks to all ASL Developers, to the numerous hams who have helped with Beta testing, and to all repeater owners who have integrated AllStar.
