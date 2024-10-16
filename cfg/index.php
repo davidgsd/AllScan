@@ -72,18 +72,16 @@ if(adminUser()) {
 	} else {
 		h2("Copy/Backup Favorites Files");
 
-		p('To enable Favorites Groups save a copy of an existing file or upload a new favorites file. Favorites files can be stored either in the AllScan web folder or in the global /etc/allscan/ folder. If more than one Favorites file is found in these locations or other configured <i>Favorites.ini Locations</i> a select box is shown on the main page enabling the active favorites file to be switched.', 'w900', false);
-
 		$view->showFavsCopyForm($files);
 
-		p('If you have only one instance of AllScan installed either destination folder can be used. If you have multiple instances installed (for different nodes), files in the global folder can be used by all instances.', 'w900', false);
+		p('To enable Favorites Groups, copy an existing file or upload a new favorites file. Favorites files can be stored in the AllScan web folder or in /etc/allscan/. If more than one Favorites file is found in these or other configured locations a select control is shown on the main page enabling easy switching between files. If you have multiple AllScan instances installed (eg. for different node #s) files in /etc/allscan/ can be used by all instances.', 'w800', false);
 	}
 
 	h2("Upload Favorites File");
 
-	p('Favorites files must be named in the format favorites[-*].ini, ie. with an optional suffix before the .ini extension. Example valid filenames: favorites.ini, favorites-WestCoast.ini, favorites-UK.ini, favorites-nets.ini, etc.', 'w900', false);
-
 	$view->showFavsUploadForm();
+
+	p('Favorites file names must be in the format favorites[-*].ini, ie. with an optional suffix before the .ini extension. Example valid filenames: favorites.ini, favorites-WestCoast.ini, favorites-UK.ini, favorites-nets.ini, etc.', 'w800', false);
 }
 
 asExit();

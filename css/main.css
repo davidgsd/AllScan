@@ -141,8 +141,8 @@ max-width:80%;
 margin:0.5em auto;
 font-size:13px;
 }
-p.w900 {
-max-width:900px;
+p.w800 {
+max-width:800px;
 }
 ul, ol {
 display:inline-block;
