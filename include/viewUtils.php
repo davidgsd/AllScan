@@ -2,13 +2,6 @@
 // viewUtils.php
 // Author: David Gleason - AllScan.info
 require_once('commonForms.php');
-define('CREATE_FAVORITESINI_FILE', 'Create Favorites.ini File');
-
-function showFavsIniForm() {
-	echo '<form id="nodeForm" method="post" action="/allscan/"><fieldset>' . NL
-		.'<input type=submit name="Submit" value="' . CREATE_FAVORITESINI_FILE . '">' . NL
-		.'</fieldset></form>' . BR;
-}
 
 function showConnStatusTable() {
 	global $node, $title2;
@@ -28,10 +21,11 @@ function showConnStatusTable() {
 }
 
 function showNodeCtrlForm() {
-	global $node, $remNode, $gCfg;
+	global $node, $remNode, $favsFile, $gCfg;
 	echo '<form id="nodeForm" method="post" action="/allscan/"><fieldset>
 <input type=hidden id="localnode" name="localnode" value="' . $node . '">
 <input type=hidden id="conncnt" name="conncnt" value="0">
+<input type=hidden id="favsfile" name="favsfile" value="' . $favsFile .'">
 <label for="node">Node#</label><input type="text" inputmode="tel" pattern="[0-9a-dA-D\*#]*"
 	id="node" name="node" maxlength="10" value="' . $remNode . '">
 <input type=submit name="Submit" value="Add Favorite" class="small">
@@ -61,8 +55,8 @@ function showFooterLinks() {
 		'AllScan FB' => 'https://www.facebook.com/groups/allscan',
 		'eHam.net' => 'https://www.eham.net/'];
 	foreach($links as $title => $url)
-		$out[] = $html->a($url, null, $title, null, '_blank');
-	$sep = ENSP . '|' . ENSP;
+		$out[] = $html->a($url, null, $title, null, '_blank') . NL;
+	$sep = ' | ';
 	echo $html->div(implode($sep, $out), 'm5');
 }
 

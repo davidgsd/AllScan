@@ -43,18 +43,26 @@ if(!empty($nodes) && !empty($hosts)) {
 	if($astdb !== false)
 		$onLoad = " onLoad=\"asInit('server.php?nodes=$node')\"";
 
-	// Determine favorites.ini file location
-	foreach($gCfg[favsIniLoc] as $favsFile) {
-		if(file_exists($favsFile))
-			break;
-		unset($favsFile);
-	}
-
 	// Handle form submits
 	$parms = getRequestParms();
 	if(isset($_POST['Submit']) && $astdb !== false) {
+		if(isset($parms['favsfile']) && $parms['favsfile'])
+			$favsFile = $parms['favsfile'];
 		processForm($parms, $msg);
+		// Reset parms after processing post submits
 		unset($_POST, $parms);
+		if(isset($favsFile))
+			$parms = ['favsfile' => $favsFile];
+	}
+
+	// Determine favorites.ini file location(s)
+	$favsFile = '';
+	$favsFiles = findFavsFiles($favsFile);
+	if(!empty($favsFiles)) {
+		if(isset($parms['favsfile']) && in_array($parms['favsfile'], $favsFiles))
+			$favsFile = $parms['favsfile'];
+	} else {
+		unset($favsFile);
 	}
 }
 
@@ -196,6 +204,9 @@ if(empty($favList)) {
 	echo $out;
 }
 
+// Show Favorites File select control
+showFavsSelect($favsFiles, $favsFile);
+
 // Status Messages div
 echo "<p id=\"scanmsg\"></p>";
 $msg = implode(BR, $msg);
@@ -204,7 +215,7 @@ echo "<div id=\"statmsg\">$msg</div>" . BR;
 $sep = ENSP . '|' . ENSP;
 // Show CPU Temp if available
 if(($ct = cpuTemp()))
-	echo '<span id="cputemp">' . $ct . '</span>' . $sep;
+	echo '<span id="cputemp">' . $ct . '</span>' . $sep . NL;
 
 // Show function buttons and Links
 echo $html->linkButton('Node Stats', "http://stats.allstarlink.org/stats/$node", 'small', null, null, 'stats');

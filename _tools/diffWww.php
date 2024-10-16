@@ -19,10 +19,10 @@ if($webRoot === $pwd) {
 	exit(1);
 }
 
-diffFiles($excludes);
+diffFiles();
 
 //--- functions ---
-function diffFiles($excludes) {
+function diffFiles() {
 	global $webRoot;
 	echo "Diff'ing development files vs. www dir...\n\n";
 	$exclude = '-X _tools/excludeFiles.txt';

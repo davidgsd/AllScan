@@ -2,7 +2,7 @@ const astApiDir='/allscan/astapi/';
 const statsDir='/allscan/stats/';
 const apiDir='/allscan/api/';
 var source, hbcnt=0, pgTitle, favsCnt=0, c0;
-var rldRetries=0, rldTmr, evtSrcRldTmr, evtSrcUrl;
+var rldRetries=0, rldTmr, evtSrcRldTmr, evtSrcUrl, lastEvtTime;
 var statsTmr, statsState=0, statsIdx=0, statsReqCnt=0;
 var xh, xha, xhs, xhr;
 var txCnt=[], txTim=[], txTT=[], txAvg=[];
@@ -300,6 +300,7 @@ function handleNodesEvent(event) {
 	// Clear rdlTmr if set
 	if(evtSrcRldTmr !== undefined)
 		clearTimeout(evtSrcRldTmr);
+	lastEvtTime = unixtime();
 	var tabledata = JSON.parse(event.data);
 	for(var localNode in tabledata) {
 		var tablehtml = '';
@@ -357,8 +358,6 @@ function handleNodesEvent(event) {
 						tablehtml += '<td>' + rowdata.ip + '</td>';
 					}
 					tablehtml += '<td id="lkey' + row + '">' + rowdata.last_keyed + '</td>';
-					// Link col is redundant. Connected col value makes clear if Link is Connecting/Established
-					// tablehtml += '<td>' + rowdata.link + '</td>';
 					tablehtml += '<td>' + rowdata.direction + '</td>';
 					tablehtml += '<td id="elap' + row +'">' +
 						rowdata.elapsed + '</td>';
@@ -416,6 +415,9 @@ function handleNodetimesEvent(event) {
 	// Update CPU Temp once per ~minute
 	if(cputemp && ++hbcnt % 120 == 0)
 		xhttpApiInit('f=getCpuTemp');
+	// If no recent evtSrc data try restarting
+	if(lastEvtTime && unixtime() > lastEvtTime + 15)
+		evtSrcRldTmr = setTimeout(initEventSrc, 500);
 }
 
 function xhttpApiInit(parms) {

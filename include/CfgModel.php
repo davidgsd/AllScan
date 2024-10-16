@@ -17,7 +17,7 @@ define('autodisc_def', 6);
 // Global Cfgs Default Values
 $gCfgDef = [
 	publicPermission => PERMISSION_READ_ONLY,
-	favsIniLoc => ['favorites.ini', '../supermon/favorites.ini'],
+	favsIniLoc => ['favorites.ini', '../supermon/favorites.ini', '/etc/allscan/favorites.ini'],
 	call => '',
 	location => '',
 	title => '',

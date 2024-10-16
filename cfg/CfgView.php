@@ -3,6 +3,11 @@
 // Author: David Gleason - AllScan.info
 define('EDIT_CFG', 'Edit Cfg');
 define('DEFAULT_CFG', 'Set to Default Value');
+define('DOWNLOAD_FILE', 'Download');
+define('UPLOAD_FILE', 'Upload');
+define('COPY_FILE', 'Copy File');
+define('DELETE_FILE', 'Delete');
+define('CONFIRM_DELETE_FILE', 'Confirm Delete');
 
 class CfgView {
 
@@ -35,8 +40,24 @@ function showCfgs($cfgs) {
 		$out .= $html->tableRow($row, null);
 	}
 	$out .= $html->tableClose();
-	//$out = $html->div($out, 'center');
-	echo $out . BR;
+	echo $out;
+}
+
+function showFiles($files, $activeFile) {
+	global $html, $wwwroot, $asdir;
+	$hdrCols = ['File Name', 'Size (Bytes)', 'Last Modified', 'Options'];
+	$out = $html->tableOpen($hdrCols, null, 'favs', null);
+	foreach($files as $f) {
+		$parms = ['Submit'=>DOWNLOAD_FILE, 'file'=>$f->name];
+		$info = ($f->name === $activeFile) ? ' [Default]' : '';
+		$dl = $html->a(getScriptName(), $parms, $f->name);
+		$parms = ['Submit'=>DELETE_FILE, 'file'=>$f->name];
+		$del = $html->a(getScriptName(), $parms, 'Delete');
+		$row = [$dl . $info, $f->size, $f->mtime, $del];
+		$out .= $html->tableRow($row, null);
+	}
+	$out .= $html->tableClose();
+	echo $out;
 }
 
 function showForms($cfg) {
@@ -72,7 +93,46 @@ function showForms($cfg) {
 		$form->fields = ['Cfg Name' => ['select'=> ['cfg_id', $list]]];
 		echo htmlForm($form);
 	}
-	return;
+}
+
+function showFavsCopyForm($files) {
+	global $html;
+	$form = new stdClass();
+	// Show Edit form
+	$form->fieldsetLegend = COPY_FILE;
+	$form->submit = COPY_FILE;
+	//$localdir = $wwwroot . '/' . $asdir . '/';
+	$fl = [];
+	foreach($files as $f)
+		$fl[$f] = $f;
+	$dl = [];
+	$dirs = [asDir(), asDir(false)];
+	foreach($dirs as $d)
+		$dl[$d] = $d;
+	$form->fields = [
+		'File to Copy' => ['select' => ['file', $fl]],
+		'Destination Dir' => ['select' => ['dir', $dl]],
+		'Name Suffix (optional)' => ['text' => ['suffix']]
+	];
+	$form->id = 'copyFileForm';
+	//$form->hiddenFields['cfg_id'] = $id;
+	echo htmlForm($form) . BR;
+}
+
+function showFavsUploadForm() {
+	global $html;
+	$form = new stdClass();
+	$form->fieldsetLegend = 'Upload File';
+	$form->submit = UPLOAD_FILE;
+	$dl = [];
+	$dirs = [asDir(), asDir(false)];
+	foreach($dirs as $d)
+		$dl[$d] = $d;
+	$form->fields = [
+		'Favorites File' => ['f' => ['fileupload']],
+		'Destination Dir' => ['select' => ['dir', $dl]],
+	];
+	echo htmlForm($form) . BR;
 }
 
 }

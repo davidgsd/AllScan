@@ -126,6 +126,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good fit
 
 # Release Notes
+**v0.84 2024-10-15**<br>
+Add Favorites File Management functions to the Cfgs Tab, and a Favorites File Select control to the main page. These functions support viewing, downloading, copying, deleting, renaming and uploading favorites files, and enable simple switching between them.
+
 **v0.83 2024-09-12**<br>
 Improve detection of enabled ASL channel driver and RxAudioStats support.
 

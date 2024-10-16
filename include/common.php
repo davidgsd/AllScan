@@ -1,11 +1,12 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.83";
+$AllScanVersion = "v0.84";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
 require_once('viewUtils.php');
+require_once('favsUtils.php');
 require_once('dbUtils.php');
 require_once('DB.php');
 require_once('UserModel.php');
@@ -86,9 +87,9 @@ function pageInit($onload='', $showHdrLinks=true) {
 	$lnk[] = $html->a(getScriptName(), null, $title, 'title');
 	if($showHdrLinks && $userCnt)
 		$lnk = array_merge($lnk, getHdrLinks());
-	$hdr[] = implode(' | ', $lnk);
+	$hdr[] = implode(" | \n", $lnk);
 	$hdr[] = "<span id=\"hb\"><img src=\"$urlbase/AllScan.png\" width=16 height=16 alt=\"*\"></span>";
-	echo "<body$onload>" . NL . '<header>' . NL . implode(ENSP, $hdr) . '</header>' . NL . BR;
+	echo "<body$onload>" . NL . '<header>' . NL . implode(ENSP . NL, $hdr) . '</header>' . NL . BR;
 }
 
 function getHdrLinks() {
@@ -409,6 +410,12 @@ function parseIntList($s) {
 	return $m[0];
 }
 
+function ok($s) {
+	global $html;
+	if(isset($html))
+		return $html->span($s, 'ok') . BR;
+	return "$s\n";
+}
 function error($s) {
 	global $html;
 	if(isset($html))
@@ -602,12 +609,29 @@ function outputCsvHeader($filename) {
 	flush();
 }
 
+function outputTxtHeader($filename) {
+	// Escape double-quotes. Seems to be the only thing that works for all browsers
+	$filename = str_replace('"', "''", $filename);
+	header('Expires: 0');
+	header('Cache-Control: private, must-revalidate, post-check=60, pre-check=120');
+	header('Content-Description: File Transfer');
+	header('Content-Disposition: attachment; filename="' . $filename . '"');
+	header("Content-type: text/plain");
+	ob_clean();
+	flush();
+}
+
 // path examples: '/' for allscan root dir, 'user/' for login page, or 'test/x.php' (no leading slash)
 function redirect($path='') {
 	global $asdir;
 	$loc = $asdir ? "/$asdir/$path" : "/$path";
 	header("Location: $loc");
 	exit();
+}
+
+function asDir($local=true) {
+	global $wwwroot, $asdir;
+	return $local ? ($wwwroot . '/' . $asdir . '/') : '/etc/allscan/';
 }
 
 function asExit($errMsg=null) {

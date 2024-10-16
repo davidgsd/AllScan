@@ -337,7 +337,7 @@ function tableOpen($hdrCols=null, $caption=null, $class=null, $escFunc=0, $id=nu
 function tableHeader($cols, $escFunc=0) {
 	$out = "<thead><tr>";
 	foreach($cols as $col)
-		$out .= "<th>" . $this->escape($col, $escFunc) . "</th>";
+		$out .= "<th>" . $this->escape($col, $escFunc) . "</th>\n";
 	$out .= "</tr></thead>\n";
 	return $out;
 }
@@ -362,9 +362,9 @@ function tableRow($cols, $escFunc=0, $colWidth=null, $useTh=false, $cellAttr=nul
 			$width = '';
 		$attr = ($cellAttr && array_key_exists($n, $cellAttr)) ? (' ' . $cellAttr[$n]) : '';
 		if($escFunc === null)
-			$out .= "<$cellTag$width$attr>$col</$cellTag>";
+			$out .= "<$cellTag$width$attr>$col</$cellTag>\n";
 		else
-			$out .= "<$cellTag$width$attr>" . $this->escape($col, $escFunc) . "</$cellTag>";
+			$out .= "<$cellTag$width$attr>" . $this->escape($col, $escFunc) . "</$cellTag>\n";
 	}
 	$out .= "</tr>\n";
 	return $out;

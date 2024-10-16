@@ -29,6 +29,8 @@ color:#fff;
 margin:1px 4px;
 padding:2px 4px;
 border:2px;
+}
+input[type=text], input[type=number], input[type=password], textarea, fieldset select {
 width:95%;
 }
 input[type=button], input[type=submit], input::file-selector-button {
@@ -138,6 +140,9 @@ p {
 max-width:80%;
 margin:0.5em auto;
 font-size:13px;
+}
+p.w900 {
+max-width:900px;
 }
 ul, ol {
 display:inline-block;

@@ -92,40 +92,6 @@ foreach($nodes as $node) {
 	}
 }
 
-function checkRxStatsSupport($ami, $fp) {
-	global $chandriver, $amicd, $rxstatssupported;
-	$msg = ["\"Thou Shalt Not Clip The ADC\" - The <i>1st Law</i> of AllStar"];
-	$res = $ami->command($fp, "susb tune menu-support Y");
-	if(strpos($res, 'RxAudioStats') === 0) {
-		$rxstatssupported = true;
-		$chandriver = 'Simpleusb';
-		$amicd = 'susb';
-	}
-	if(!$rxstatssupported) {
-		$res = $ami->command($fp, "radio tune menu-support Y");
-		if(strpos($res, 'RxAudioStats') === 0) {
-			$rxstatssupported = true;
-			$chandriver = 'Usbradio';
-			$amicd = 'radio';
-		}
-	}
-	if(!$rxstatssupported) {
-		$msg[] = "ASL version does not support RxAudioStats";
-	} else {
-		$msg[] = "RxAudioStats supported, $chandriver driver";
-		$res = $ami->command($fp, "$amicd show settings");
-		if(preg_match('/Card is ([-0-9]{1,2})/', $res, $m) == 1 && $m[1] >= 0) {
-			$msg[] = "Channel driver settings:";
-			$ra = explode(NL, $res);
-			foreach($ra as $m) {
-				if(strposa($m, ['Output ', 'Rx ', 'Tx ']))
-					$msg[] = $m;
-			}
-		}
-	}
-	return $msg;
-}
-
 // Main loop - build $data array and output as a json object
 $current = [];
 $saved = [];
@@ -181,6 +147,40 @@ while(1) {
 fwrite($fp, "ACTION: Logoff\r\n\r\n");
 
 exit();
+
+function checkRxStatsSupport($ami, $fp) {
+	global $chandriver, $amicd, $rxstatssupported;
+	$msg = ["\"Thou Shalt Not Clip The ADC\" - The <i>1st Law</i> of AllStar"];
+	$res = $ami->command($fp, "susb tune menu-support Y");
+	if(strpos($res, 'RxAudioStats') === 0) {
+		$rxstatssupported = true;
+		$chandriver = 'Simpleusb';
+		$amicd = 'susb';
+	}
+	if(!$rxstatssupported) {
+		$res = $ami->command($fp, "radio tune menu-support Y");
+		if(strpos($res, 'RxAudioStats') === 0) {
+			$rxstatssupported = true;
+			$chandriver = 'Usbradio';
+			$amicd = 'radio';
+		}
+	}
+	if(!$rxstatssupported) {
+		$msg[] = "ASL version does not support RxAudioStats";
+	} else {
+		$msg[] = "RxAudioStats supported, $chandriver driver";
+		$res = $ami->command($fp, "$amicd show settings");
+		if(preg_match('/Card is ([-0-9]{1,2})/', $res, $m) == 1 && $m[1] >= 0) {
+			$msg[] = "Channel driver settings:";
+			$ra = explode(NL, $res);
+			foreach($ra as $m) {
+				if(strposa($m, ['Output ', 'Rx ', 'Tx ']))
+					$msg[] = $m;
+			}
+		}
+	}
+	return $msg;
+}
 
 // Get status for this $node
 function getNode($fp, $node) {

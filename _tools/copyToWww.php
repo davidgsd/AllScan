@@ -6,7 +6,7 @@ if(isset($_SERVER['REMOTE_ADDR']) || isset($_SERVER['HTTP_HOST'])) {
 }
 $webRoot = '/var/www/html/allscan/';
 // Copy files to webroot, with exception of the following dirs/files:
-$excludes = array('.git', '.gitignore', 'README*', '_tools');
+$excludes = array('.git', '.gitignore');
 
 // Note: pwd starts in dir where script is located, not where called from
 // Do below if might be called from somewhere else
@@ -29,7 +29,7 @@ function copyFiles($excludes, $test=false, $toWww=true) {
 	}
 	$opts = $test ? '--list-only' : '';
 	$dirs = $toWww ? '. ' . $webRoot : $webRoot . ' .';
-	$cmd = "rsync -avvC $exclude $opts $dirs";
+	$cmd = "rsync -avC $exclude $opts $dirs";
 	passthru($cmd);
 	echo "Done\n";
 }

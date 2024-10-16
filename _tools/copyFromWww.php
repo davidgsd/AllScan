@@ -6,7 +6,7 @@ if(isset($_SERVER['REMOTE_ADDR']) || isset($_SERVER['HTTP_HOST'])) {
 }
 $webRoot = '/var/www/html/allscan/';
 // Look in web folder and copy all files to local dir, with exception of the following dirs:
-$excludes = array('test', 'old', '*.tmp', '*.bak', 'log.txt');
+$excludes = ['test', 'old', '*.tmp', '*.bak', 'log.txt'];
 // Note: pwd starts in dir where script is located, not where called from
 // Do below if might be called from somewhere else
 $pwd = getcwd();

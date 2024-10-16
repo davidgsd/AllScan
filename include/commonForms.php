@@ -201,7 +201,7 @@ function confirmForm($label, $text, $parms=null, $url=null, $password=false, $su
 	if(!$url)
 		$url = getScriptName();
 	// Open form
-	$out = $html->formOpen($url, $form->method, $form->id);
+	$out = $html->formOpen($url, $form->method);
 	if($label)
 		$out .= $html->fieldsetOpen($label);
 	// Text
