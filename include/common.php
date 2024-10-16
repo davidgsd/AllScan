@@ -26,8 +26,8 @@ umask(0002);
 	wwwroot/allscan/		/etc/allscan/allscan.db			(default)
 	wwwroot/allscan-test/	/etc/allscan/allscan-test.db
 	wwwroot/				/etc/allscan/.db
-	If you copy/move/backup an allscan install, eg. `cp -a allscan allscan-bak`, you should also copy the DB file:
-	`cp /etc/allscan/allscan.db /etc/allscan/allscan-bak.db`
+	If you copy/move/backup an allscan install, eg. "cp -a allscan allscan-bak", you should also copy the DB file:
+	"cp /etc/allscan/allscan.db /etc/allscan/allscan-bak.db"
 */
 // File System Cfgs - initialized in asInit() before dbInit() can be called
 $wwwroot = '';	// eg. var/www/html

@@ -129,17 +129,14 @@ if($dlfiles) {
 	if(isset($bak) && is_dir($bak)) {
 		msg("Checking for .ini files in $bak/...");
 		execCmd("cp -n $bak/*.ini $asdir/");
-		execCmd("chmod 664 $asdir/*.ini");
-		execCmd("chgrp $group $asdir/*.ini");
 	}
 }
 
-msg("Verifying $asdir dir has 0775 permissions and $group group");
-if(!chmod($asdir, 0775))
-	msg("ERROR: chmod($asdir, 0775) failed");
-
-if(!chgrp($asdir, $group))
-	msg("ERROR: chgrp($asdir, $group) failed");
+msg("Verifying $asdir dir has $group group writable permissions");
+execCmd("chmod 775 $asdir");
+execCmd("chgrp $group $asdir");
+execCmd("chmod 664 $asdir/*.ini");
+execCmd("chgrp $group $asdir/*.ini");
 
 checkDbDir();
 

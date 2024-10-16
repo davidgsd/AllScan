@@ -13,7 +13,8 @@ function showFavsSelect($files, $activeFile) {
 }
 
 function showFavsIniForm() {
-	echo '<form id="nodeForm" method="post" action="/allscan/"><fieldset>' . NL
+	global $asdir;
+	echo '<form id="nodeForm" method="post" action="/' . $asdir . '/"><fieldset>' . NL
 		.'<input type=submit name="Submit" value="' . CREATE_FAVORITESINI_FILE . '">' . NL
 		.'</fieldset></form>' . BR;
 }
@@ -40,7 +41,7 @@ function validateFavsFile($file, &$msg, $checkExists=true) {
 	return true;
 }
 
-// Determine favorites file location(s). Show all files defined in gCfg[favsIniLoc], and any files
+// Determine favorites file location(s). Check gCfg[favsIniLoc] locations and any files
 // in the local dir or /etc/allscan/ dir named favorites*.ini
 function findFavsFiles(&$activeFile) {
 	global $gCfg;
