@@ -1,6 +1,6 @@
-const astApiDir='/allscan/astapi/';
-const statsDir='/allscan/stats/';
-const apiDir='/allscan/api/';
+const astApiDir='astapi/';
+const statsDir='stats/';
+const apiDir='api/';
 var source, hbcnt=0, pgTitle, favsCnt=0, c0;
 var rldRetries=0, rldTmr, evtSrcRldTmr, evtSrcUrl;
 var statsTmr, statsState=0, statsIdx=0, statsReqCnt=0;
