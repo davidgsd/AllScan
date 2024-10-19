@@ -46,7 +46,7 @@ The AllScan Install/Update script automatically checks system configuration deta
 
 Log into your node by SSH and run the following commands:
 
-**ASL3 nodes**: Confirm that you have PHP and unzip installed by running
+**ASL3 nodes**: Confirm that you have PHP and unzip installed by running<br>
 	<code>sudo apt update; sudo apt install php unzip -y</code>
 
 	cd ~
