@@ -90,7 +90,7 @@ h2('Favorites');
 // Read in favorites.ini
 $favs = [];
 $favcmds = [];
-if(!isset($favsFile)) {
+if(!isset($favsFile) || !$favsFile) {
 	msg('favorites.ini not found. Click below to create ' . $gCfg[favsIniLoc][0]);
 	showFavsIniForm();
 } else {

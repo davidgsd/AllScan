@@ -11,8 +11,6 @@ See [screenshot.png](https://github.com/davidgsd/AllScan/blob/main/screenshot.pn
 
 These features finally give AllStar nodes similar memory management and scan capabilities that analog radios have had for decades. AllScan is mobile-friendly and optimized for ease of use on both small and large screens. AllScan follows the latest web development standards, with PHP, JavaScript, HTML, and CSS cleanly partitioned, runs on both ASL and HamVOIP, and is simple to install, configure, and update.
 
-AllScan supports multiple locations of the favorites.ini file. If no favorites.ini file is found AllScan will ask if you'd like to create the file and if so will copy the docs/favorites.ini.sample file to ./favorites.ini, which has a list of well-known nodes to get you started.
-
 Prior to installing AllScan it is recommended that you have a working install of Supermon or Allmon. AllScan can automatically read their config files. Currently AllScan supports favorites.ini entries that refer to connecting to nodes eg. 'cmd[] = "rpt cmd %node% ilink 3 [node#]"' but may also support other types of commands in the future.
 
 As AllScan receives data from the ASL stats server it updates the Favorites Table rows with color coded details showing the following:
@@ -41,8 +39,6 @@ Multiple copies of AllScan can be installed on one node (server) if desired, eac
 # Pre-Install Notes
 Ideally you should be using ASL3 and you should have Allmon or Supermon properly configured and working. Confirm you are able to properly execute various functions in Allmon or Supermon such as connecting and disconnecting remote nodes. AllScan works great on HamVOIP and older ASL versions but ASL3 is highly recommended as it has numerous major improvements, and also supports x64 platforms (such as Dell Wyse 3040s which work much better than RPi's yet cost half as much).
 
-IMPORTANT: Confirm that you have PHP and unzip installed before running the install commands in the next section. This can be done by running "sudo apt update; sudo apt install php unzip -y" on ASL, or "sudo pacman update; sudo pacman install php unzip -y" on HV nodes.
-
 If you have Supermon installed AllScan will use the favorites.ini file in the supermon directory. See the Supermon groups.io page for details on how to install Supermon. If you use Supermon2 instead of Supermon or want to put your favorites.ini file in some other folder, the favorites.ini search location(s) can be set on the AllScan Cfgs Page.
 
 # Automatic Install / Update
@@ -50,8 +46,10 @@ The AllScan Install/Update script automatically checks system configuration deta
 
 Log into your node by SSH and run the following commands:
 
+**ASL3 nodes**: Confirm that you have PHP and unzip installed by running
+	<code>sudo apt update; sudo apt install php unzip -y</code>
+
 	cd ~
-	sudo rm AllScanInstallUpdate.php 2>/dev/null
 	wget 'https://raw.githubusercontent.com/davidgsd/AllScan/main/AllScanInstallUpdate.php'
 	chmod 755 AllScanInstallUpdate.php
 	sudo ./AllScanInstallUpdate.php
@@ -127,6 +125,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good idea
 
 # Release Notes
+**v0.87 2024-10-18**<br>
+Fix bug where on new installs on nodes with no existing favorites files the main page would not fully load. Other minor optimizations.
+
 **v0.86 2024-10-15**<br>
 Simplify entry of node Call Sign, Location and Title configs for installs that do not have a Supermon global.inc file from which these can be imported. In this case a form is now shown where these settings can be easily entered.
 

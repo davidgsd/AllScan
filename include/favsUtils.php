@@ -78,5 +78,7 @@ function findFavsFiles(&$activeFile) {
 		if(validateFavsFile($f, $dbgmsg))
 			$vfiles[] = $f;
 	}
+	if(!$activeFile && count($vfiles))
+		$activeFile = $vfiles[0];
 	return $vfiles;
 }
