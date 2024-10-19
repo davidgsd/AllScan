@@ -74,7 +74,7 @@ if(adminUser()) {
 
 		$view->showFavsCopyForm($files);
 
-		p('The Favorites file select control on the main page enables easy switching between files, supporting grouping of favorites by location, type, interests, etc. To create a new favorites file, copy an existing file or upload a new file. Favorites files can be stored in the AllScan web folder or in /etc/allscan/. If you have multiple AllScan instances installed (eg. for different node #s) files in /etc/allscan/ can be used by all instances.', 'w800', false);
+		p('The Favorites file select control on the main page enables easy switching between files, supporting grouping of favorites by location, type, interests, etc. A new favorites file can be created by copying and then editing an existing file, or uploading a new file. Favorites files can be stored in the AllScan web folder or in /etc/allscan/. If you have multiple AllScan instances installed (eg. for different node #s) files in /etc/allscan/ can be used by all instances.', 'w800', false);
 	}
 
 	h2("Upload Favorites File");
