@@ -25,7 +25,7 @@ if(!readOk())
 $msg = [];
 $parms = getRequestParms();
 // Ignore Add/Edit requests if not Admin user
-if(isset($parms['Submit']) && adminUser()) {
+if(isset($parms['Submit']) && adminUser() && $parms['Submit'] !== CANCEL) {
 	$formvars = ['cfg_id', 'val', 'file', 'dir', 'suffix', 'confirm'];
 	$cfg = processForm($parms['Submit'], arrayToObj($parms, $formvars), $msg);
 }
@@ -74,7 +74,7 @@ if(adminUser()) {
 
 		$view->showFavsCopyForm($files);
 
-		p('To enable Favorites Groups, copy an existing file or upload a new favorites file. Favorites files can be stored in the AllScan web folder or in /etc/allscan/. If more than one Favorites file is found in these or other configured locations a select control is shown on the main page enabling easy switching between files. If you have multiple AllScan instances installed (eg. for different node #s) files in /etc/allscan/ can be used by all instances.', 'w800', false);
+		p('The Favorites file select control on the main page enables easy switching between files, supporting grouping of favorites by location, type, interests, etc. To create a new favorites file, copy an existing file or upload a new file. Favorites files can be stored in the AllScan web folder or in /etc/allscan/. If you have multiple AllScan instances installed (eg. for different node #s) files in /etc/allscan/ can be used by all instances.', 'w800', false);
 	}
 
 	h2("Upload Favorites File");
