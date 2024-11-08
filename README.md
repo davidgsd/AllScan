@@ -60,7 +60,7 @@ Now open a browser and go to your node's IP address followed by /allscan/, eg. `
 
 If you did a new install AllScan will prompt you to create an admin account. Be sure to do this right away. You can then configure the permission settings for AllScan. These default to Read-Only for public (not logged-in) users. This setting can be changed on the "Cfgs" page.
 
-If you did an update, **force a browser reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load the updated JavaScript and CSS files.
+If you did an update, **force a browser reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load any updated JavaScript and CSS files.
 
 NOTES for HamVOIP only:
 1. You may need to uncomment/add the following lines in /etc/php/php.ini (make sure they do not have a ';' in front)<br>
@@ -123,7 +123,7 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 
 # Release Notes
 **v0.88 2024-11-07**<br>
-Enable reading of AMI cfgs from rpt.conf and manager.conf if not found in allmon.ini search locations.
+Enable reading AMI cfgs from rpt.conf and manager.conf if not found in .ini search locations.
 
 **v0.87 2024-10-18**<br>
 Fix bug where on new installs on nodes with no existing favorites files the main page would not fully load. Other minor optimizations.
@@ -142,12 +142,6 @@ Show additional messages in the log window at startup including which ASL channe
 
 **v0.81 2024-08-26**<br>
 Updates to AMI parser to auto-detect Asterisk version and support differences in some commands in ASL2/3. Restart Asterisk button now works with ASL3. Display ASL version in messages window at startup. Fix issue where in ASL3 after Asterisk restart AMI stats error messages could repeat indefinitely, in this event AllScan will now reload. Update default favorites.ini file. Fix some php log warning messages.
-
-**v0.78 2024-08-11**<br>
-Update install script for ASL3 to make a readable copy of the allmon3.ini file (outside of the web server root folder with 660 permissions) to ensure AMI credentials are available to AllScan. Note: Be sure you have Allmon3 fully working before installing/updating AllScan. This update is not needed for ASL2/HV nodes.
-
-**v0.77 2024-07-01**<br>
-Updates to support use of ASL3, and Allmon3 .ini file. If you do not have Allmon2 or Supermon installed, AllScan will now also check /etc/allmon3/allmon3.ini for the AMI credentials (note: may be necessary to execute "sudo chmod o+r /etc/allmon3/allmon3.ini" so the file is readable).
 
 **v0.75 2023-11-05**<br>
 Update install/update script with changes from WA3WCO to support additional Linux versions, see github.com/Allan-N/ for details.
@@ -186,7 +180,7 @@ Update handling of JS offline/online and EventSource error events to reinit Even
 Support 'Favorites.ini Locations' Cfgs setting. Optimizations to Favorites Add/Delete functions, support cases of blank or nonexistent files. Minor optimizations. Link Connection Status table node names to ASL stats page. Adjust Favs table highlight colors.
 
 **v0.59 2023-01-23**<br>
-Support old PHP versions (< 7.3.x) setcookie function w/SameSite parameter. Fixes login issues in v0.53-0.58 on nodes with < PHP 7.3. Enable cookie options to be set with cookieSameSiteOpt and cookieUseRootPath variables in include/UserModel.php. Fix issue where allmon.ini search path used by API files could be different than used by main files. Add additional debug log messages during login process.
+Support old PHP versions (< 7.3.x) setcookie function w/SameSite parameter. Fixes login issues in v0.53-0.58 on nodes with < PHP 7.3. Enable cookie options to be set with cookieSameSiteOpt and cookieUseRootPath variables in include/UserModel.php.
 
 **v0.56 2023-01-22**<br>
 Optimizations to Keyed node status detection. ASL stats API data for many nodes shows a 0 stats.keyed value even when the node is in fact keyed. Testing revealed that stats.totalkeyups count and stats.totaltxtime are usually valid however and thus keyed status can be detected from changes in these values between stats requests. Implement moving average calculation of Tx activity level based on stats.keyed or total time keyed divided by elapsed time between the 2 most recent stats requests. The Favorites Table '#' column for each node is now highlighted in a variable shade of red corresponding to the average Tx activity over the past few minutes.
@@ -204,10 +198,10 @@ Add 'Node Stats' button. Implement Call Sign, Location and Node Title Cfgs, thes
 Add user authentication and permissions checks to all API files. Add DTMF command button. Updates and optimizations to installer/updater: Fix issue where updater would exit prior to completing all checks if install was up-to-date, provide more detail about all commands executed, prompt user before executing any apt-get/pacman update/upgrade actions.
 
 **v0.48 2023-01-11**<br>
-Implement User Authentication, User Admin, Login/Logout, User Settings and Cfg Management functions. Major refactoring and additions. AllScan now defaults public (not logged-in) users to Read-Only access. This can be changed to None (no public access), Read/Modify, or to Full (no logins needed). Upon install of this version, AllScan will automatically verify the system configuration, create its Database and necessary tables, and when you first visit the allscan url it will prompt you to create an Admin user account, with detailed usage notes. Add additional log messages to dbUtils checkTables(). Change default order of possible allmon.ini locations to look in ../supermon/ prior to /etc/asterisk/ as supermon may be more likely to have valid AMI credentials. Update install/update script to update & upgrade OS packages (fixes issue seen on RPi4 w/latest ASL 2.0 where failed to find SQLite php extension). JavaScript optimizations.
+Implement User Authentication, User Admin, Login/Logout, User Settings and Cfg Management functions. Major refactoring and additions. AllScan now defaults public (not logged-in) users to Read-Only access. This can be changed to None (no public access), Read/Modify, or to Full (no logins needed). Upon install of this version, AllScan will automatically verify the system configuration, create its Database and necessary tables, and when you first visit the allscan url it will prompt you to create an Admin user account, with detailed usage notes.
 
 **v0.4 2023-01-02**<br>
-Only show CPU Temp if data is available. Reduce favs table CSS cell padding from 4 to 3 px. Update InstallUpdate script to verify favorites.ini file in supermon dir is writeable by web server if dir exists. Readme updates. Minor optimizations. Add API to eventually support stats caching and additional stats features. Update CPU temp data once per minute.
+Only show CPU Temp if data is available. Update InstallUpdate script to verify favorites.ini file in supermon dir is writeable by web server if dir exists. Add API to eventually support stats caching and additional stats features. Update CPU temp data once per minute.
 
 **v0.38 2022-12-24**<br>
 For EchoLink nodes don't link node Name text to ASL stats page. Revise Green/Yellow CPU Temp range threshold from 120 to 130 °F. Support 7-digit (EchoLink) node numbers when reading in favorites.ini. Fix issue where stats request scanning would stop once it reached an EchoLink node number in the Favorites Table. Properly handle case of invalid node number in favorites file. Download ASTDB file if not found in allscan, allmon or supermon locations.
@@ -216,7 +210,7 @@ For EchoLink nodes don't link node Name text to ASL stats page. Revise Green/Yel
 Optimize stats request timing to more quickly populate the favorites table after page load, then go to a reduced request rate over time, to reduce the chance of the ASL stats request limit (30 per minute) being exceeded if there are multiple AllScan web clients on a node. Link Favorites table Names text to the ASL stats page. Add default global.inc file docs/global.inc.sample and give user option to configure and save this to ./global.inc if file was not found in . or ../supermon/. Documentation updates. GUI optimizations. Add default favorites file docs/favorites.ini.sample and give user option to copy this to ./favorites.ini if file was not found in . or ../supermon/.
 
 **v0.3 2022-12-19**<br>
-Implement ASL Stats functions, color coding of Favorites Table and new 'Rx%' and 'LCnt' columns. Enable automatic reading of astdb.txt file from allscan's directory or from ../supermon/ or /var/log/asterisk/. Enable automatic reading of allmon.ini file from allscan's directory or from /etc/asterisk/, ../supermon/, or ../allmon/allmon.ini.php. Show detailed messages on any issues found when trying to read various files.
+Implement ASL Stats functions, color coding of Favorites Table and new 'Rx%' and 'LCnt' columns. Enable automatic reading of astdb.txt file from allscan's directory or from ../supermon/ or /var/log/asterisk/.
 
 **v0.23 2022-12-18**<br>
 Add print of astdb.txt file Last Update times. CSS optimizations. Add Asterisk Restart button. Improvements to log messages. Support Disconnect before Connect feature. This sends AMI an 'rpt cmd ilink 6' (Disconnect all links) command and waits 500mS before executing a Connect request, if 'Disconnect before Connect' checkbox is checked and any nodes are connected.
