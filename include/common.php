@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.87";
+$AllScanVersion = "v0.88";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -38,6 +38,8 @@ $urlbase = '';	// eg. /allscan (prepended to url paths eg. <img src=\"$urlbase/A
 // Title cfgs
 $title = '';
 $title2 = '';
+// AMI cfgs
+$amicfg = new stdClass();
 
 function asInit(&$msg) {
 	global $wwwroot, $asdir, $subdir, $relpath, $urlbase;
@@ -127,63 +129,121 @@ function msg($txt, $class=null) {
 	echo $txt . NL;
 }
 
+function getAmiCfg(&$msg) {
+	global $amicfg;
+	// Read node number(s) from rpt.conf
+	$f = '/etc/asterisk/rpt.conf';
+	if(!file_exists($f))
+		return;
+	$rptc = file($f, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+	if($rptc === false) {
+		$msg[] = "Error reading $f";
+		return;
+	}
+	$nnums = [];
+	foreach($rptc as $s) {
+		if(preg_match('/^\[([0-9]{5,6})\]/', $s, $m) == 1)
+			$nnums[] = $m[1];
+	}
+	if(!count($nnums))
+		return;
+	$msg[] = "rpt.conf node #s: " . implode(', ', $nnums);
+	// Read AMI info from manager.conf
+	$f = '/etc/asterisk/manager.conf';
+	if(!file_exists($f))
+		return;
+	$mcfg = parse_ini_file($f, true);
+	if($mcfg === false) {
+		$msg[] = "Error reading $f";
+		return;
+	}
+	$amicfg->node = $nnums[0];
+	foreach($mcfg as $k => $v) {
+		if($k === 'general' && isset($v['port']) && isset($v['bindaddr'])) {
+			$amicfg->host = $v['bindaddr'];
+			$amicfg->port = $v['port'];
+		} elseif(!isset($amicfg->user) && isset($v['secret'])) {
+			$amicfg->user = $k;
+			$amicfg->pass = $v['secret'];
+		}
+	}
+}
+
 $allmonini = ['allmon.ini', '../supermon/allmon.ini', '/etc/asterisk/allmon.ini.php', '../allmon2/allmon.ini.php',
 				'/etc/allmon3/allmon3.ini', '../supermon2/user_files/allmon.ini'];
-//'/etc/asterisk/manager.conf'
 
 // Get nodes list and host IP(s)
 function getNodeCfg(&$msg, &$hosts) {
-	global $allmonini;
-	// Check for file in our directory and if not found look in the asterisk, supermon and allmon2 dirs
+	global $allmonini, $amicfg;
+	getAmiCfg($msg);
+	// Check for file in our directory and if not found look in $allmonini locations
 	foreach($allmonini as $f) {
 		if(file_exists($f)) {
 			$cfg = parse_ini_file($f, true);
 			if($cfg === false) {
 				$msg[] = "Error parsing $f";
+				continue;
+			}
+			$nodes = [];
+			foreach($cfg as $n => $c) {
+				if(validDbId($n) && isset($c['host']) && $c['host']) {
+					$nodes[] = $n;
+					$hosts[] = $c['host'];
+				}
+			}
+			if(empty($nodes) || empty($hosts)) {
+				$msg[] = "No valid node found in $f";
+				//$msg[] = varDumpClean($cfg, true);
 			} else {
-				$nodes = [];
-				foreach($cfg as $n => $c) {
-					if(validDbId($n) && isset($c['host']) && $c['host']) {
-						$nodes[] = $n;
-						$hosts[] = $c['host'];
-					}
-				}
-				if(empty($nodes) || empty($hosts)) {
-					$msg[] = "No valid node found in $f";
-					$msg[] = varDumpClean($cfg, true);
-				} else {
-					$msg[] = "Node $nodes[0] $hosts[0] read from $f";
-					if(count($nodes) > 1)
-						$msg[] = "(More than one node is defined in $f, AllScan currently uses only the first.)";
-					return $nodes;
-				}
+				$msg[] = "Node $nodes[0] $hosts[0] read from $f";
+				if(count($nodes) > 1)
+					$msg[] = "(More than one node is defined in $f, AllScan currently uses only the first.)";
+				return $nodes;
 			}
 		}
 	}
-	$cwd = getcwd();
-	$msg[] = "No valid [node#] and host definitions found. Check that you have AllMon or Supermon installed or " . BR
-		.	"an allmon.ini.php file in /etc/asterisk/ containing a [YourNode#] line followed by host and passwd defines.";
+	// If got here no node definitions were found in $allmonini locations. Use ASL .conf data
+	if(isset($amicfg->node) && isset($amicfg->host) && isset($amicfg->port) && isset($amicfg->user)) {
+		$nodes[] = $amicfg->node;
+		$hosts[] = $amicfg->host;
+		$msg[] = "Node $nodes[0] $hosts[0] read from ASL cfgs";
+		return $nodes;
+	}
+	$msg[] = "No valid node/AMI definitions found. Run asl-menu to configure AMI credentials.";
 	return false;
 }
 
 // Below called by astapi files, which should only happen if controller file eg. index.php already called
-// getNodeCfg() above which confirms there is a valid file available
+// getNodeCfg() above which confirms there is a valid file available with AMI credentials
 function readNodeCfg() {
-	global $allmonini;
-	// Check for file in our directory and if not found look in the asterisk, supermon and allmon dirs
+	global $allmonini, $amicfg;
+	$msg = [];
+	getAmiCfg($msg);
+	// Check for file in our directory and if not found look in $allmonini locations
+	$ok = false;
 	foreach($allmonini as $f) {
 		if(file_exists($f)) {
 			$cfg = parse_ini_file($f, true);
 			if($cfg === false)
 				continue;
-			// Allmon3 uses 'pass' instead of 'passwd' cfg name, convert here
-			foreach($cfg as &$c) {
+			foreach($cfg as $n => &$c) {
+				// Allmon3 uses 'pass' instead of 'passwd' cfg name, convert here
 				if(isset($c['pass']) && !isset($c['passwd']))
 					$c['passwd'] = $c['pass'];
+				if(validDbId($n) && isset($c['host']) && $c['host'] && isset($c['passwd']) && $c['passwd'])
+					$ok = true;
 			}
 			unset($c);
-			return $cfg;
+			if($ok) {
+				return $cfg;
+			}
 		}
+	}
+	// If got here no node definitions were found in $allmonini locations. Use ASL .conf data
+	if(isset($amicfg->node) && isset($amicfg->host) && isset($amicfg->port) && isset($amicfg->user)) {
+		$cfg = [$amicfg->node =>
+					['host' => $amicfg->host, 'user' => $amicfg->user, 'passwd' => $amicfg->pass]];
+		return $cfg;
 	}
 	return false;
 }
