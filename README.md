@@ -37,12 +37,12 @@ Additional screenshots:
 Multiple copies of AllScan can be installed on one node (server) if desired, each with their own separate configuration, Favorites, and/or different node numbers. Just make copies of the /var/www/html/allscan/ dir eg. to "allscan2" and put copies of allmon.ini and favorites.ini with your desired configuration in the new folder. Each copy of AllScan will store its user/login credentials in /etc/allscan/ in a .db file named the same as the name of its web folder, eg. "allscan2.db". (To have other copies use the same user credentials make a symbolic link from eg. allscan2.db to allscan.db.)
 
 # Pre-Install Notes
-Ideally you should be using ASL3 and you should have Allmon or Supermon properly configured and working. AllScan works great on HamVOIP and older ASL versions but ASL3 is highly recommended as it has numerous major improvements, and also supports x64 platforms (such as Dell Wyse 3040s which work much better than RPi's and cost half as much).
+Ideally you should be using ASL3 and you should have Allmon or Supermon properly configured and working. AllScan works great on HamVOIP and older ASL versions but ASL3 is highly recommended as it has numerous major improvements, and also supports x64 platforms (such as Dell Wyse 3040 or Beelink T5 Mini PCs which work much better than RPi's and are more cost-effective).
 
 If you have Supermon installed AllScan will give you the option to use the favorites.ini file in the supermon directory. See the Supermon groups.io page for details on how to install Supermon. If you use Supermon2 instead of Supermon or want to put your favorites.ini file in some other folder, the favorites.ini search location(s) can be set on the AllScan Cfgs Page.
 
-# Automatic Install / Update
-The AllScan Install/Update script automatically checks system configuration details, changes to the web server root folder, checks if AllScan is already installed and if so what version, and if not or a newer version is available will prompt you to continue with the Install/Update. Just enter 'y' and seconds later the install/update will be complete. If you prefer to install/update manually see the [Manual Install / Update Instructions](https://github.com/davidgsd/AllScan/blob/main/docs/manualInstallUpdate.md) however this may be out-of-date and would have no advantage over the automated install.
+# Install / Update
+The AllScan Install/Update script automatically checks system configuration details, checks if AllScan is already installed and what version, and if a newer version is available will prompt you to continue with the Install/Update. Just enter 'y' and seconds later the install/update will be complete.
 
 Log into your node by SSH and run the following commands:
 
@@ -78,36 +78,26 @@ Most nodes already have a number of Cfg files and to simplify the install proces
 1. **astdb.txt**: The ASL database file with the list of all nodes provisioned on the AllStarLink network. This file should already exist in ../supermon/astdb.txt or /var/log/asterisk/astdb.txt. If the file is not found it will be automatically downloaded into the allscan directory. If you have a properly configured node you should have a cron entry that downloads the latest astdb file at least once per week. AllScan shows the status of the above files and their last modification time in the status messages box (below the Favorites Table). If you see there is no recent astdb file (less than 1 week old) you should review your cron settings (which should have been configured when you installed Allmon or Supermon).
 2. **allmon.ini**: This defines your node number(s) and the Asterisk Manager credentials. It can usually be found in any of the following locations: ../supermon/allmon.ini, /etc/asterisk/allmon.ini.php, ../allmon2/allmon.ini.php, or /etc/allmon3/allmon3.ini. AllScan will search those locations in that order and use the first file found. If you see connection/stats error messages check those file locations and verify they have the correct data. If you have multiple Nodes defined in allmon.ini, AllScan will use the first Node# in the file. (A future version of AllScan may support multiple Node#s and allow these cfgs to be stored in AllScan's database.) You can also place an allmon.ini file in AllScan's web root folder, which will take precedence over other file locations.
 3. **global.inc**: Cfg file in the supermon directory with user settings such as your name, call sign, node title, etc. AllScan will automatically import the following variables from global.inc if found: $CALL, $LOCATION, and $TITLE2. Otherwise you will be prompted to enter them after first setting up AllScan. The Call Sign and Location parameters are shown in the AllScan Page Header, and the Node Title parameter is shown in the Connection Status Table header.
-4. **favorites.ini**: The favorites file can be found in the supermon directory or in the allscan directory. Or if you have the file somewhere else (eg. ../supermon2/) you can set that location in the 'Favorites.ini Locations' Cfgs Parameter. If not found in any of those locations you will be prompted to create a new favorites.ini file in the allscan directory.
+4. **favorites.ini**: The favorites file can be found in the supermon directory or in the allscan directory. Or if you have the file somewhere else (eg. ../supermon2/) you can set that location in the 'Favorites.ini Locations' Cfgs Parameter. A sample favorites file is also included.
 
 All AllScan Cfg parameters can be viewed and set on the Cfgs page if you are logged in as an Admin user. Just click the 'Cfgs' link and all Cfgs are then shown along with an Edit form.
 
 # Troubleshooting
-For any issues including directory/file permissions issues or issues with SQLite not being available it is recommended to first always run the update script. The script will check if you have the latest version of AllScan and update your install if not, and will validate all directory and file permissions and update/upgrade any out-of-date OS packages. Refer to the "Automatic Install / Update" section above and run the update script and then see if the issue was resolved.
+For any issues including directory/file permissions issues or issues with SQLite not being available it is recommended to first always run the update script. The script will check if you have the latest version of AllScan and update your install if not, and will validate all directory and file permissions and update any out-of-date OS packages. Refer to the "Install / Update" section above, run the update script, reboot the node, and then see if the issue was resolved.
 
 HamVOIP users: See this [Blog Post by KJ7T](https://randomwire.substack.com/p/updating-allscan-on-the-clearnode) for detailed steps on how to enable the SQLite3 extension in php.ini.
 
 If you have somehow corrupted your install and running the install/update script does not fix it, run "sudo rm -rf /etc/allscan /var/www/html/allscan /srv/http/allscan 2>/dev/null" to completely uninstall AllScan, and then run the installer again.
 
-If you get a permissions error when trying to Add a Favorite, check that the /var/www/html/allscan and supermon dirs have 775 permissions and www-data group, and that the favorites.ini file exists in one or both directories and has 664 permissions and www-data as the group. These settings should already be that way if your Supermon install is properly working, or it would not be able to edit and save the favorites.ini file. But if not the following commands should correct the permission settings:
-
-	cd /var/www/html || cd /srv/http # Change to www root folder (works on ASL and HamVOIP)
-	cd supermon
-	sudo touch favorites.ini favorites.ini.bak
-	sudo chmod 664 favorites.ini favorites.ini.bak
-	sudo chmod 775 .
-	# For ASL set group to www-data
-	sudo chgrp www-data favorites.ini favorites.ini.bak .
-	# else for HamVOIP set group to http
-	# sudo chgrp http favorites.ini favorites.ini.bak .
-
-A common fix for many issues is simply to reboot your node. You might be surprised how many issues end up being resolved with nothing more than a reboot. Nodes are complex systems and sometimes strange things happen and they need a reboot.
+A common fix for many issues is simply to reboot your node. You might be surprised how many issues end up being resolved with nothing more than a reboot.
 
 Be sure to check out the [Ham Radio Crusader YouTube channel AllScan videos](https://www.youtube.com/@HamRadioCrusader/search?query=AllScan) for more details and a walkthrough of how to install, set up and use AllScan on ASL3, HamVOIP, or DVSwitch.
 
-If you are still unable to get things working after trying the above, email me at the contact info below and provide as much detail as possible on the issue you see along with the following info:
+If you are still unable to get things working after trying the above, **email me** at the contact info below and provide as much detail as possible on the issue you see along with the following info:
 1. All messages shown when you run the install/update script.
 2. Directory listing of the web root folder and the allscan folder. Do this by running "cd /var/www/html; ls -la . allscan" (or for HamVOIP "cd /srv/http; ls -la . allscan").
+
+For fatest response, support requests / questions / inquiries should be emailed to me, rather than posted on fb or github.
 
 # Contact
 If you have any questions email david at allscan.info. Also see [AllScan.info](https://AllScan.info), and the [AllScan FB Group](https://www.facebook.com/groups/allscan). Note that any tech support questions should be emailed to me &ndash; not posted to the FB group.
