@@ -97,7 +97,7 @@ If you are still unable to get things working after trying the above, **email me
 1. All messages shown when you run the install/update script.
 2. Directory listing of the web root folder and the allscan folder. Do this by running "cd /var/www/html; ls -la . allscan" (or for HamVOIP "cd /srv/http; ls -la . allscan").
 
-For fatest response, support requests / questions / inquiries should be emailed to me, rather than posted on fb or github.
+For fastest response support requests / questions / inquiries should be emailed to me, rather than posted on FB or github.
 
 # Contact
 If you have any questions email david at allscan.info. Also see [AllScan.info](https://AllScan.info), and the [AllScan FB Group](https://www.facebook.com/groups/allscan). Note that any tech support questions should be emailed to me &ndash; not posted to the FB group.
