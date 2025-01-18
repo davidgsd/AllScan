@@ -1,7 +1,9 @@
 #!/usr/bin/php
 <?php
 define('NL', "\n");
-/* This script will copy the necessary shell script and speech files to /usr/share/asterisk/agi-bin/ to support DTMF commands for saying the node's LAN or WAN IP address, turning WiFi on and off, rebooting or powering off, and playing back a test audio file, First add the following to rpt.conf:
+/* This script will copy the necessary shell script and speech files to /usr/share/asterisk/agi-bin/
+to support DTMF commands for saying the node's LAN or WAN IP address, turning WiFi on and off,
+rebooting or powering off, and playing back a test audio file, First add the following to rpt.conf:
 
 69 = autopatchup,context=my-ip,noct=1,farenddisconnect=1,dialtime=9000,quiet=1
 
@@ -56,7 +58,8 @@ load => res_agi.so                  ; Asterisk Gateway Interface (AGI)
 load => res_speech.so               ; Generic Speech Recognition API
 
 
-Then execute this file (sudo php ./setUpDtmfCmds.php) to copy the .sh and .ul files to the Asterisk agi-bin folder and set the correct permissions,
+Then execute this file (sudo php ./setUpDtmfCmds.php) to copy the .sh and .ul files to the
+Asterisk agi-bin folder and set the correct permissions,
 */
 // This should be run from CLI only (SSH), not over the web
 if(isset($_SERVER['REMOTE_ADDR']) || isset($_SERVER['HTTP_HOST'])) {
