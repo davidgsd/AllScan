@@ -50,6 +50,7 @@ Log into your node by SSH and run the following commands:
 	sudo apt update; sudo apt install php unzip -y
 
 	cd ~
+	rm AllScanInstallUpdate.php 2> /dev/null
 	wget 'https://raw.githubusercontent.com/davidgsd/AllScan/main/AllScanInstallUpdate.php'
 	chmod 755 AllScanInstallUpdate.php
 	sudo ./AllScanInstallUpdate.php
@@ -125,9 +126,6 @@ Simplify entry of node Call Sign, Location and Title configs for installs that d
 Add Favorites File Management functions to the Cfgs Tab, and a Favorites File Select control to the main page. These functions support viewing, downloading, copying, deleting, renaming and uploading favorites files, and enable simple switching between them.
 
 **v0.83 2024-09-12**<br>
-Improve detection of enabled ASL channel driver and RxAudioStats support.
-
-**v0.82 2024-09-08**<br>
 Show additional messages in the log window at startup including which ASL channel driver is enabled, audio gain settings, and ASL RxAudioStats support.
 
 **v0.81 2024-08-26**<br>
