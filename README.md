@@ -113,6 +113,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good idea
 
 # Release Notes
+**v0.89 2025-03-02**<br>
+Enable nodes to be connected by double-clicking on node# links. This has the same effect as single-clicking a node# and then clicking the Connect button.
+
 **v0.88 2024-11-07**<br>
 Enable reading AMI cfgs from rpt.conf and manager.conf if not found in .ini search locations.
 

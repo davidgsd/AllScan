@@ -192,7 +192,8 @@ if(empty($favList)) {
 	}
 	$out = $html->tableOpen($hdrCols, null, 'favs', null, 'favs');
 	foreach($favList as $f) {
-		$nodeNumAttr = ['1' => 'class="nodeNum" onClick="setNodeBox(' . $f[1] . ')"'];
+		$nodeNumAttr = ['1' => 'class="nodeNum" onClick="setNodeBox('.$f[1].')" '
+						.	'onDblClick="connectNode(\'connect\')"'];
 		// Link name to ASL stats page for node
 		if($f[1] >= 2000 && $f[1] < 3000000)
 			$f[2] = $html->a("http://stats.allstarlink.org/stats/" . $f[1], null, $f[2], null, 'stats');
