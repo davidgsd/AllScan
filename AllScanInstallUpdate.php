@@ -204,23 +204,27 @@ if(is_file('/etc/systemd/system/asl3-update-astdb.service')) {
 
 // Confirm SQLite3 is in enabled in php.ini
 $fn = exec('sudo find /etc/php -name php.ini |grep -v cli');
-msg("php.ini location: $fn");
-$lcgood = exec("grep sqlite /etc/php/8.2/apache2/php.ini | grep '^extension=' | wc -l");
-$lcbad = exec("grep sqlite /etc/php/8.2/apache2/php.ini | grep '^;extension=' | wc -l");
-if($lcgood >= 2)
-	msg("php.ini appears to have SQLite3 enabled");
-elseif($lcbad < 2) {
-	msg("\nWARNING: SQLite3 extension does not appear to be enabled in php.ini.\n"
-		."You may need to manually edit the file and uncomment (remove leading ';') "
-		."the lines that say 'extension=pdo_sqlite' and 'extension=sqlite3'.");
-	$s = readline("Hit any key to confirm");
+if($fn) {
+	msg("php.ini location: $fn");
+	$lcgood = exec("grep sqlite /etc/php/8.2/apache2/php.ini | grep '^extension=' | wc -l");
+	$lcbad = exec("grep sqlite /etc/php/8.2/apache2/php.ini | grep '^;extension=' | wc -l");
+	if($lcgood >= 2)
+		msg("php.ini appears to have SQLite3 enabled");
+	elseif($lcbad < 2) {
+		msg("\nWARNING: SQLite3 extension does not appear to be enabled in php.ini.\n"
+			."You may need to manually edit the file and uncomment (remove leading ';') "
+			."the lines that say 'extension=pdo_sqlite' and 'extension=sqlite3'.");
+		$s = readline("Hit any key to confirm");
+	} else {
+		msg("Backing up php.ini -> $fn.bak");
+		execCmd("cp $fn $fn.bak");
+		msg("Enabling SQLite3 extension in php.ini");
+		execCmd("sed -i 's/;extension=pdo_sqlite/extension=pdo_sqlite/g' $fn");
+		execCmd("sed -i 's/;extension=sqlite3/extension=sqlite31/g' $fn");
+		restartWebServer();
+	}
 } else {
-	msg("Backing up php.ini -> $fn.bak");
-	execCmd("cp $fn $fn.bak");
-	msg("Enabling SQLite3 extension in php.ini");
-	execCmd("sed -i 's/;extension=pdo_sqlite/extension=pdo_sqlite/g' $fn");
-	execCmd("sed -i 's/;extension=sqlite3/extension=sqlite31/g' $fn");
-	restartWebServer();
+	msg("WARNING: php.ini not found in /etc/php/");
 }
 
 msg("Install/Update Complete.");
