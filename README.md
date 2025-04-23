@@ -46,7 +46,7 @@ The AllScan Install/Update script automatically checks system configuration deta
 
 Log into your node by SSH and run the following commands:
 
-	# Confirm PHP, SQLite, unzip and avahi-dameon are installed:
+	# Confirm PHP, SQLite, unzip and avahi-daemon are installed:
 	sudo apt update; sudo apt install php php-sqlite3 php-curl unzip avahi-daemon -y
 
 	cd ~
