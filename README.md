@@ -57,7 +57,7 @@ Log into your node by SSH and run the following commands:
 
 The Install/Update script will provide detailed status messages on each step of the process. Carefully review all output messages and confirm no errors occur.
 
-Now open a browser and go to your node's IP address followed by /allscan/, eg. `http://192.168.1.23/allscan/` and be sure to add a browser bookmark. You can also access allscan at the mDNS URL http://[hostname].local/allscan/ (which is more reliable as it's not affected by IP address changes). It is recommended to set your node's host name to 'node' followed by your node# eg. 'node567890'. You can check the host name with the 'hostname' command, and can change the host name by running 'sudo hostnamectl set-hostname [new hostname]'.
+Now open a browser and go to your node's mDNS or IP address followed by /allscan/, eg. `http://[hostname].local/allscan/` and be sure to add a browser bookmark. (It is recommended to set your node's host name to 'node' followed by your node# eg. 'node567890'. You can check the host name with the 'hostname' command, and can change the host name by running 'sudo hostnamectl set-hostname [new hostname]'.)
 
 If you did a new install AllScan will prompt you to create an admin account. Be sure to do this right away. You can then configure the permission settings for AllScan. These default to Read-Only for public (not logged-in) users. This setting can be changed on the "Cfgs" page.
 
