@@ -46,8 +46,8 @@ The AllScan Install/Update script automatically checks system configuration deta
 
 Log into your node by SSH and run the following commands:
 
-	# ASL3 nodes: Confirm PHP and unzip are installed:
-	sudo apt update; sudo apt install php unzip -y
+	# Confirm PHP, SQLite, unzip and avahi-dameon are installed:
+	sudo apt update; sudo apt install php php-sqlite3 php-curl unzip avahi-daemon -y
 
 	cd ~
 	rm AllScanInstallUpdate.php 2> /dev/null
@@ -63,16 +63,16 @@ If you did a new install AllScan will prompt you to create an admin account. Be 
 
 If you did an update, **force a browser reload by pressing CTRL-[F5] or clearing your browser cache, or in mobile browsers do a long-press of the reload button**, so your browser will load any updated JavaScript and CSS files.
 
-NOTES for HamVOIP only:
+NOTES:
 1. You may need to uncomment/add the following lines in /etc/php/php.ini (make sure they do not have a ';' in front)<br>
-	extension=pdo_sqlite.so<br>
-	extension=sqlite3.so
-2. Then restart Lighttpd web server or restart the node
+	extension=pdo_sqlite<br>
+	extension=sqlite3
+2. Then restart the web server or restart the node
 
 # AllScan Nodes, Accessories and How-To-Guides
 If you do not yet have a node or might like to upgrade your node, see [AllScan.info](https://allscan.info/) for How-To Guides, Nodes, USB Interfaces, Accessories and more.
 
-AllScan nodes and USB radio/audio interfaces provide extensive features and excellent audio quality - see the [Products Page](https://allscan.info/products/) for details.
+AllScan nodes, node modules, and USB interfaces provide extensive features and excellent audio quality - see the [Products Page](https://allscan.info/products/) for details.
 
 # Configuration Files and Parameters
 Most nodes already have a number of Cfg files and to simplify the install process AllScan will try to use these rather than require redundant files/data to be created/entered. These files are as follows:
@@ -93,6 +93,8 @@ If you have somehow corrupted your install and running the install/update script
 A common fix for many issues is simply to reboot your node. You might be surprised how many issues end up being resolved with nothing more than a reboot.
 
 Be sure to check out the [Ham Radio Crusader YouTube channel AllScan videos](https://www.youtube.com/@HamRadioCrusader/search?query=AllScan) for more details and a walkthrough of how to install, set up and use AllScan on ASL3, HamVOIP, or DVSwitch.
+
+If you have other issues with your node that are not related to the AllScan web app itself be sure to review the ASL config file settings listed in my How-To Guides at [AllScan.info](https://allscan.info/). Be sure to verify you have made ALL the settings shown in the appropriate guide for your node type (radio-less / HT / mobile radio).
 
 If you are still unable to get things working after trying the above, **email me** at the contact info below and provide as much detail as possible on the issue you see along with the following info:
 1. All messages shown when you run the install/update script.

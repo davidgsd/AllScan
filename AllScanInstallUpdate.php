@@ -1,13 +1,13 @@
 #!/usr/bin/php
 <?php
-$AllScanInstallerUpdaterVersion = "v1.23";
+$AllScanInstallerUpdaterVersion = "v1.24";
 define('NL', "\n");
-// Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory. The script will then determine
-// the location of the web root folder on your system, cd to that folder, check if you have AllScan installed and install
-// it if not, or if already installed will check the version and update the install if a newer version is available.
+// Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory. We'll then determine
+// the location of the web root folder, cd to that folder, check if you have AllScan installed and install
+// it if not, or will check the version and update the install if a newer version is available.
 //
-// NOTE: Updating can result in modified files being overwritten. This script will make a backup copy of the allscan
-// folder to allscan.bak.[ver#]/ You may then need to copy any files you added/modified back into the allscan folder.
+// NOTE: Updating can result in modified files being overwritten. This script will backup the allscan
+// folder to allscan.bak.[ver#]/ You may then need to copy any added/modified files back into the folder.
 //
 msg("AllScan Installer/Updater Version: $AllScanInstallerUpdaterVersion");
 
@@ -170,19 +170,23 @@ if($s === 'y') {
 		passthruCmd("pacman -Syu");
 		passthruCmd("pacman -S php-sqlite");
 	}
-
-	msg("Restarting web server...");
-	if(is_executable('/usr/bin/apachectl') || is_executable('/usr/sbin/apachectl'))
-		$cmd = "apachectl restart 2> /dev/null";
-	else
-		$cmd = "systemctl restart lighttpd.service 2> /dev/null";
-	if(!execCmd($cmd))
-		msg("Restart webserver or restart node now");
+	restartWebServer();
 }
 
-// if ASL3, make sure astdb.txt is available
-if(is_executable('/usr/bin/apt-get') && !is_file('/etc/systemd/system/asl3-update-astdb.service')) {
-	passthruCmd("sudo apt install -y asl3-update-nodelist 2> /dev/null");
+// if ASL3, make sure astdb.txt is available, and sqlite3 and avahi-daemon are set up
+if(is_executable('/usr/bin/apt')) {
+	if(!is_file('/etc/systemd/system/asl3-update-astdb.service')) {
+		passthruCmd("sudo apt install -y asl3-update-nodelist 2> /dev/null");
+	}
+	$fc = exec("find /var/lib/php -name sqlite3 -type f -printf '.'| wc -c");
+	if(!$fc) {
+		passthruCmd("sudo apt install -y php-sqlite3 2> /dev/null");
+		restartWebServer();
+	}
+	if(!is_file('/usr/sbin/avahi-daemon')) {
+		passthruCmd("sudo apt install -y avahi-daemon 2> /dev/null");
+	}
+	sleep(1);
 }
 if(is_file('/etc/systemd/system/asl3-update-astdb.service')) {
 	passthruCmd("systemctl enable asl3-update-astdb.service 2> /dev/null");
@@ -198,18 +202,50 @@ if(is_file('/etc/systemd/system/asl3-update-astdb.service')) {
 	}
 }
 
+// Confirm SQLite3 is in enabled in php.ini
+$fn = exec('sudo find /etc/php -name php.ini |grep -v cli');
+msg("php.ini location: $fn");
+$lcgood = exec("grep sqlite /etc/php/8.2/apache2/php.ini | grep '^extension=' | wc -l");
+$lcbad = exec("grep sqlite /etc/php/8.2/apache2/php.ini | grep '^;extension=' | wc -l");
+if($lcgood >= 2)
+	msg("php.ini appears to have SQLite3 enabled");
+elseif($lcbad < 2) {
+	msg("\nWARNING: SQLite3 extension does not appear to be enabled in php.ini.\n"
+		."You may need to manually edit the file and uncomment (remove leading ';') "
+		."the lines that say 'extension=pdo_sqlite' and 'extension=sqlite3'.");
+	$s = readline("Hit any key to confirm");
+} else {
+	msg("Backing up php.ini -> $fn.bak");
+	execCmd("cp $fn $fn.bak");
+	msg("Enabling SQLite3 extension in php.ini");
+	execCmd("sed -i 's/;extension=pdo_sqlite/extension=pdo_sqlite/g' $fn");
+	execCmd("sed -i 's/;extension=sqlite3/extension=sqlite31/g' $fn");
+	restartWebServer();
+}
+
 msg("Install/Update Complete.");
 
 // Show URLs where AllScan can be accessed and other notes
 $ip = exec("wget -t 1 -T 3 -q -O- http://checkip.dyndns.org:8245 | cut -d':' -f2 | cut -d' ' -f2 | cut -d'<' -f1");
-$lanip = exec('hostname --all-ip-addresses');
+$hn = exec('hostname');
+$lanip = exec("hostname -I | cut -f1 -d' '");
 if(!filter_var($lanip, FILTER_VALIDATE_IP)) {
 	$lanip = exec("ifconfig | grep inet | head -1 | awk '{print $2}'");
 	if($lanip === '127.0.0.1')
 		$lanip = exec("ifconfig | grep inet | tail -1 | awk '{print $2}'");
 }
+$lip = '';
+if($lanip)
+	$lip = "http://$lanip/$asdir/";
+if($hn) {
+	if($lip)
+		$lip .= ' or ';
+	$lip .= "http://$hn.local/$asdir/";
+}
+if(!$lip)
+	$lip = '[Local IPV4 address / hostname could not be determined]';
 
-msg("AllScan can be accessed at:\n\thttp://$lanip/$asdir/ on the local network, or\n"
+msg("AllScan can be accessed at:\n\t$lip on the local network, or\n"
 	."\thttp://$ip/$asdir/ remotely if your router has a port forwarded to this node.");
 
 msg("Be sure to bookmark the above URL(s) in your browser.");
@@ -278,6 +314,16 @@ function checkSmDir() {
 		execCmd("chgrp $group $favsini $favsbak .");
 		chdir('..');
 	}
+}
+
+function restartWebServer() {
+	msg("Restarting web server...");
+	if(is_executable('/usr/bin/apachectl') || is_executable('/usr/sbin/apachectl'))
+		$cmd = "apachectl restart 2> /dev/null";
+	else
+		$cmd = "systemctl restart lighttpd.service 2> /dev/null";
+	if(!execCmd($cmd))
+		msg("Restart webserver or restart node now");
 }
 
 function msg($s) {
