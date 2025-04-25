@@ -183,7 +183,10 @@ if(is_executable('/usr/bin/apt')) {
 		passthruCmd("sudo apt install -y php-sqlite3 2> /dev/null");
 		restartWebServer();
 	}
-	if(!is_file('/usr/sbin/avahi-daemon')) {
+	if(!is_executable('/usr/bin/asl-tts')) {
+		passthruCmd("sudo apt install -y asl3-tts 2> /dev/null");
+	}
+	if(!is_executable('/usr/sbin/avahi-daemon')) {
 		passthruCmd("sudo apt install -y avahi-daemon 2> /dev/null");
 	}
 	sleep(1);
