@@ -1,2 +1,2 @@
 #!/bin/bash
-/usr/sbin/poweroff
+sudo /usr/sbin/poweroff
