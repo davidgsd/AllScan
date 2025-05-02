@@ -3,19 +3,16 @@
 define('NL', "\n");
 
 /* This is currently just a test script, that copies some files. This does not need to be executed,
-the docs/rpt.conf has all needed instructions and commands for setting up AllScan-recommended DTMF commands.
+docs/rpt.conf has all needed instructions and commands for setting up AllScan-recommended DTMF commands.
 The rest of this file should be ignored for now. */
 
 /* This script will copy the necessary shell script and speech files to /usr/share/asterisk/agi-bin/
-to support DTMF commands for saying the node's LAN or WAN IP address, turning WiFi on and off,
+to support DTMF commands for saying the node's LAN, mDNS, and WAN IP addresses, turning WiFi on and off,
 rebooting or powering off, and playing back a test audio file.
 
-NOTE: See the comments in docs/rpt.conf and follow all instructions there.
-
-Then execute this file (sudo php ./setUpDtmfCmds.php) to copy the .sh and .ul files to the
-Asterisk agi-bin folder and set the correct permissions.
+NOTE: See the comments in docs/rpt.conf and follow the instructions there.
 */
-// This should be run from CLI only (SSH), not over the web
+// This should be run from CLI only (SSH)
 if(isset($_SERVER['REMOTE_ADDR']) || isset($_SERVER['HTTP_HOST'])) {
 	echo "This script must be run from the Command Line Interface only.<br>\n";
 	exit(0);
