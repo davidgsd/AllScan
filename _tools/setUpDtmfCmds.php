@@ -4,59 +4,13 @@ define('NL', "\n");
 /* This script will copy the necessary shell script and speech files to /usr/share/asterisk/agi-bin/
 to support DTMF commands for saying the node's LAN or WAN IP address, turning WiFi on and off,
 rebooting or powering off, and playing back a test audio file, First add the following to rpt.conf:
-
 69 = autopatchup,context=my-ip,noct=1,farenddisconnect=1,dialtime=9000,quiet=1
 
+Than add the text in docs/extensions.conf to your /etc/asterisk/extensions.conf file
 
-Then add the following to extensions.conf:
-
-; *690: Say LAN IP Address
-exten => 0,1,AGI(getip.sh)
-exten => 0,n,Wait(1)
-exten => 0,n,SayAlpha(${result})
-exten => 0,n,Hangup
-
-; *691: Say WAN IP Address
-exten => 1,1,Set(result=${CURL(https://api.ipify.org)})
-exten => 1,n,Wait(1)
-exten => 1,n,SayAlpha(${result})
-exten => 1,n,Hangup
-
-; *692: Turn Off Wi-Fi
-exten => 2,1,AGI(wifidown.sh)
-exten => 2,n,Wait(1)
-exten => 2,n,Playback(/usr/share/asterisk/agi-bin/wifidisabled)
-exten => 2,n,Hangup
-
-; *693: Turn On Wi-Fi
-exten => 3,1,AGI(wifiup.sh)
-exten => 3,n,Wait(1)
-exten => 3,n,Playback(/usr/share/asterisk/agi-bin/wifienabled)
-exten => 3,n,Hangup
-
-; *694: Reboot Node
-exten => 4,1,AGI(reboot.sh)
-exten => 4,n,Wait(1)
-exten => 4,n,Playback(/usr/share/asterisk/agi-bin/reboot)
-exten => 4,n,Hangup
-
-; *695: Power Off Node
-exten => 5,1,AGI(poweroff.sh)
-exten => 5,n,Wait(1)
-exten => 5,n,Playback(/usr/share/asterisk/agi-bin/poweroff)
-exten => 5,n,Hangup
-
-; *699: Play test file
-exten => 9,1,Wait(1)
-exten => 9,n,Playback(/usr/share/asterisk/agi-bin/test)
-exten => 9,n,Hangup
-
-
-Then enable the following lines in modules.conf
-
-load => res_agi.so                  ; Asterisk Gateway Interface (AGI)
-load => res_speech.so               ; Generic Speech Recognition API
-
+Then add the following lines in modules.conf
+load = res_agi.so                  ; Asterisk Gateway Interface (AGI)
+load = res_speech.so               ; Generic Speech Recognition API
 
 Then execute this file (sudo php ./setUpDtmfCmds.php) to copy the .sh and .ul files to the
 Asterisk agi-bin folder and set the correct permissions,
