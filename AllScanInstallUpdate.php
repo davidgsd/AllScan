@@ -162,7 +162,6 @@ if($s === 'y') {
 	if(is_executable('/usr/bin/apt-get')) {
 		passthruCmd("apt-get -y update");
 		passthruCmd("apt-get -y upgrade");
-		passthruCmd("apt-get install -y php-sqlite3 php-curl");
 	} else if(is_executable('/usr/bin/yum')) {
 		passthruCmd("yum -y update");
 		passthruCmd("yum -y upgrade");
@@ -223,7 +222,7 @@ if($fn) {
 		execCmd("cp $fn $fn.bak");
 		msg("Enabling SQLite3 extension in php.ini");
 		execCmd("sed -i 's/;extension=pdo_sqlite/extension=pdo_sqlite/g' $fn");
-		execCmd("sed -i 's/;extension=sqlite3/extension=sqlite31/g' $fn");
+		execCmd("sed -i 's/;extension=sqlite3/extension=sqlite3/g' $fn");
 		restartWebServer();
 	}
 } else {
@@ -233,6 +232,8 @@ if($fn) {
 msg("Install/Update Complete.");
 
 // Show URLs where AllScan can be accessed and other notes
+$nn = exec("grep '^NODE = ' /etc/asterisk/extensions.conf");
+$bp = exec("grep '^bindport = ' /etc/asterisk/iax.conf");
 $ip = exec("wget -t 1 -T 3 -q -O- http://checkip.dyndns.org:8245 | cut -d':' -f2 | cut -d' ' -f2 | cut -d'<' -f1");
 $hn = exec('hostname');
 $lanip = exec("hostname -I | cut -f1 -d' '");
@@ -252,8 +253,18 @@ if($hn) {
 if(!$lip)
 	$lip = '[Local IPV4 address / hostname could not be determined]';
 
+$wip = "http://$ip/$asdir/";
+if(preg_match('/NODE = ([0-9]{4,6})/', $nn, $m) == 1) {
+	$node = $m[1];
+	$wip .= " or http://$node.nodes.allstarlink.org/$asdir/";
+}
+$port = 4569;
+if(preg_match('/bindport = ([0-9]{4,5})/', $bp, $m) == 1) {
+	$port = $m[1];
+}
+
 msg("AllScan can be accessed at:\n\t$lip on the local network, or\n"
-	."\thttp://$ip/$asdir/ remotely if your router has a port forwarded to this node.");
+	."\t$wip remotely\n\tif your router has port $port forwarded to this node.");
 
 msg("Be sure to bookmark the above URL(s) in your browser.");
 msg("IMPORTANT: After updates do a CTRL-F5 in your browser (or long-press the reload button in mobile browsers), or clear the browser cache, so that all CSS and JavaScript files will properly update.");

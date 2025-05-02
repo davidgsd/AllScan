@@ -125,11 +125,13 @@ function formOpen($scriptName=null, $method='post', $id=null, $class=null, $targ
 		"enctype=\"multipart/form-data\"$class AUTOCOMPLETE=\"off\">\n";
 }
 function textField($name, $label, $len=null, $val=null, $class=null, $readonly=null) {
-	$out = strlen($label) ? ("<label for=\"$id\">" . htmlspecial($label) . "</label>\n") : '';
+	$out = $label ? $this->getLabelHtml($label, "_$name") : '';
 	$out .= '<input ';
 	if($readonly)
 		$out .= 'readonly ';
 	$out .= "type=text name=\"$name\" AUTOCOMPLETE=\"off\"";
+	if($label)
+		$out .= ' id="_' . $name . '"';
 	if($len)
 		$out .= " maxlength=\"$len\"";
 	if($class !== null && strlen($class))
@@ -143,8 +145,10 @@ function passwordField($name, $label, $len=null, $val=null, $class=null) {
 	$size = ceil($len/1.6);
 	if(strlen($val) > $size)
 		$size = strlen($val);
-	$out = strlen($label) ? ("<label for=\"$id\">" . htmlspecial($label) . "</label>\n") : '';
+	$out = $label ? $this->getLabelHtml($label, "_$name") : '';
 	$out .= "<input type=password name=\"$name\"";
+	if($label)
+		$out .= ' id="_' . $name . '"';
 	if($len)
 		$out .= " size=\"$size\" maxlength=\"$len\"";
 	if($class !== null && strlen($class))
@@ -157,7 +161,7 @@ function passwordField($name, $label, $len=null, $val=null, $class=null) {
 function checkbox($name, $label, $isChecked=false, $class=null) {
 	global $checkBoxId;
 	$id = 'cb' . $checkBoxId++;
-	$out = strlen($label) ? ("<label for=\"$id\">" . htmlspecial($label) . "</label>") : '';
+	$out = $label ? $this->getLabelHtml($label, $id) : '';
 	$out .= "<input type=checkbox name=\"$name\" id=\"$id\"";
 	if(strlen($class))
 		$out .= " class=\"$class\"";
@@ -167,8 +171,10 @@ function checkbox($name, $label, $isChecked=false, $class=null) {
 	return $out;
 }
 function fileUpload($name, $label, $multiple=false, $class=null) {
-	$out = strlen($label) ? ("<label for=\"$id\">" . htmlspecial($label) . "</label>") : '';
+	$out = $label ? $this->getLabelHtml($label, "_$name") : '';
 	$out .= "<input type=file name=\"$name\"";
+	if($label)
+		$out .= ' id="_' . $name . '"';
 	if(strlen($class))
 		$out .= " class=\"$class\"";
 	if($multiple)
@@ -182,10 +188,10 @@ function hiddenField($name, $val) {
 	return "<input type=hidden name=\"$name\" value=\"$val\">\n";
 }
 function select($name, $label, $list, $selected=null, $class=null, $escapeTxt=true, $submitOnChange=false) {
-	$out = $label ? $this->getLabelHtml($label, $name) : '';
+	$out = $label ? $this->getLabelHtml($label, "_$name") : '';
 	$out .= '<select ';
 	if($label)
-		$out .= 'id="' . $name . '" ';
+		$out .= 'id="_' . $name . '" ';
 	$multiple = is_array($selected);
 	if($multiple) {
 		$out .= 'multiple ';

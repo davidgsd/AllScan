@@ -113,7 +113,7 @@ while(1) {
 		// Save remote nodes
 		$current[$node]['remote_nodes'] = [];
 		$i = 0;
-		foreach($sortedConnectedNodes as $remoteNode => $arr) {
+		foreach($sortedConnectedNodes as $arr) {
 			// Store remote nodes time values
 			$nodeTime[$node]['remote_nodes'][$i]['elapsed'] = $arr['elapsed'] ?? 0;
 			$nodeTime[$node]['remote_nodes'][$i]['last_keyed'] = $arr['last_keyed'];
@@ -130,6 +130,7 @@ while(1) {
 			$current[$node]['remote_nodes'][$i]['last_keyed'] = $arr['last_keyed'] === 'Never' ? 'Never' : NBSP;
 			$current[$node]['remote_nodes'][$i]['cos_keyed'] = $arr['cos_keyed'] ?? 0;
 			$current[$node]['remote_nodes'][$i]['tx_keyed'] = $arr['tx_keyed'] ?? 0;
+			$current[$node]['remote_nodes'][$i]['lnodes'] = $arr['lnodes'] ?? [];
 			$i++;
 		}
 	}
@@ -150,7 +151,6 @@ exit();
 
 function checkRxStatsSupport($ami, $fp) {
 	global $chandriver, $amicd, $rxstatssupported;
-	$msg = ["\"Thou Shalt Not Clip The ADC\" - The <i>1st Law</i> of AllStar"];
 	$res = $ami->command($fp, "susb tune menu-support Y");
 	if(strpos($res, 'RxAudioStats') === 0) {
 		$rxstatssupported = true;
@@ -192,8 +192,7 @@ function getNode($fp, $node) {
 		$rptStatus = $ami->getResponse($fp, $actionID);
 	} else {
 		sendData(['status'=>'XStat failed!']);
-		// On ASL3 if Asterisk restarts we get above error repeated indefinitely. Exit and let
-		// client JS reinit connection.
+		// On ASL3 if Asterisk restarts above error repeats indefinitely. Let client JS reinit connection.
 		if(++$errCnt > 9)
 			exit();
 	}
@@ -203,12 +202,11 @@ function getNode($fp, $node) {
 		$sawStatus = $ami->getResponse($fp, $actionID);
 	} else {
 		sendData(['status'=>'sawStat failed!']);
-		// On ASL3 if Asterisk restarts we get above error repeated indefinitely. Exit and let
-		// client JS reinit connection.
+		// On ASL3 if Asterisk restarts above error repeats indefinitely. Let client JS reinit connection.
 		if(++$errCnt > 9)
 			exit();
 	}
-	// Parse this $node. Returns an array of currently connected nodes
+	// Returns an array of currently connected nodes
 	$current = parseNode($fp, $rptStatus, $sawStatus);
 	return $current;
 }
@@ -262,7 +260,9 @@ function sortNodes($nodes) {
 
 function parseNode($fp, $rptStatus, $sawStatus) {
 	$curNodes = [];
-	$conns = [];
+	$conns = []; // Directly connected nodes
+	$lnodes = []; // All connected nodes
+	$modes = [];
 	// Parse 'rptStat Conn:' lines
 	foreach($rptStatus as $line) {
 		if(preg_match('/Conn: (.*)/', $line, $matches)) {
@@ -283,8 +283,10 @@ function parseNode($fp, $rptStatus, $sawStatus) {
 		if(preg_match("/LinkedNodes: (.*)/", $line, $matches)) {
 			$longRangeLinks = preg_split("/, /", trim($matches[1]));
 			foreach($longRangeLinks as $line) {
-				$n = substr($line,1);
-				$modes[$n]['mode'] = substr($line,0,1);
+				$n = substr($line, 1);
+				$modes[$n]['mode'] = substr($line, 0, 1);
+				if(is_numeric($n) && $n >= 2000 && $n < 1000000)
+					$lnodes[] = $n;
 			}
 		}
 	}
@@ -330,5 +332,7 @@ function parseNode($fp, $rptStatus, $sawStatus) {
 	}
 	$curNodes[1]['cos_keyed'] = ($rxKeyed === "1") ? 1 : 0;
 	$curNodes[1]['tx_keyed'] = ($txKeyed === "1") ? 1 : 0;
+	// Add list of all connected nodes
+	$curNodes[1]['lnodes'] = $lnodes;
 	return $curNodes;
 }

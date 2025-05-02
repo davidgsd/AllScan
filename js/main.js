@@ -5,7 +5,7 @@ var source, hbcnt=0, pgTitle, favsCnt=0, c0;
 var rldRetries=0, rldTmr, evtSrcRldTmr, evtSrcUrl;
 var statsTmr, statsState=0, statsIdx=0, statsReqCnt=0;
 var xh, xha, xhs, xhr;
-var txCnt=[], txTim=[], txTT=[], txAvg=[];
+var txCnt=[], txTim=[], txTT=[], txAvg=[], lnodes=[];
 // DOM elements
 var hb, lnode, rnode, conncnt, ftbl, statmsg, scanmsg, cputemp;
 
@@ -149,7 +149,16 @@ function handleStatsResponse() {
 	for(var r=0, n=ftbl.rows.length-1; r < n; r++) {
 		//for(var c=0, m=ftbl.rows[r].cells.length; c < m; c++) {
 		var cells = ftbl.rows[r+1].cells;
-		var node = cells[1].innerHTML;
+		var c1 = cells[1];
+		var node = c1.innerHTML;
+		// If node is in lnodes connected list, highlight Node col cell in green
+		if(lnodes.includes(node)) {
+			if(c1.style.backgroundColor !== 'darkgreen')
+				c1.style.backgroundColor = 'darkgreen';
+		} else {
+			if(c1.style.backgroundColor !== 'transparent')
+				c1.style.backgroundColor = 'transparent';
+		}
 		if(node != s.node)
 			continue;
 		// Calculate rolling avg Tx activity indication
@@ -337,7 +346,9 @@ function handleNodesEvent(event) {
 				tablehtml += '<tr><td colspan="6">No Connections</td></tr>';
 			} else {
 				nodeNum = rowdata.node;
-				if(nodeNum != 1) {
+				if(nodeNum == 1) {
+					lnodes = rowdata.lnodes;
+				} else {
 					total_nodes++
 					// Set background color
 					if(rowdata.keyed == 'yes') {

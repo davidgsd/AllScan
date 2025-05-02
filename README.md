@@ -20,6 +20,9 @@ Color codes for '#' column:
 * Medium Green: Node Active, Web-Transceiver enabled (may be more likely to accept connections)
 * Dark Green: Node Active (registered and reporting to AllStarLink Network)
 
+Color codes for 'Node' column:
+* Dark Green: Node is currently connected
+
 'Rx%' column: The remote node's reported TxTime divided by its Uptime, provides a general indication of how busy the node tends to be.
 
 'LCnt' column: The reported number of Connected Links (ie. user nodes, hubs, bridges, or other links).
@@ -57,7 +60,7 @@ Log into your node by SSH and run the following commands:
 
 The Install/Update script will provide detailed status messages on each step of the process. Carefully review all output messages and confirm no errors occur.
 
-Now open a browser and go to your node's mDNS or IP address followed by /allscan/, eg. `http://[hostname].local/allscan/` and be sure to add a browser bookmark. (It is recommended to set your node's host name to 'node' followed by your node# eg. 'node567890'. You can check the host name with the 'hostname' command, and can change the host name by running 'sudo hostnamectl set-hostname [new hostname]'.)
+Now open a browser and go to your node's mDNS or IP address followed by /allscan/, eg. `http://[hostname].local/allscan/` and be sure to add a browser bookmark. (It is recommended to set your node's host name to 'node' followed by your node# eg. 'node567890'. You can check the host name with the 'hostname' command, and can change the host name by running 'sudo hostnamectl set-hostname [new hostname]'.) If the node's IAX port is forwarded in your router it can be accessed from the internet at `http://[node#].nodes.allstarlink.org`.
 
 If you did a new install AllScan will prompt you to create an admin account. Be sure to do this right away. You can then configure the permission settings for AllScan. These default to Read-Only for public (not logged-in) users. This setting can be changed on the "Cfgs" page.
 
@@ -115,6 +118,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good idea
 
 # Release Notes
+**v0.90 2025-05-01**<br>
+Highlight Node column cell in Favorites Table if node is currently connected. Add example files showing how to set up DTMF commands as used in AllScan nodes - see docs/rpt.conf. Enhancements to install/update script to install additional utilities including avahi-daemon and asl3-tts, and to update php.ini if needed to enable SQLite3.
+
 **v0.89 2025-03-02**<br>
 Enable nodes to be connected by double-clicking on node# links. This has the same effect as single-clicking a node# and then clicking the Connect button.
 
