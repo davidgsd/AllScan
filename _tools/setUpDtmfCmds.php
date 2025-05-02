@@ -1,19 +1,19 @@
 #!/usr/bin/php
 <?php
 define('NL', "\n");
+
+/* This is currently just a test script, that copies some files. This does not need to be executed,
+the docs/rpt.conf has all needed instructions and commands for setting up AllScan-recommended DTMF commands.
+The rest of this file should be ignored for now. */
+
 /* This script will copy the necessary shell script and speech files to /usr/share/asterisk/agi-bin/
 to support DTMF commands for saying the node's LAN or WAN IP address, turning WiFi on and off,
-rebooting or powering off, and playing back a test audio file, First add the following to rpt.conf:
-69 = autopatchup,context=my-ip,noct=1,farenddisconnect=1,dialtime=9000,quiet=1
+rebooting or powering off, and playing back a test audio file.
 
-Than add the text in docs/extensions.conf to your /etc/asterisk/extensions.conf file
-
-Then add the following lines in modules.conf
-load = res_agi.so                  ; Asterisk Gateway Interface (AGI)
-load = res_speech.so               ; Generic Speech Recognition API
+NOTE: See the comments in docs/rpt.conf and follow all instructions there.
 
 Then execute this file (sudo php ./setUpDtmfCmds.php) to copy the .sh and .ul files to the
-Asterisk agi-bin folder and set the correct permissions,
+Asterisk agi-bin folder and set the correct permissions.
 */
 // This should be run from CLI only (SSH), not over the web
 if(isset($_SERVER['REMOTE_ADDR']) || isset($_SERVER['HTTP_HOST'])) {
