@@ -165,10 +165,10 @@ if($s === 'y') {
 	if(is_executable('/usr/bin/apt-get')) {
 		passthruCmd("apt-get -y update");
 		passthruCmd("apt-get -y upgrade");
-	} else if(is_executable('/usr/bin/yum')) {
+	} elseif(is_executable('/usr/bin/yum')) {
 		passthruCmd("yum -y update");
 		passthruCmd("yum -y upgrade");
-	} else if(is_executable('/usr/bin/pacman')) {
+	} elseif(is_executable('/usr/bin/pacman')) {
 		passthruCmd("pacman -Syu");
 		passthruCmd("pacman -S php-sqlite");
 	}
@@ -340,25 +340,19 @@ function checkDbDir() {
 	global $group, $ver;
 	// Confirm /etc/allscan dir exists and is writable by web server
 	$asdbdir = '/etc/allscan';
-	if(!is_dir($asdbdir)) {
-		msg("Creating $asdbdir dir with 0775 permissions and $group group");
-		if(!mkdir($asdbdir, 0775))
-			errExit('mkdir failed');
-	}
-	msg("Verifying $asdbdir dir has 0775 permissions and $group group");
-	if(!chmod($asdbdir, 0775))
-		msg("ERROR: chmod($asdbdir, 0775) failed");
-	if(!chgrp($asdbdir, $group))
-		msg("ERROR: chgrp($asdbdir, $group) failed");
-
+	if(!is_dir($asdbdir))
+		execCmd("mkdir $asdbdir");
+	if((fileperms($asdbdir) & 0777) != 0775)
+		execCmd("chmod 775 $asdbdir");
+	if(getGroupName($asdbdir) !== $group)
+		execCmd("chgrp $group $asdbdir");
 	// Backup DB file
 	$dbfile = $asdbdir . '/allscan.db';
-	if(file_exists("$asdbdir.db")) {
-		if(!$ver)
-			$ver = 'bak';
-		$bakfile = "$dbfile.$ver";
-		copy($dbfile, $bakfile);
-	}
+	if(!$ver)
+		$ver = 'bak';
+	$bakfile = "$dbfile.$ver";
+	if(file_exists($dbfile) && !file_exists($bakfile))
+		execCmd("cp $dbfile $bakfile");
 }
 
 function checkSmDir() {
@@ -367,13 +361,29 @@ function checkSmDir() {
 	$smdir = 'supermon';
 	if(is_dir($smdir)) {
 		$favsini = 'favorites.ini';
-		$favsbak = $favsini . '.bak';
+		$favsbak = "$favsini.bak";
 		msg("Confirming supermon $favsini and $favsbak are writable by web server");
 		chdir($smdir);
-		execCmd("touch $favsini $favsbak");
-		execCmd("chmod 664 $favsini $favsbak");
-		execCmd("chmod 775 .");
-		execCmd("chgrp $group $favsini $favsbak .");
+
+		if(!file_exists($favsini))
+			execCmd("touch $favsini");
+		if(!file_exists($favsbak))
+			execCmd("touch $favsbak");
+
+		if((fileperms($favsini) & 0777) != 0664)
+			execCmd("chmod 664 $favsini");
+		if((fileperms($favsbak) & 0777) != 0664)
+			execCmd("chmod 664 $favsbak");
+		if((fileperms('.') & 0777) != 0775)
+			execCmd("chmod 775 .");
+
+		if(getGroupName($favsini) !== $group)
+			execCmd("chgrp $group $favsini");
+		if(getGroupName($favsbak) !== $group)
+			execCmd("chgrp $group $favsbak");
+		if(getGroupName('.') !== $group)
+			execCmd("chgrp $group .");
+
 		chdir('..');
 	}
 }
