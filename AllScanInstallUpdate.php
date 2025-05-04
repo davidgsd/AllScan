@@ -238,36 +238,45 @@ if($fn) {
 	msg("php.ini not found in /etc/php/");
 }
 
-// Copy DTMF command script and audio files to Asterisk folder
-msg("Copy DTMF command support files to /usr/share/asterisk/agi-bin/?");
-$s = readline("Enter 'y' to confirm, any other key to skip: ");
-if($s === 'y') {
-	$d0 = "$webdir/$asdir/_tools/agi-bin";
-	$d1 = "/usr/share/asterisk/agi-bin";
-	$ls0 = trim(shell_exec("ls $d0"));
-	if(!$ls0) {
-		msg("Error reading $d0/.");
+// Check DTMF command script and audio files
+$d0 = "$webdir/$asdir/_tools/agi-bin";
+$d1 = "/usr/share/asterisk/agi-bin";
+$ls0 = trim(shell_exec("ls $d0"));
+if(!$ls0) {
+	msg("Error reading $d0/.");
+} else {
+	if(!file_exists($d1)) {
+		msg("$d1/ not found.");
 	} else {
-		if(!file_exists($d1)) {
-			msg("$d1/ not found.");
-		} else {
-			$f0 = explode(NL, $ls0);
-			$ls1 = trim(shell_exec("ls $d1"));
-			$f1 = $ls1 ? explode(NL, $ls1) : [];
-			$fcp = [];
-			foreach($f0 as $f) {
-				if(array_search($f, $f1) === false || exec("diff $d0/$f $d1/$f"))
-					$fcp[] = $f;
+		$f0 = explode(NL, $ls0);
+		sort($f0);
+		$ls1 = trim(shell_exec("ls $d1"));
+		$f1 = $ls1 ? explode(NL, $ls1) : [];
+		$fcp = [];
+		$ov = 0;
+		foreach($f0 as $f) {
+			if(array_search($f, $f1) === false) {
+				$fcp[] = $f;
+			} elseif(exec("diff $d0/$f $d1/$f")) {
+				$fcp[] = $f;
+				$ov++;
 			}
-			if(!count($fcp)) {
-				msg("Files already present.");
-			} else {
+		}
+		if(count($fcp)) {
+			msg("Copy DTMF command support files to /usr/share/asterisk/agi-bin/?\n"
+				."Files to be copied: " . implode(', ', $fcp));
+			if($ov)
+				msg("Warning: This will result in $ov file(s) being overwritten");
+			if(count($f1))
+				msg("Existing files in directory: " . implode(', ', $f1));
+			$s = readline("Enter 'y' to confirm, any other key to skip: ");
+			if($s === 'y') {
 				foreach($fcp as $f)
 					execCmd("cp $d0/$f $d1/$f");
 			}
 		}
-		msg("See $webdir/$asdir/docs/rpt.conf and extensions.conf for DTMF command setup notes.");
 	}
+	msg("See $webdir/$asdir/docs/rpt.conf and extensions.conf for DTMF command setup notes.");
 }
 
 msg("Install/Update Complete.");
@@ -357,12 +366,12 @@ function checkDbDir() {
 
 function checkSmDir() {
 	global $group;
-	// Verify supermon folder favorites.ini and favorites.ini.bak are writable by web server
+	// Verify supermon folder favorites.ini and favorites.ini.bak writable by web server
 	$smdir = 'supermon';
 	if(is_dir($smdir)) {
 		$favsini = 'favorites.ini';
 		$favsbak = "$favsini.bak";
-		msg("Confirming supermon $favsini and $favsbak are writable by web server");
+		msg("Confirming supermon $favsini and $favsbak writable by web server");
 		chdir($smdir);
 
 		if(!file_exists($favsini))
