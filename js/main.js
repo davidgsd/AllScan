@@ -6,6 +6,8 @@ var rldRetries=0, rldTmr, evtSrcRldTmr, evtSrcUrl;
 var statsTmr, statsState=0, statsIdx=0, statsReqCnt=0;
 var xh, xha, xhs, xhr;
 var txCnt=[], txTim=[], txTT=[], txAvg=[], lnodes=[];
+var lastStatMsg = '';
+var pat = /error/i;
 // DOM elements
 var hb, lnode, rnode, conncnt, ftbl, statmsg, scanmsg, cputemp;
 
@@ -81,7 +83,7 @@ function handleOfflineEvent() {
 }
 
 function getStats() {
-	// ASL API request limit is 30 reqs/minute. In case more than one node is on this server ideally do no
+	// ASL API request limit is 30 reqs/minute. In case of multiple users ideally do no
 	// more than one req per 4 secs and increase that time if any requests return an error.
 	var rnodes=[], node;
 	switch(statsState) {
@@ -269,10 +271,14 @@ function handleXRldResp() {
 }
 
 function statMsg(msg) {
+	// Prevent duplicate error messages
+	if(msg === lastStatMsg && pat.test(msg))
+		return;
 	if(statmsg.innerHTML.length > 50000)
 		statmsg.innerHTML = '';
 	statmsg.innerHTML = (statmsg.innerHTML === '') ? msg : (statmsg.innerHTML + '<br>' + msg);
 	statmsg.scrollTop = statmsg.scrollHeight;
+	lastStatMsg = msg;
 }
 function clearStatMsg() {
 	statmsg.innerHTML = '';
