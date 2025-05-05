@@ -433,8 +433,8 @@ function updateFavsTableNodeCol() {
 		var node = c1.innerHTML;
 		// If node is in lnodes connected list, highlight Node cell in green
 		if(lnodes.length && lnodes.includes(node)) {
-			if(c1.style.backgroundColor !== 'darkgreen')
-				c1.style.backgroundColor = 'darkgreen';
+			if(c1.style.backgroundColor !== '#005511')
+				c1.style.backgroundColor = '#005511';
 		} else {
 			if(c1.style.backgroundColor !== 'transparent')
 				c1.style.backgroundColor = 'transparent';
