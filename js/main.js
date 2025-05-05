@@ -6,7 +6,7 @@ var rldRetries=0, rldTmr, evtSrcRldTmr, evtSrcUrl;
 var statsTmr, statsState=0, statsIdx=0, statsReqCnt=0;
 var xh, xha, xhs, xhr;
 var txCnt=[], txTim=[], txTT=[], txAvg=[], lnodes=[];
-var lastStatMsg = '';
+var lastStatMsg='', statsErr=false;
 var pat = /error/i;
 // DOM elements
 var hb, lnode, rnode, conncnt, ftbl, statmsg, scanmsg, cputemp;
@@ -121,7 +121,10 @@ function handleStatsResponse() {
 		return;
 	}
 	if(xhs.status != 200) {
-		statMsg('/stats/ HTTP error ' + xhs.status + '. Retrying in 15 Secs...');
+		if(!statsErr) {
+			statMsg('/stats/ HTTP error ' + xhs.status + '. Retrying in 15 Secs...');
+			statsErr = true;
+		}
 		statsTmr = setTimeout(getStats, 15000);
 		return;
 	}
@@ -212,6 +215,7 @@ function handleStatsResponse() {
 	if(tms * n < 30000 && statsReqCnt >= 2 * n)
 		tms = 30000 / n;
 	statsTmr = setTimeout(getStats, tms);
+	statsErr = false;
 }
 function convertRange(val, min, max) {
 	if(val > 100)
