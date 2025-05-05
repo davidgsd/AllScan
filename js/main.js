@@ -151,14 +151,6 @@ function handleStatsResponse() {
 		var cells = ftbl.rows[r+1].cells;
 		var c1 = cells[1];
 		var node = c1.innerHTML;
-		// If node is in lnodes connected list, highlight Node col cell in green
-		if(lnodes.includes(node)) {
-			if(c1.style.backgroundColor !== 'darkgreen')
-				c1.style.backgroundColor = 'darkgreen';
-		} else {
-			if(c1.style.backgroundColor !== 'transparent')
-				c1.style.backgroundColor = 'transparent';
-		}
 		if(node != s.node)
 			continue;
 		// Calculate rolling avg Tx activity indication
@@ -344,10 +336,17 @@ function handleNodesEvent(event) {
 			var rowdata = tabledata[localNode].remote_nodes[row];
 			if(rowdata.info === 'NO CONNECTION') {
 				tablehtml += '<tr><td colspan="6">No Connections</td></tr>';
+				if(lnodes.length) {
+					lnodes = [];
+					updateFavsTableNodeCol();
+				}
 			} else {
 				nodeNum = rowdata.node;
 				if(nodeNum == 1) {
-					lnodes = rowdata.lnodes;
+					if(lnodes.toString() !== rowdata.lnodes.toString()) {
+						lnodes = rowdata.lnodes;
+						updateFavsTableNodeCol();
+					}
 				} else {
 					total_nodes++
 					// Set background color
@@ -425,6 +424,22 @@ function handleNodetimesEvent(event) {
 	// Update CPU Temp once per ~minute
 	if(cputemp && ++hbcnt % 120 == 0)
 		xhttpApiInit('f=getCpuTemp');
+}
+
+function updateFavsTableNodeCol() {
+	for(var r=0, n=ftbl.rows.length-1; r < n; r++) {
+		var cells = ftbl.rows[r+1].cells;
+		var c1 = cells[1];
+		var node = c1.innerHTML;
+		// If node is in lnodes connected list, highlight Node cell in green
+		if(lnodes.length && lnodes.includes(node)) {
+			if(c1.style.backgroundColor !== 'darkgreen')
+				c1.style.backgroundColor = 'darkgreen';
+		} else {
+			if(c1.style.backgroundColor !== 'transparent')
+				c1.style.backgroundColor = 'transparent';
+		}
+	}
 }
 
 function xhttpApiInit(parms) {

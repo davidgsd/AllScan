@@ -252,6 +252,7 @@ if(!$ls0) {
 		sort($f0);
 		$ls1 = trim(shell_exec("ls $d1"));
 		$f1 = $ls1 ? explode(NL, $ls1) : [];
+		sort($f1);
 		$fcp = [];
 		$ov = 0;
 		foreach($f0 as $f) {

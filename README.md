@@ -118,6 +118,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good idea
 
 # Release Notes
+**v0.91 2025-05-01**<br>
+Optimizations to JavaScript that highlights Favs table node column cells for connected nodes. Optimizations to install/update script.
+
 **v0.90 2025-05-01**<br>
 Highlight Node column cell in Favorites Table if node is currently connected. Add example files showing how to set up DTMF commands as used in AllScan nodes - see docs/rpt.conf and extensions.conf. Enhancements to install/update script to install additional utilities including avahi-daemon and asl3-tts, and to update php.ini if needed to enable SQLite3.
 

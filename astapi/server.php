@@ -96,6 +96,7 @@ foreach($nodes as $node) {
 $current = [];
 $saved = [];
 $nodeTime = [];
+//$n = 0;
 while(1) {
 	foreach($nodes as $node) {
 		// Is host of this node logged in?
@@ -137,6 +138,8 @@ while(1) {
 	// Send current nodes only when data changes
 	if($current !== $saved) {
 		sendData($current, 'nodes');
+		// if($n++ == 5)
+		//	logToFile($current, 'log.txt');
 		$saved = $current;
 	}
 	// Send times every cycle
