@@ -55,12 +55,20 @@ $asdir = 'allscan';
 // Enable mkdir(..., 0775) to work properly
 umask(0002);
 clearstatcache();
-
 // Check if dir exists. If so, see if an update is needed. If not, install AllScan
 $dlfiles = true;
-$ver = 0.0;
+$ver = '';
 if(is_dir($asdir)) {
 	msg("$asdir dir exists. Checking if update needed...");
+	// TBR. Read version from common.php, will be phased out to use only version.txt
+	$fname = 'common.php';
+	if(($s = `grep '^\$AllScanVersion' $asdir/include/$fname`)) {
+		if(preg_match('/"v([0-9\.]{3,4})"/', $s, $m) == 1)
+			$ver = $m[1];
+	}
+	if(empty($ver))
+		$ver = 'Unknown';
+	// Check local & remote version.txt
 	if(checkUpdate($ver)) {
 		msg("AllScan is out-of-date.");
 		$s = readline("Ready to Update AllScan. Enter 'y' to confirm, any other key to exit: ");
