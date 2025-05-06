@@ -124,6 +124,8 @@ checkDbDir();
 checkSmDir();
 
 msg("PHP Version: " . phpversion());
+$astver = trim(shell_exec('asterisk -V') ?? 'Unknown');
+msg("Asterisk Version: " . $astver);
 
 // Confirm necessary php extensions are installed
 msg("Checking OS packages and PHP extensions...");
@@ -133,22 +135,22 @@ if(!class_exists('SQLite3')) {
 		."You may also need to enable the pdo_sqlite and sqlite3 extensions in php.ini.");
 }
 
-msg("Ready to run OS update/upgrade commands." . NL
-	."If you have recently updated and upgraded your system you do not need to do this now." . NL
-	."THE UPDATE/UPGRADE PROCESS CAN POTENTIALLY CAUSE OLDER SOFTWARE PACKAGES TO STOP WORKING." . NL
-	."DO NOT PROCEED WITH THIS STEP IF YOU ARE NOT SURE OR IF YOU ARE NOT AN AUTHORIZED SERVER ADMIN." . NL
+msg("Would you like to check for OS/package updates?" . NL
+	."If you recently updated your system or if everything is working great you do not need to do this now. " . NL
+	."The update process can cause some software packages to stop working or require config file updates." . NL
+	."DO NOT PROCEED WITH THIS STEP IF YOU'RE NOT SURE OR IF YOU'RE NOT AN AUTHORIZED SERVER ADMIN." . NL
 	."Otherwise it is recommended to ensure your system is up-to-date.");
 $s = readline("Enter 'y' to proceed, any other key to skip this step: ");
 if($s === 'y') {
 	if(is_executable('/usr/bin/apt-get')) {
 		passthruCmd("apt-get -y update");
-		passthruCmd("apt-get -y upgrade");
+		passthruCmd("apt-get upgrade");
 	} elseif(is_executable('/usr/bin/yum')) {
 		passthruCmd("yum -y update");
-		passthruCmd("yum -y upgrade");
+		passthruCmd("yum upgrade");
 	} elseif(is_executable('/usr/bin/pacman')) {
 		passthruCmd("pacman -Syu");
-		passthruCmd("pacman -S php-sqlite");
+		passthruCmd("pacman php-sqlite");
 	}
 	restartWebServer();
 }
