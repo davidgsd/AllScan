@@ -66,7 +66,7 @@ if(!empty($nodes) && !empty($hosts)) {
 	}
 }
 
-pageInit($onLoad);
+pageInit($onLoad, true, checkUpdate());
 
 if(!isset($node) || $astdb === false)
 	asExit(implode(BR, $msg));
@@ -347,6 +347,31 @@ function processForm($parms, &$msg) {
 			}
 			break;
 	}
+}
+
+function checkUpdate() {
+	global $msg;
+	if(!adminUser())
+		return false;
+	$vfile = 'include/version.txt';
+	if(!file_exists($vfile))
+		return true;
+	$vl = file_get_contents($vfile);
+	if(!$vl)
+		return true;
+	$url = "https://raw.githubusercontent.com/davidgsd/AllScan/main/$vfile";
+	$vr = file_get_contents($url);
+	if(!$vr) {
+		$msg[] = "Unable to retrieve $url";
+		return false;
+	}
+	$vl = (float)trim($vl);
+	$vr = (float)trim($vr);
+	if($vl != $vr) {
+		$msg[] = "AllScan v$vr is now available, click the Update link for more info.";
+		return true;
+	}
+	return false;
 }
 
 function getELInfo($n) {

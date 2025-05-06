@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-$AllScanInstallerUpdaterVersion = "v1.25";
+$AllScanInstallerUpdaterVersion = "1.26";
 define('NL', "\n");
 // Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory. We'll then determine
 // the location of the web root folder, cd to that folder, check if you have AllScan installed and install
@@ -58,51 +58,22 @@ clearstatcache();
 
 // Check if dir exists. If so, see if an update is needed. If not, install AllScan
 $dlfiles = true;
+$ver = 0.0;
 if(is_dir($asdir)) {
 	msg("$asdir dir exists. Checking if update needed...");
-	$fname = 'common.php';
-	if(($s = `grep '^\$AllScanVersion' $asdir/include/$fname`)) {
-		if(preg_match('/"v([0-9\.]{3,5})"/', $s, $m) == 1)
-			$ver = $m[1];
-	}
-	if(empty($ver))
-		$ver = 'Unknown';
-	msg("Allscan current version: $ver");
-
-	msg("Checking github version...");
-	if(file_exists($fname)) {
-		unlink($fname);
-		if(file_exists($fname))
-			errExit("$fname already exists in cwd, delete failed.");
-	}
-	$url = 'https://raw.githubusercontent.com/davidgsd/AllScan/main/include/' . $fname;
-	if(!execCmd("wget -q '$url'") || !file_exists($fname))
-		errExit("wget $fname failed.");
-
-	if(($s = `grep '^\$AllScanVersion' $fname`)) {
-		if(preg_match('/"v([0-9\.]{3,5})"/', $s, $m) == 1)
-			$gver = $m[1];
-	}
-	unlink($fname);
-	if(empty($gver))
-		$gver = 'Unknown';
-	msg("Allscan github version: $gver");
-
-	if($gver <= $ver) {
-		msg("AllScan is up-to-date.");
-		$dlfiles = false;
-	} else {
+	if(checkUpdate($ver)) {
 		msg("AllScan is out-of-date.");
-
 		$s = readline("Ready to Update AllScan. Enter 'y' to confirm, any other key to exit: ");
 		if($s !== 'y')
 			exit();
-
 		$bak = "$asdir.bak.$ver";
 		msg("Moving $asdir/ to $bak/...");
 		if(is_dir($bak))
 			execCmd("rm -rf $bak");
 		execCmd("mv $asdir $bak");
+	} else {
+		msg("AllScan is up-to-date.");
+		$dlfiles = false;
 	}
 } else {
 	msg("$asdir dir not found.");
@@ -138,8 +109,16 @@ if((fileperms($asdir) & 0777) != 0775)
 	execCmd("chmod 775 $asdir");
 if(getGroupName($asdir) !== $group)
 	execCmd("chgrp $group $asdir");
-execCmd("chmod 664 $asdir/*.ini");
-execCmd("chgrp $group $asdir/*.ini");
+$inis = shell_exec("ls $asdir/*.ini") . shell_exec("ls $asdir/*.ini.bak");
+if($inis) {
+	$inis = explode(NL, trim($inis));
+	foreach($inis as $f) {
+		if((fileperms($f) & 0777) != 0664)
+			execCmd("chmod 664 $f");
+		if(getGroupName($f) !== $group)
+			execCmd("chgrp $group $f");
+	}
+}
 
 checkDbDir();
 
@@ -319,13 +298,35 @@ msg("AllScan can be accessed at:\n\t$lip on the local network, or\n"
 
 if($dlfiles) {
 	msg("Be sure to bookmark the above URL(s) in your browser.");
-	msg("IMPORTANT: After updates do a CTRL-F5 in your browser (or long-press the reload button in mobile\n" 
+	msg("IMPORTANT: After updates do a CTRL-F5 in your browser (or long-press the reload button in mobile\n"
 		."browsers), or clear the browser cache, so that CSS and JavaScript files will properly update.");
 }
 
 exit();
 
 // ---------------------------------------------------
+
+function checkUpdate(&$ver) {
+	global $asdir;
+	$vfile = 'include/version.txt';
+	if(!file_exists("$asdir/$vfile"))
+		return true;
+	$v = file_get_contents("$asdir/$vfile");
+	if(!$v)
+		return true;
+	$ver = trim($v);
+	msg("AllScan current version: $ver");
+	$url = "https://raw.githubusercontent.com/davidgsd/AllScan/main/$vfile";
+	$v = file_get_contents($url);
+	if(!$v) {
+		msg("Unable to retrieve $url");
+		return false;
+	}
+	$v = trim($v);
+	msg("AllScan github version: $v");
+	return ($ver < $v);
+}
+
 // Execute command, show the command, show the output and return val
 function execCmd($cmd) {
 	echo "Executing cmd: $cmd ... ";

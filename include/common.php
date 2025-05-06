@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.91";
+$AllScanVersion = "v0.92";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -67,7 +67,7 @@ function htmlInit($title) {
 		.	'</head>' . NL;
 }
 
-function pageInit($onload='', $showHdrLinks=true) {
+function pageInit($onload='', $showHdrLinks=true, $showUpdateLink=false) {
 	global $html, $AllScanVersion, $gCfg, $urlbase, $subdir, $title, $title2, $cfgModel, $userCnt;
 	// Return now if not called from an HTML context
 	if(!isset($html))
@@ -85,7 +85,10 @@ function pageInit($onload='', $showHdrLinks=true) {
 	}
 	// Output header
 	$hdr = $lnk = [];
-	$hdr[] = $html->a("$urlbase/", null, 'AllScan', 'logo') . " <small>$AllScanVersion</small>";
+	$ver = " <small>$AllScanVersion</small>";
+	if($showUpdateLink)
+		$ver .= $html->a('https://github.com/davidgsd/AllScan#install--update',	null, '&#09889;');
+	$hdr[] = $html->a("$urlbase/", null, 'AllScan', 'logo') . $ver;
 	$lnk[] = $html->a(getScriptName(), null, $title, 'title');
 	if($showHdrLinks && $userCnt)
 		$lnk = array_merge($lnk, getHdrLinks());
