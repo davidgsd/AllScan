@@ -40,7 +40,7 @@ Additional screenshots:
 Multiple copies of AllScan can be installed on one node (server) if desired, each with their own separate configuration, Favorites, and/or different node numbers. Just make copies of the /var/www/html/allscan/ dir eg. to "allscan2" and put copies of allmon.ini and favorites.ini with your desired configuration in the new folder. Each copy of AllScan will store its user/login credentials in /etc/allscan/ in a .db file named the same as the name of its web folder, eg. "allscan2.db". (To have other copies use the same user credentials make a symbolic link from eg. allscan2.db to allscan.db.)
 
 # Pre-Install Notes
-Ideally you should be using ASL3 and you should have Allmon or Supermon properly configured and working. AllScan works great on HamVOIP and older ASL versions but ASL3 is highly recommended as it has numerous major improvements, and also supports x64 platforms (such as Dell Wyse 3040 or Beelink T5 Mini PCs which work much better than RPi's and are more cost-effective).
+Ideally you should be using ASL3 and you should have Allmon or Supermon properly configured and working. AllScan works great on HamVOIP and older ASL versions but ASL3 is highly recommended as it has numerous major improvements, and also supports x64 platforms (such as Dell Wyse 3040 or Beelink T5 Mini PCs which compared to RPi's are more reliable, more cost-effective and have more features).
 
 If you have Supermon installed AllScan will give you the option to use the favorites.ini file in the supermon directory. See the Supermon groups.io page for details on how to install Supermon. If you use Supermon2 instead of Supermon or want to put your favorites.ini file in some other folder, the favorites.ini search location(s) can be set on the AllScan Cfgs Page.
 
@@ -75,7 +75,7 @@ NOTES:
 # AllScan Nodes, Accessories and How-To-Guides
 If you do not yet have a node or might like to upgrade your node, see [AllScan.info](https://allscan.info/) for How-To Guides, Nodes, USB Interfaces, Accessories and more.
 
-AllScan nodes, node modules, and USB interfaces provide extensive features and excellent audio quality - see the [Products Page](https://allscan.info/products/) for details.
+AllScan nodes, node modules, and USB interfaces provide extensive features and outstanding audio quality - see the [Products Page](https://allscan.info/products/) for details.
 
 # Configuration Files and Parameters
 Most nodes already have a number of Cfg files and to simplify the install process AllScan will try to use these rather than require redundant files/data to be created/entered. These files are as follows:
@@ -89,13 +89,13 @@ All AllScan Cfg parameters can be viewed and set on the Cfgs page if you are log
 # Troubleshooting
 For any issues including directory/file permissions issues or issues with SQLite not being available it is recommended to first always run the update script. The script will check if you have the latest version of AllScan and update your install if not, and will validate all directory and file permissions and update any out-of-date OS packages. Refer to the "Install / Update" section above, run the update script, reboot the node, and then see if the issue was resolved.
 
-HamVOIP users: See this [Blog Post by KJ7T](https://randomwire.substack.com/p/updating-allscan-on-the-clearnode) for detailed steps on how to enable the SQLite3 extension in php.ini.
-
 If you have somehow corrupted your install and running the install/update script does not fix it, run "sudo rm -rf /etc/allscan /var/www/html/allscan /srv/http/allscan 2>/dev/null" to completely uninstall AllScan, and then run the installer again.
 
 A common fix for many issues is simply to reboot your node. You might be surprised how many issues end up being resolved with nothing more than a reboot.
 
 Be sure to check out the [Ham Radio Crusader YouTube channel AllScan videos](https://www.youtube.com/@HamRadioCrusader/search?query=AllScan) for more details and a walkthrough of how to install, set up and use AllScan on ASL3, HamVOIP, or DVSwitch.
+
+HamVOIP users: See this [Blog Post by KJ7T](https://randomwire.substack.com/p/updating-allscan-on-the-clearnode) for detailed steps on how to enable the SQLite3 extension in php.ini.
 
 If you have other issues with your node that are not related to the AllScan web app itself be sure to review the ASL config file settings listed in my How-To Guides at [AllScan.info](https://allscan.info/). Be sure to verify you have made ALL the settings shown in the appropriate guide for your node type (radio-less / HT / mobile radio).
 
