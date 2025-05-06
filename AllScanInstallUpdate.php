@@ -1,21 +1,22 @@
 #!/usr/bin/php
 <?php
-$AllScanInstallerUpdaterVersion = "1.26";
+$AllScanInstallerUpdaterVersion = "1.27";
 define('NL', "\n");
 // Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory. We'll then determine
 // the location of the web root folder, cd to that folder, check if you have AllScan installed and install
 // it if not, or will check the version and update the install if a newer version is available.
 //
-// NOTE: Updating can result in modified files being overwritten. This script will backup the allscan
+// Updating can result in modified files being overwritten. This script will backup the allscan
 // folder to allscan.bak.[ver#]/ You may then need to copy any added/modified files back into the folder.
 //
-msg("AllScan Installer/Updater Version: $AllScanInstallerUpdaterVersion");
-
 // This should be run from CLI only (SSH), not over the web
 if(isset($_SERVER['REMOTE_ADDR']) || isset($_SERVER['HTTP_HOST'])) {
 	echo "This script must be run from the Command Line Interface only.<br>\n";
 	exit(0);
 }
+
+// Check if this file is the most recent version
+checkInstallerVersion();
 
 // Determine web server folder
 $dirs = ['/var/www/html', '/srv/http'];
@@ -57,18 +58,9 @@ umask(0002);
 clearstatcache();
 // Check if dir exists. If so, see if an update is needed. If not, install AllScan
 $dlfiles = true;
-$ver = '';
+$ver = 'Unknown';
 if(is_dir($asdir)) {
 	msg("$asdir dir exists. Checking if update needed...");
-	// TBR. Read version from common.php, will be phased out to use only version.txt
-	$fname = 'common.php';
-	if(($s = `grep '^\$AllScanVersion' $asdir/include/$fname`)) {
-		if(preg_match('/"v([0-9\.]{3,4})"/', $s, $m) == 1)
-			$ver = $m[1];
-	}
-	if(empty($ver))
-		$ver = 'Unknown';
-	// Check local & remote version.txt
 	if(checkUpdate($ver)) {
 		msg("AllScan is out-of-date.");
 		$s = readline("Ready to Update AllScan. Enter 'y' to confirm, any other key to exit: ");
@@ -315,23 +307,63 @@ exit();
 
 function checkUpdate(&$ver) {
 	global $asdir;
-	$vfile = 'include/version.txt';
-	if(!file_exists("$asdir/$vfile"))
+	$fname = "include/common.php";
+	if(!file_exists("$asdir/$fname"))
 		return true;
-	$v = file_get_contents("$asdir/$vfile");
-	if(!$v)
+	$file = file("$asdir/$fname");
+	if(empty($file))
 		return true;
-	$ver = trim($v);
-	msg("AllScan current version: $ver");
-	$url = "https://raw.githubusercontent.com/davidgsd/AllScan/main/$vfile";
-	$v = file_get_contents($url);
-	if(!$v) {
-		msg("Unable to retrieve $url");
-		return false;
+	foreach($file as $line) {
+		if(preg_match('/^\$AllScanVersion = "v([0-9\.]{3,4})"/', $line, $m) == 1) {
+			$ver = $m[1];
+			break;
+		}
 	}
-	$v = trim($v);
-	msg("AllScan github version: $v");
-	return ($ver < $v);
+	msg("AllScan current version: $ver");
+	if($ver < 0.92)
+		return true;
+
+	$url = "https://raw.githubusercontent.com/davidgsd/AllScan/main/$fname";
+	$file = file($url);
+	if(empty($file))
+		errExit("Retrieve $fname from github failed. Try executing \"wget '$url'\" and check error messages. Also confirm that your node supports https and that its system time/RTC is set correctly.");
+
+	foreach($file as $line) {
+		if(preg_match('/^\$AllScanVersion = "v([0-9\.]{3,4})"/', $line, $m) == 1) {
+			$gver = $m[1];
+			break;
+		}
+	}
+	if(empty($gver))
+		errExit("Error parsing $url. Please visit $asurl and follow the install/update instructions.");
+
+	msg("AllScan github version: $gver");
+	return ($ver < $gver);
+}
+
+function checkInstallerVersion() {
+	global $AllScanInstallerUpdaterVersion;
+	msg("AllScan Installer/Updater Version: $AllScanInstallerUpdaterVersion");
+	$fname = basename(__FILE__);
+	msg("Checking github version...");
+	$url = "https://raw.githubusercontent.com/davidgsd/AllScan/main/$fname";
+	$asurl = 'https://github.com/davidgsd/AllScan';
+	$file = file($url);
+	if(empty($file))
+		errExit("Retrieve $fname from github failed. Try executing \"wget '$url'\" and check error messages. Also confirm that your node supports https and that its system time/RTC is set correctly.");
+
+	foreach($file as $line) {
+		if(preg_match('/^\$AllScanInstallerUpdaterVersion = "([0-9\.]{3,4})"/', $line, $m) == 1) {
+			$gver = $m[1];
+			break;
+		}
+	}
+	if(empty($gver))
+		errExit("Error parsing $url. Please visit $asurl and follow the install/update instructions there.");
+
+	msg("AllScan Installer/Updater github version: $gver");
+	if($AllScanInstallerUpdaterVersion != $gver)
+		errExit("This file is out-of-date. Please visit $asurl and follow the install/update instructions there.");
 }
 
 // Execute command, show the command, show the output and return val
@@ -428,7 +460,6 @@ function msg($s) {
 }
 
 function errExit($s) {
-	msg('ERROR: ' . $s);
-	msg('Check directory permissions and that this script was run as sudo/root.');
+	msg("\nERROR: $s\n");
 	exit();
 }
