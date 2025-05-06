@@ -2,14 +2,14 @@
 <?php
 $AllScanInstallerUpdaterVersion = "1.27";
 define('NL', "\n");
-// Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory. We'll then determine
-// the location of the web root folder, cd to that folder, check if you have AllScan installed and install
-// it if not, or will check the version and update the install if a newer version is available.
+// Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory.
+// We'll then check if AllScan is installed, install it if not, or check the version
+// and update the install if a newer version is available.
 //
-// Updating can result in modified files being overwritten. This script will backup the allscan
-// folder to allscan.bak.[ver#]/ You may then need to copy any added/modified files back into the folder.
+// Updating can result in modified files being overwritten. The allscan folder will be backed up
+// to allscan.bak.[ver#]/. Added/modified files may then need to be copied back into the new folder.
 //
-// This should be run from CLI only (SSH), not over the web
+// This should be run from CLI only (terminal/SSH), not from the web
 if(isset($_SERVER['REMOTE_ADDR']) || isset($_SERVER['HTTP_HOST'])) {
 	echo "This script must be run from the Command Line Interface only.<br>\n";
 	exit(0);
@@ -120,12 +120,11 @@ if(!empty($inis)) {
 }
 
 checkDbDir();
-
 checkSmDir();
 
 msg("PHP Version: " . phpversion());
 $astver = trim(shell_exec('asterisk -V') ?? 'Unknown');
-msg("Asterisk Version: " . $astver);
+msg("Asterisk/ASL Version: " . $astver);
 
 // Confirm necessary php extensions are installed
 msg("Checking OS packages and PHP extensions...");
@@ -193,7 +192,7 @@ if(is_executable('/usr/bin/apt')) {
 	}
 }
 
-// Confirm SQLite3 is in enabled in php.ini
+// Confirm SQLite3 is enabled in php.ini
 $fn = exec('sudo find /etc/php -name php.ini |grep -v cli');
 if($fn) {
 	msg("php.ini location: $fn");
