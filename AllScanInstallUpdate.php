@@ -109,9 +109,8 @@ if((fileperms($asdir) & 0777) != 0775)
 	execCmd("chmod 775 $asdir");
 if(getGroupName($asdir) !== $group)
 	execCmd("chgrp $group $asdir");
-$inis = shell_exec("ls $asdir/*.ini") . shell_exec("ls $asdir/*.ini.bak");
-if($inis) {
-	$inis = explode(NL, trim($inis));
+$inis = glob("$asdir/*{.ini,.ini.bak}", GLOB_BRACE);
+if(!empty($inis)) {
 	foreach($inis as $f) {
 		if((fileperms($f) & 0777) != 0664)
 			execCmd("chmod 664 $f");
@@ -220,7 +219,7 @@ if($fn) {
 // Check DTMF command script and audio files
 $d0 = "$webdir/$asdir/_tools/agi-bin";
 $d1 = "/usr/share/asterisk/agi-bin";
-$ls0 = trim(shell_exec("ls $d0"));
+$ls0 = trim(shell_exec("ls $d0 2>/dev/null"));
 if(!$ls0) {
 	msg("Error reading $d0/.");
 } else {
@@ -229,7 +228,7 @@ if(!$ls0) {
 	} else {
 		$f0 = explode(NL, $ls0);
 		sort($f0);
-		$ls1 = trim(shell_exec("ls $d1"));
+		$ls1 = trim(shell_exec("ls $d1 2>/dev/null"));
 		$f1 = $ls1 ? explode(NL, $ls1) : [];
 		sort($f1);
 		$fcp = [];
