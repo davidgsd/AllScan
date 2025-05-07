@@ -6,10 +6,10 @@ var rldRetries=0, rldTmr, evtSrcRldTmr, evtSrcUrl;
 var statsTmr, statsState=0, statsIdx=0, statsReqCnt=0;
 var xh, xha, xhs, xhr;
 var txCnt=[], txTim=[], txTT=[], txAvg=[], lnodes=[];
-var lastStatMsg='', statsErr=false;
+var lastStatMsg='', statsErr=false, localNode;
 var pat = /error/i;
 // DOM elements
-var hb, lnode, rnode, conncnt, ftbl, statmsg, scanmsg, cputemp;
+var hb, rnode, conncnt, ftbl, statmsg, scanmsg, cputemp;
 
 function asInit(url) {
 	if(typeof(EventSource) === 'undefined') {
@@ -18,7 +18,7 @@ function asInit(url) {
 	}
 	hb = document.getElementById('hb');
 	ftbl = document.getElementById('favs');
-	lnode = document.getElementById('localnode');
+	localNode = document.getElementById('localnode').value;
 	rnode = document.getElementById('node');
 	conncnt = document.getElementById('conncnt');
 	statmsg = document.getElementById('statmsg');
@@ -312,14 +312,14 @@ function handleNodesEvent(event) {
 	if(evtSrcRldTmr !== undefined)
 		clearTimeout(evtSrcRldTmr);
 	var tabledata = JSON.parse(event.data);
-	for(var localNode in tabledata) {
+	for(var n in tabledata) {
 		var tablehtml = '';
 		var total_nodes = 0;
 		var cos_keyed = 0;
 		var tx_keyed = 0;
 		var pgTitlePrefix = '';
-		for(row in tabledata[localNode].remote_nodes) {
-			var rowdata = tabledata[localNode].remote_nodes[row];
+		for(row in tabledata[n].remote_nodes) {
+			var rowdata = tabledata[n].remote_nodes[row];
 			if(rowdata.cos_keyed == 1)
 				cos_keyed = 1;
 			if(rowdata.tx_keyed == 1)
@@ -327,23 +327,23 @@ function handleNodesEvent(event) {
 		}
 		if(cos_keyed == 0) {
 			if(tx_keyed == 0) {
-				tablehtml += '<tr class="gColor"><td>' + localNode + '</td><td>Idle</td><td colspan="4"></td></tr>';
+				tablehtml += '<tr class="gColor"><td>' + n + '</td><td>Idle</td><td colspan="4"></td></tr>';
 			} else {
-				tablehtml += '<tr class="tColor"><td>' + localNode + '</td><td>PTT-Keyed</td><td colspan="4"></td></tr>';
+				tablehtml += '<tr class="tColor"><td>' + n + '</td><td>PTT-Keyed</td><td colspan="4"></td></tr>';
 				pgTitlePrefix = '\u{1F534} '; // Red Circle
 			}
 		} else {
 			if(tx_keyed == 0) {
-				tablehtml += '<tr class="lColor"><td>' + localNode + '</td><td>COS-Detected</td><td colspan="4"></td></tr>';
+				tablehtml += '<tr class="lColor"><td>' + n + '</td><td>COS-Detected</td><td colspan="4"></td></tr>';
 				pgTitlePrefix = '\u{1F7E2} '; // Green Circle
 			} else {
-				tablehtml += '<tr class="bColor"><td>' + localNode +
+				tablehtml += '<tr class="bColor"><td>' + n +
 					'</td><td colspan="2">COS-Detected, PTT-Keyed</td><td colspan="4"></td></tr>';
 				pgTitlePrefix = '\u{1F7E1} '; // Orange Circle
 			}
 		}
-		for(row in tabledata[localNode].remote_nodes) {
-			var rowdata = tabledata[localNode].remote_nodes[row];
+		for(row in tabledata[n].remote_nodes) {
+			var rowdata = tabledata[n].remote_nodes[row];
 			if(rowdata.info === 'NO CONNECTION') {
 				tablehtml += '<tr><td colspan="6">No Connections</td></tr>';
 				if(lnodes.length) {
@@ -367,7 +367,7 @@ function handleNodesEvent(event) {
 					} else {
 						tablehtml += '<tr>';
 					}
-					var id = 't' + localNode + 'c0' + 'r' + row;
+					var id = 't' + n + 'c0' + 'r' + row;
 					tablehtml += '<td id="' + id + '" class="nodeNum" onClick="setNodeBox(' + nodeNum + ')">' +
 						nodeNum + '</td>';
 					// Show info or IP
@@ -398,8 +398,8 @@ function handleNodesEvent(event) {
 		if(total_nodes > 1) {
 			tablehtml += '<tr><td colspan="6">' + total_nodes + ' nodes connected</td></tr>';
 		}
-		// $('#table_' + localNode + ' tbody:first').html(tablehtml);
-		const cstbl = document.getElementById('table_' + localNode);
+		// $('#table_' + n + ' tbody:first').html(tablehtml);
+		const cstbl = document.getElementById('table_' + n);
 		tbody0 = cstbl.getElementsByTagName('tbody')[0];
 		tbody0.innerHTML = tablehtml;
 		if(conncnt)
@@ -412,11 +412,11 @@ function handleNodetimesEvent(event) {
 	if(evtSrcRldTmr !== undefined)
 		clearTimeout(evtSrcRldTmr);
 	var tabledata = JSON.parse(event.data);
-	for(localNode in tabledata) {
-		tableID = 'table_' + localNode;
+	for(n in tabledata) {
+		tableID = 'table_' + n;
 		cstbl = document.getElementById(tableID);
-		for(row in tabledata[localNode].remote_nodes) {
-			var rowdata = tabledata[localNode].remote_nodes[row];
+		for(row in tabledata[n].remote_nodes) {
+			var rowdata = tabledata[n].remote_nodes[row];
 			rowID='lkey' + row;
 			//$( '#' + tableID + ' #' + rowID).text( rowdata.last_keyed );
 			tableRow = document.getElementById(rowID);
@@ -442,7 +442,10 @@ function updateFavsTableNodeCol() {
 		var c1 = cells[1];
 		var node = c1.innerHTML;
 		// If node is in lnodes connected list, highlight Node cell in green
-		if(lnodes.length && lnodes.includes(node)) {
+		if(node == localNode) {
+			if(c1.style.backgroundColor !== '#003377')
+				c1.style.backgroundColor = '#003377';
+		} else if(lnodes.length && lnodes.includes(node)) {
 			if(c1.style.backgroundColor !== '#005511')
 				c1.style.backgroundColor = '#005511';
 		} else {
@@ -481,7 +484,6 @@ function handleApiResponse() {
 }
 
 function connectNode(button) {
-	var localNode = lnode.value;
 	var remoteNode = rnode.value;
 	if(remoteNode < 1) {
 		alert('Please enter a valid remote node number.');
@@ -496,7 +498,6 @@ function connectNode(button) {
 	xhttpSend(astApiDir + 'connect.php', parms);
 }
 function disconnectNode() {
-	var localNode = lnode.value;
 	var remoteNode = rnode.value;
 	if(remoteNode.length == 0) {
 		alert('Please enter the remote node number.');
@@ -507,7 +508,6 @@ function disconnectNode() {
 	xhttpSend(astApiDir + 'connect.php', parms);
 }
 function dtmfCmd() {
-	var localNode = lnode.value;
 	var cmd = rnode.value;
 	if(cmd.length == 0) {
 		alert('Please enter a valid DTMF command in the Node# field.');
@@ -519,7 +519,6 @@ function dtmfCmd() {
 function astrestart() {
 	window.removeEventListener('beforeunload', closeEventSrc);
 	closeEventSrc();
-	var localNode = lnode.value;
 	parms = 'button=restart' + '&localnode='+localNode;
 	xhttpSend(astApiDir + 'cmd.php', parms);
 	// Reinit Event Source
