@@ -227,9 +227,13 @@ background-color:rgba(51,51,119,0.75);
 table.favs tbody tr {
 line-height:100%;
 }
+table.favs tbody tr:hover {
+background-color:rgba(51,51,119,0.67);
+}
 table.favs th, table.favs td {
 padding:3px;
 }
+
 small {
 font:11px/1.25 "Helvetica Narrow","Arial Narrow",Verdana,Arial,Helvetica,sans-serif;
 }
