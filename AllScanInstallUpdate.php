@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-$AllScanInstallerUpdaterVersion = "1.27";
+$AllScanInstallerUpdaterVersion = "1.28";
 define('NL', "\n");
 // Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory.
 // We'll then check if AllScan is installed, install it if not, or check the version
@@ -182,7 +182,7 @@ if(is_executable('/usr/bin/apt')) {
 		$fname = '/etc/allmon3/allmon3.ini';
 		if(file_exists($fname)) {
 			$fname2 = '/etc/asterisk/allmon.ini.php';
-			if(exec("diff $fname $fname2"))
+			if(!file_exists($fname2) || exec("diff $fname $fname2"))
 				execCmd("cp $fname $fname2");
 			if((fileperms($fname2) & 0777) != 0660)
 				execCmd("chmod 660 $fname2");
