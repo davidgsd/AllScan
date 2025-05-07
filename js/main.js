@@ -446,8 +446,8 @@ function updateFavsTableNodeCol() {
 			if(c1.style.backgroundColor !== '#003377')
 				c1.style.backgroundColor = '#003377';
 		} else if(lnodes.length && lnodes.includes(node)) {
-			if(c1.style.backgroundColor !== '#005511')
-				c1.style.backgroundColor = '#005511';
+			if(c1.style.backgroundColor !== '#005010')
+				c1.style.backgroundColor = '#005010';
 		} else {
 			if(c1.style.backgroundColor !== 'transparent')
 				c1.style.backgroundColor = 'transparent';
