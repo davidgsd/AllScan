@@ -49,11 +49,8 @@ The AllScan Install/Update script automatically checks system configuration deta
 
 Log into your node by SSH and run the following commands:
 
-	# Confirm needed packages are installed:
 	sudo apt update; sudo apt install php php-sqlite3 php-curl unzip avahi-daemon asl3-tts -y
-
-	cd ~
-	rm AllScanInstallUpdate.php 2> /dev/null
+	cd ~; rm AllScanInstallUpdate.php 2> /dev/null
 	wget 'https://raw.githubusercontent.com/davidgsd/AllScan/main/AllScanInstallUpdate.php'
 	chmod 755 AllScanInstallUpdate.php
 	sudo ./AllScanInstallUpdate.php
