@@ -82,9 +82,7 @@ if(!isset($parms))
 $remNode = (isset($parms['node']) && validDbID($parms['node']) && strlen($parms['node']) < 9) ? $parms['node'] : '';
 
 showConnStatusTable();
-
-if(modifyOk())
-	showNodeCtrlForm();
+showNodeCtrlForm();
 
 h2('Favorites');
 // Read in favorites.ini

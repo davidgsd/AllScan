@@ -24,7 +24,8 @@ function showConnStatusTable() {
 
 function showNodeCtrlForm() {
 	global $node, $remNode, $favsFile, $asdir, $gCfg;
-	echo '<form id="nodeForm" method="post" action="/' . $asdir . '/"><fieldset>
+	if(modifyOk())
+		echo '<form id="nodeForm" method="post" action="/' . $asdir . '/"><fieldset>
 <input type=hidden id="localnode" name="localnode" value="' . $node . '">
 <input type=hidden id="conncnt" name="conncnt" value="0">
 <input type=hidden id="favsfile" name="favsfile" value="' . $favsFile .'">
@@ -44,6 +45,8 @@ function showNodeCtrlForm() {
 	for="autodisc">Disconnect before Connect</label>
 </fieldset></form>
 ';
+	else
+		echo '<input type=hidden id="localnode" name="localnode" value="' . $node . '">' . NL;
 }
 
 function showSetNodeInfoForm() {
