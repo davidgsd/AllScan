@@ -351,18 +351,39 @@ function checkUpdate() {
 	global $msg;
 	if(!adminUser())
 		return false;
-	$vfile = 'include/version.txt';
-	if(!file_exists($vfile))
+	$fname = "include/common.php";
+	$vpat = '/^\$AllScanVersion = "v([0-9\.]{3,4})"/';
+	if(!file_exists($fname))
 		return true;
-	$vl = file_get_contents($vfile);
-	if(!$vl)
+	$file = file($fname);
+	if(empty($file))
 		return true;
-	$url = "https://raw.githubusercontent.com/davidgsd/AllScan/main/$vfile";
-	$vr = file_get_contents($url);
-	if(!$vr) {
+	foreach($file as $line) {
+		if(preg_match($vpat, $line, $m) == 1) {
+			$vl = $m[1];
+			break;
+		}
+	}
+	if(empty($vl))
+		return true;
+
+	$url = "https://raw.githubusercontent.com/davidgsd/AllScan/main/$fname";
+	$file = file($url);
+	if(empty($file)) {
 		$msg[] = "Unable to retrieve $url";
 		return false;
 	}
+	foreach($file as $line) {
+		if(preg_match($vpat, $line, $m) == 1) {
+			$vr = $m[1];
+			break;
+		}
+	}
+	if(empty($vr)) {
+		$msg[] = "Error parsing $url";
+		return false;
+	}
+
 	$vl = (float)trim($vl);
 	$vr = (float)trim($vr);
 	if($vl != $vr) {

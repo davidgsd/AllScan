@@ -309,19 +309,20 @@ exit();
 function checkUpdate(&$ver) {
 	global $asdir;
 	$fname = "include/common.php";
+	$vpat = '/^\$AllScanVersion = "v([0-9\.]{3,4})"/';
 	if(!file_exists("$asdir/$fname"))
 		return true;
 	$file = file("$asdir/$fname");
 	if(empty($file))
 		return true;
 	foreach($file as $line) {
-		if(preg_match('/^\$AllScanVersion = "v([0-9\.]{3,4})"/', $line, $m) == 1) {
+		if(preg_match($vpat, $line, $m) == 1) {
 			$ver = $m[1];
 			break;
 		}
 	}
 	msg("AllScan current version: $ver");
-	if($ver < 0.92)
+	if($ver < 0.93)
 		return true;
 
 	$url = "https://raw.githubusercontent.com/davidgsd/AllScan/main/$fname";
@@ -330,7 +331,7 @@ function checkUpdate(&$ver) {
 		errExit("Retrieve $fname from github failed. Try executing \"wget '$url'\" and check error messages. Also confirm that your node supports https and that its system time/RTC is set correctly.");
 
 	foreach($file as $line) {
-		if(preg_match('/^\$AllScanVersion = "v([0-9\.]{3,4})"/', $line, $m) == 1) {
+		if(preg_match($vpat, $line, $m) == 1) {
 			$gver = $m[1];
 			break;
 		}
