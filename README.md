@@ -114,10 +114,10 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 
 # Release Notes
 **v0.93 2025-05-13**<br>
-Fix bug where for non-logged-in users JavaScript functions would not work.
+Fix bug introduced in v0.90 where for non-logged-in users JavaScript functions would not work.
 
 **v0.92 2025-05-05**<br>
-When loading main page check if a newer AllScan version is available and if so display a lighting bolt icon link next to the version number in the page header. This link then opens the AllScan github page and update instructions. Add include/version.txt file to simplify checking of version number. JS optimizations to prevent duplicate error messages eg. if node is offline.
+When loading main page check if a newer AllScan version is available and if so display a lighting bolt icon link next to the version number in the page header. This link then opens the AllScan github page and update instructions. JS optimizations to prevent duplicate error messages eg. if node is offline.
 
 **v0.91 2025-05-04**<br>
 Optimizations to JavaScript that highlights Favs table node column cells for connected nodes. Optimizations to install/update script.

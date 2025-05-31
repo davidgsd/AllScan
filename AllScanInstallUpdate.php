@@ -137,7 +137,7 @@ if(!class_exists('SQLite3')) {
 msg("Would you like to check for OS/package updates?" . NL
 	."If you recently updated your system or if everything is working great you do not need to do this now. " . NL
 	."The update process can cause some software packages to stop working or require config file updates." . NL
-	."DO NOT PROCEED WITH THIS STEP IF YOU'RE NOT SURE OR IF YOU'RE NOT AN AUTHORIZED SERVER ADMIN." . NL
+	."DO NOT PROCEED WITH THIS STEP IF YOU'RE NOT SURE OR ARE NOT AN AUTHORIZED SERVER ADMIN." . NL
 	."Otherwise it is recommended to ensure your system is up-to-date.");
 $s = readline("Enter 'y' to proceed, any other key to skip this step: ");
 if($s === 'y') {
@@ -149,7 +149,7 @@ if($s === 'y') {
 		passthruCmd("yum upgrade");
 	} elseif(is_executable('/usr/bin/pacman')) {
 		passthruCmd("pacman -Syu");
-		passthruCmd("pacman php-sqlite");
+		passthruCmd("pacman -S php-sqlite");
 	}
 	restartWebServer();
 }
