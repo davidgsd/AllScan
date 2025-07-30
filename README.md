@@ -106,15 +106,13 @@ If you have any questions email david at allscan.info. Also see [AllScan.info](h
 <a href="https://allscan.info/"><img src="docs/AllScan.info.png"></a>
 
 # Donations
-To contribute to AllScan feel free to send any amount by paypal, venmo or zelle to chc_media at yahoo.com. Even $5 does help cover expenses and enable me to spend more time on further development and new features. Thank you for your support, and with helping spread the word about AllScan and ASL. [Donate with Paypal](https://www.paypal.com/donate?hosted_button_id=5BELZZ4EEAHKW)
+To contribute to AllScan feel free to send any amount by paypal, venmo or zelle to chc_media at yahoo.com. Even $5 does help cover expenses and enable me to spend more time on further development and new features. Thank you for your support, and with helping spread the word about AllScan and ASL.
 
-AllScan stickers are now available and are a great way to help support the project and spread the word. These are 3"x3" UV-resistant outdoor-rated stickers on an iridescent metallic material with permanent adhesive. One sticker is included at no charge with any order of an AllScan product at [AllScan.info](https://allscan.info) or stickers can be purchased separately with free USPS shipping to US or for outside the US add $5 shipping.
+<a href="https://www.paypal.com/donate?hosted_button_id=5BELZZ4EEAHKW"><img src="docs/btn_donate_LG.gif"></a>
+
+AllScan stickers are now available and are also a great way to help support the project and spread the word. These are 3"x3" UV-resistant outdoor-rated stickers on an iridescent metallic material with permanent adhesive. One sticker is included at no charge with any order of an AllScan product at [AllScan.info](https://allscan.info) or stickers can be purchased separately for $5 ea., 3 for $10, or 10 for $20, with free US shipping or for outside the US add $5 shipping. These can be ordered on my website or with the above Donate button specifying the Qty in the comments.
 
 <img src="docs/AllScan-Sticker-1603x1351.jpg" width=401 height=338>
-
-[Buy Qty 1 $5](https://www.paypal.com/cgi-bin/webscr?on0=Qty&os0=1&currency_code=USD)
-[Buy Qty 3 $10](https://www.paypal.com/cgi-bin/webscr?on0=Qty&os0=1&currency_code=USD)
-[Buy Qty 10 $20](https://www.paypal.com/cgi-bin/webscr?on0=Qty&os0=1&currency_code=USD)
 
 # Road Map
 As of version 0.65, AllScan implements the main features I originally planned, and works very well for the use case of personal nodes that have one or two primary users and/or a small number of occasional other users. A future version of AllScan will add enhanced support for a larger number of simultaneous web-client users (which will require ASL stats caching so that numerous web-clients would not each be making separate ASL stats requests which would significantly slow down the stats scanning functions). However this is not a common use case and is not a current priority. AllScan will also at some point more fully support nodes with more than one node number eg. allowing the local node to be selected from a select box control. Other changes planned:
@@ -145,7 +143,7 @@ Enable reading AMI cfgs from rpt.conf and manager.conf if not found in .ini sear
 Fix bug where on new installs on nodes with no existing favorites files the main page would not fully load. Other minor optimizations.
 
 **v0.86 2024-10-15**<br>
-Add Favorites File Management functions to the Cfgs Tab, and a Favorites File Select control to the main page. These functions support viewing, downloading, copying, deleting, renaming and uploading favorites files, and enable simple switching between them. Simplify entry of node Call Sign, Location and Title configs for installs that do not have a Supermon global.inc file. 
+Add Favorites File Management functions to the Cfgs Tab, and a Favorites File Select control to the main page. These functions support viewing, downloading, copying, deleting, renaming and uploading favorites files, and enable simple switching between them. Simplify entry of node Call Sign, Location and Title configs for installs that do not have a Supermon global.inc file.
 
 **v0.83 2024-09-12**<br>
 Show additional messages in the log window at startup including which ASL channel driver is enabled, audio gain settings, and ASL RxAudioStats support.
