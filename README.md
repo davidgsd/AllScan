@@ -103,13 +103,14 @@ For fastest response support requests / questions / inquiries should be emailed 
 # Contact
 If you have any questions email david at allscan.info. Also see [AllScan.info](https://AllScan.info), and the [AllScan FB Group](https://www.facebook.com/groups/allscan). Note that any tech support questions should be emailed to me &ndash; not posted to the FB group.
 
+<img src="docs/AllScan.info.png">
+
 # Donations
 To contribute to AllScan feel free to send any amount by paypal, venmo or zelle to chc_media at yahoo.com. Even $5 does help cover expenses and enable me to spend more time on further development and new features. Thank you for your support, and with helping spread the word about AllScan and ASL.
 
-AllScan stickers are now available and are a great way to help support the project and spread the word. These are 3"x3" UV-resistant outdoor-rated stickers on an iridescent metallic material with permanent adhesive. One sticker is included at no charge with any order of an AllScan product at [AllScan.info](https://allscan.info) or stickers can be purchased separately for $5 ea. / 3 for $10 / or 10 for $20, with free USPS shipping included to US (or $5 shipping outside the US)
+AllScan stickers are now available and are a great way to help support the project and spread the word. These are 3"x3" UV-resistant outdoor-rated stickers on an iridescent metallic material with permanent adhesive. One sticker is included at no charge with any order of an AllScan product at [AllScan.info](https://allscan.info) or stickers can be purchased separately for $5 ea. / 3 for $10 / 10 for $20, with free USPS shipping included to US or for outside the US add $5 shipping.
 
 <img src="docs/AllScan-Sticker-1603x1351.jpg" width=401 height=338>
-
 
 # Road Map
 As of version 0.65, AllScan implements the main features I originally planned, and works very well for the use case of personal nodes that have one or two primary users and/or a small number of occasional other users. A future version of AllScan will add enhanced support for a larger number of simultaneous web-client users (which will require ASL stats caching so that numerous web-clients would not each be making separate ASL stats requests which would significantly slow down the stats scanning functions). However this is not a common use case and is not a current priority. AllScan will also at some point more fully support nodes with more than one node number eg. allowing the local node to be selected from a select box control. Other changes planned:
@@ -227,5 +228,3 @@ A: To uninstall, delete the allscan folder in the web server root directory (/va
 
 # Thanks
 Thanks to all ASL Developers, to the numerous hams who have helped with Beta testing, and to all repeater owners who have integrated AllStar.
-
-<img src="docs/AllScan.info.png">
