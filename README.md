@@ -103,7 +103,7 @@ For fastest response support requests / questions / inquiries should be emailed 
 # Contact
 If you have any questions email david at allscan.info. Also see [AllScan.info](https://AllScan.info), and the [AllScan FB Group](https://www.facebook.com/groups/allscan). Note that any tech support questions should be emailed to me &ndash; not posted to the FB group.
 
-<a href="https://allscan.info/><img src="docs/AllScan.info.png"></a>
+<a href="https://allscan.info/"><img src="docs/AllScan.info.png"></a>
 
 # Donations
 To contribute to AllScan feel free to send any amount by paypal, venmo or zelle to chc_media at yahoo.com. Even $5 does help cover expenses and enable me to spend more time on further development and new features. Thank you for your support, and with helping spread the word about AllScan and ASL.
