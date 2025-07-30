@@ -110,7 +110,7 @@ To contribute to AllScan feel free to send any amount by paypal, venmo or zelle 
 
 <a href="https://www.paypal.com/donate?hosted_button_id=5BELZZ4EEAHKW"><img src="docs/btn_donate_LG.gif"></a>
 
-AllScan stickers are now available and are also a great way to help support the project and spread the word. These are 3"x3" UV-resistant outdoor-rated stickers on an iridescent metallic material with permanent adhesive. One sticker is included at no charge with any order of an AllScan product at [AllScan.info](https://allscan.info) or stickers can be purchased separately for $5 ea., 3 for $10, or 10 for $20, with free US shipping or for outside the US add $5 shipping. These can be ordered on my website or with the above Donate button specifying the Qty in the comments.
+AllScan stickers are now available and are also a great way to help support the project and spread the word. These are 3"x3" UV-resistant outdoor-rated stickers on an iridescent metallic material with permanent adhesive. One sticker is included at no charge with any order of an AllScan product at [AllScan.info](https://allscan.info) or stickers can be purchased separately for $5 ea., 3 for $10, or 10 for $20, with free US shipping or for outside the US add $5 shipping. These can be ordered on my website or with the above Donate button (specify Sticker Qty in comments).
 
 <img src="docs/AllScan-Sticker-1603x1351.jpg" width=401 height=338>
 
