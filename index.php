@@ -31,11 +31,13 @@ checkDiskSpace($msg);
 
 // Load node and host definitions
 $hosts = [];
+$ports = [];
 $onLoad = '';
-$nodes = getNodeCfg($msg, $hosts);
+$nodes = getNodeCfg($msg, $hosts, $ports);
 if(!empty($nodes) && !empty($hosts)) {
 	$node = $nodes[0];
 	$host = $hosts[0];
+	$port = $ports[0];
 
 	// Load ASL DB
 	$astdb = readAstDb($msg);
@@ -394,7 +396,7 @@ function checkUpdate() {
 }
 
 function getELInfo($n) {
-	global $node, $host, $ami;
+	global $node, $host, $port, $ami;
 	static $servers, $fp, $cfg;
 	if(!$node || !$host) {
 		return;
@@ -407,8 +409,8 @@ function getELInfo($n) {
 	}
 	// Login to AMI
 	if(!array_key_exists($host, $servers)) {
-		// msg("Connecting to Asterisk Manager $node $host...");
-		$fp[$host] = $ami->connect($host);
+		// msg("Connecting to Asterisk Manager $node $host:$port...");
+		$fp[$host] = $ami->connect($host, $port);
 		if($fp[$host] === false) {
 			//msg('Connect Failed. Check allmon.ini settings.');
 			return;

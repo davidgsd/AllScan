@@ -57,17 +57,19 @@ $amicd = '';
 $rxstatssupported = false;
 
 foreach($nodes as $node) {
-	$host = $cfg[$node]['host'];
-	if(!$host) {
-		$data['status'] = "Invalid host setting in allmon.ini [$node]";
+	$arr = parseAllmonCfg($cfg[$node]);
+	if($arr === null) {
+		$data['status'] = "Invalid AMI Cfgs [$node]";
 		sendData($data, 'connection');
 		continue;
 	}
-	$data = ['host'=>$host, 'node'=>$node];
+	$host = $arr[0];
+	$port = $arr[1];
+	$data = ['host'=>$host, 'port'=>$port, 'node'=>$node];
 	// Connect and login to each manager only once
 	if(!array_key_exists($host, $servers)) {
-		$data['status'] = "Connecting to Asterisk Manager $node $host...";
-		$fp[$host] = $ami->connect($host);
+		$data['status'] = "Connecting to Asterisk Manager $node $host:$port...";
+		$fp[$host] = $ami->connect($host, $port);
 		if($fp[$host] === false) {
 			$data['status'] .= 'Connect Failed. Check allmon.ini settings.';
 		} else {
@@ -78,7 +80,7 @@ foreach($nodes as $node) {
 				$servers[$host] = 'y';
 				$data['status'] .= 'Login OK';
 			} else {
-				$data['status'] .= "Login Failed. Check allmon.ini settings.";
+				$data['status'] .= "Login Failed. Check AMI Cfgs.";
 			}
 			// Log version info
 			$data['status'] .= "<br>ASL Ver: $ami->aslver, AllScan Ver: "

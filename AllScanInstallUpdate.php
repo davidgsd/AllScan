@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-$AllScanInstallerUpdaterVersion = "1.28";
+$AllScanInstallerUpdaterVersion = "1.29";
 define('NL', "\n");
 // Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory.
 // We'll then check if AllScan is installed, install it if not, or check the version
@@ -179,6 +179,7 @@ if(is_executable('/usr/bin/apt')) {
 			passthruCmd("systemctl start asl3-update-astdb.timer 2> /dev/null");
 		}
 		// Make a readable copy of allmon3.ini (Allmon3 updates can reset the file permissions)
+		/* This should rarely if ever be useful as manager.conf should always have correct AMI cfgs
 		$fname = '/etc/allmon3/allmon3.ini';
 		if(file_exists($fname)) {
 			$fname2 = '/etc/asterisk/allmon.ini.php';
@@ -189,6 +190,7 @@ if(is_executable('/usr/bin/apt')) {
 			if(getGroupName($fname2) !== $group)
 				execCmd("chgrp $group $fname2");
 		}
+		*/
 	}
 }
 

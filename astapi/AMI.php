@@ -4,11 +4,9 @@ define('AMI_DEBUG_LOG', 'log.txt');
 class AMI {
 public $aslver = '2.0/unknown';
 
-function connect($host) {
-	// Set default port if not provided
-	$arr = explode(':', $host);
-	$ip = $arr[0];
-	$port = isset($arr[1]) ? $arr[1] : 5038;
+function connect($ip, $port) {
+	if(!$ip || !$port)
+		return false;
 	return fsockopen($ip, $port, $errno, $errstr, 5);
 }
 

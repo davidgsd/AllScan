@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.93";
+$AllScanVersion = "v0.94";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -172,11 +172,11 @@ function getAmiCfg(&$msg) {
 	}
 }
 
-$allmonini = ['allmon.ini', '../supermon/allmon.ini', '/etc/asterisk/allmon.ini.php', '../allmon2/allmon.ini.php',
-				'/etc/allmon3/allmon3.ini', '../supermon2/user_files/allmon.ini'];
+$allmonini = ['allmon.ini', '../supermon/allmon.ini', '/etc/asterisk/allmon.ini.php',
+				'../allmon2/allmon.ini.php', '../supermon2/user_files/allmon.ini'];
 
 // Get nodes list and host IP(s)
-function getNodeCfg(&$msg, &$hosts) {
+function getNodeCfg(&$msg, &$hosts, &$ports) {
 	global $allmonini, $amicfg;
 	getAmiCfg($msg);
 	// Check for file in our directory and if not found look in $allmonini locations
@@ -190,15 +190,19 @@ function getNodeCfg(&$msg, &$hosts) {
 			$nodes = [];
 			foreach($cfg as $n => $c) {
 				if(validDbId($n) && isset($c['host']) && $c['host']) {
-					$nodes[] = $n;
-					$hosts[] = $c['host'];
+					$arr = parseAllmonCfg($c);
+					if($arr !== null) {
+						$nodes[] = $n;
+						$hosts[] = $arr[0];
+						$ports[] = $arr[1];
+					}
 				}
 			}
-			if(empty($nodes) || empty($hosts)) {
+			if(empty($nodes)) {
 				$msg[] = "No valid node found in $f";
 				//$msg[] = varDumpClean($cfg, true);
 			} else {
-				$msg[] = "Node $nodes[0] $hosts[0] read from $f";
+				$msg[] = "Node $nodes[0] $hosts[0]:$ports[0] read from $f";
 				if(count($nodes) > 1)
 					$msg[] = "(More than one node is defined in $f, AllScan currently uses only the first.)";
 				return $nodes;
@@ -209,11 +213,23 @@ function getNodeCfg(&$msg, &$hosts) {
 	if(isset($amicfg->node) && isset($amicfg->host) && isset($amicfg->port) && isset($amicfg->user)) {
 		$nodes[] = $amicfg->node;
 		$hosts[] = $amicfg->host;
-		$msg[] = "Node $nodes[0] $hosts[0] read from ASL cfgs";
+		$ports[] = $amicfg->port;
+		$msg[] = "Node $nodes[0] $hosts[0]:$ports[0] read from ASL cfgs";
 		return $nodes;
 	}
 	$msg[] = "No valid node/AMI definitions found. Run asl-menu to configure AMI credentials.";
 	return false;
+}
+
+function parseAllmonCfg($cfg) {
+	$host = $cfg['host'];
+	// AllMon2 .ini used format IPV4[:port], AllMon3 has [optional] port on a separate line
+	if(preg_match('/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d{3,5})/', $host, $m) == 1)
+		list($x, $host, $port) = $m;
+	if(validIpAddr($host)) {
+		$port = (isset($cfg['port']) && $cfg['port'] > 80 && $cfg['port'] < 65535) ? $cfg['port'] : 5038;
+		return [$host, $port];
+	}
 }
 
 // Below called by astapi files, which should only happen if controller file eg. index.php already called

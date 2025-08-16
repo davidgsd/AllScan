@@ -25,9 +25,14 @@ $cfg = readNodeCfg();
 if($cfg === false)
 	exit("allmon.ini not found\n");
 
+$arr = parseAllmonCfg($cfg[$localnode]);
+if($arr === null)
+	exit("No valid AMI Cfgs\n");
+list($host, $port) = $arr;
+
 // Open socket to Asterisk Manager
 $ami = new AMI();
-$fp = $ami->connect($cfg[$localnode]['host']);
+$fp = $ami->connect($host, $port);
 if($fp === false)
 	exit("Could not connect\n");
 
