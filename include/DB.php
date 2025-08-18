@@ -229,8 +229,8 @@ function getLastInsertId() {
 }
 
 function unquoteSqlFunctions($vals) {
-	$search = array("'NOW()'", "'NULL'");
-	$replace = array('NOW()', 'NULL');
+	$search = ["'NOW()'", "'NULL'"];
+	$replace = ['NOW()', 'NULL'];
 	$vals = str_replace($search, $replace, $vals);
 	return $vals;
 }

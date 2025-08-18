@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-$AllScanInstallerUpdaterVersion = "1.29";
+$AllScanInstallerUpdaterVersion = "1.30";
 define('NL', "\n");
 // Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory.
 // We'll then check if AllScan is installed, install it if not, or check the version
@@ -195,28 +195,34 @@ if(is_executable('/usr/bin/apt')) {
 }
 
 // Confirm SQLite3 is enabled in php.ini
-$fn = exec('sudo find /etc/php -name php.ini |grep -v cli');
-if($fn) {
-	msg("php.ini location: $fn");
-	$lcgood = exec("grep sqlite /etc/php/8.2/apache2/php.ini | grep '^extension=' | wc -l");
-	$lcbad = exec("grep sqlite /etc/php/8.2/apache2/php.ini | grep '^;extension=' | wc -l");
-	if($lcgood >= 2)
-		msg("php.ini appears to have SQLite3 enabled");
-	elseif($lcbad < 2) {
-		msg("\nWARNING: SQLite3 extension does not appear to be enabled in php.ini.\n"
-			."You may need to manually edit the file and uncomment (remove leading ';') "
-			."the lines that say 'extension=pdo_sqlite' and 'extension=sqlite3'.");
-		$s = readline("Hit any key to confirm");
+// Check that class exists may not be accurate since this script is run from CLI vs wep app is
+// run under apache and the CLI and Apache php.ini may differ
+if(!class_exists('SQLite3')) {
+	$fn = exec('sudo find /etc/php -name php.ini |grep -v cli');
+	if($fn) {
+		msg("php.ini location: $fn");
+		$lcgood = exec("grep sqlite /etc/php/8.2/apache2/php.ini | grep '^extension=' | wc -l");
+		$lcbad = exec("grep sqlite /etc/php/8.2/apache2/php.ini | grep '^;extension=' | wc -l");
+		if($lcgood >= 2)
+			msg("php.ini appears to have SQLite3 enabled");
+		elseif($lcbad < 2) {
+			msg("\nWARNING: SQLite3 extension does not appear to be enabled in php.ini.\n"
+				."You may need to manually edit the file and uncomment (remove leading ';') "
+				."the lines that say 'extension=pdo_sqlite' and 'extension=sqlite3'.");
+			$s = readline("Hit any key to confirm");
+		} else {
+			// Below may no longer be needed on more recent Debian 12, may result in unnecessary warning
+			// messages in php log due to module being already loaded
+			msg("Backing up php.ini -> $fn.bak");
+			execCmd("cp $fn $fn.bak");
+			msg("Enabling SQLite3 extension in php.ini");
+			execCmd("sed -i 's/;extension=pdo_sqlite/extension=pdo_sqlite/g' $fn");
+			execCmd("sed -i 's/;extension=sqlite3/extension=sqlite3/g' $fn");
+			restartWebServer();
+		}
 	} else {
-		msg("Backing up php.ini -> $fn.bak");
-		execCmd("cp $fn $fn.bak");
-		msg("Enabling SQLite3 extension in php.ini");
-		execCmd("sed -i 's/;extension=pdo_sqlite/extension=pdo_sqlite/g' $fn");
-		execCmd("sed -i 's/;extension=sqlite3/extension=sqlite3/g' $fn");
-		restartWebServer();
+		msg("php.ini not found in /etc/php/");
 	}
-} else {
-	msg("php.ini not found in /etc/php/");
 }
 
 // Check DTMF command script and audio files

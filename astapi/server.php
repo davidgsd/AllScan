@@ -25,10 +25,10 @@ $passedNodes = explode(',', trim(strip_tags($_GET['nodes'])));
 
 chdir('..');
 
-// Load allmon.ini
+// Load AMI Cfgs
 $cfg = readNodeCfg();
 if($cfg === false) {
-	sendData(['status' => "allmon.ini not found."]);
+	sendData(['status' => "AMI Cfgs not found."]);
 	exit();
 }
 
@@ -37,11 +37,11 @@ $astdb = readAstDb2();
 
 // Verify nodes are in ini file
 $nodes = [];
-foreach($passedNodes as $i => $node) {
+foreach($passedNodes as $node) {
 	if(isset($cfg[$node])) {
 		$nodes[] = $node;
 	} else {
-		sendData(['node'=>$node, 'status'=>"Node $node not in allmon.ini"], 'nodes');
+		sendData(['node'=>$node, 'status'=>"Node $node not in AMI Cfgs"], 'nodes');
 	}
 }
 
@@ -71,7 +71,7 @@ foreach($nodes as $node) {
 		$data['status'] = "Connecting to Asterisk Manager $node $host:$port...";
 		$fp[$host] = $ami->connect($host, $port);
 		if($fp[$host] === false) {
-			$data['status'] .= 'Connect Failed. Check allmon.ini settings.';
+			$data['status'] .= 'Connect Failed. Check AMI Cfgs.';
 		} else {
 			// Try to login
 			$amiuser = $cfg[$node]['user'];

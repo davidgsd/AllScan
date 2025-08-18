@@ -475,8 +475,7 @@ function setLabelClass($class) {
 	$this->labelClass = $class;
 }
 private function getLabelHtml($text, $id) {
-	if($this->labelClass)
-		$lc = ' class="' . $this->labelClass . '"';
+	$lc = isset($this->labelClass) ? (' class="' . $this->labelClass . '"') : '';
 	return "<label for=\"$id\"$lc>" . htmlspecialchars($text) . "</label>\n";
 }
 

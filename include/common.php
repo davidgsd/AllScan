@@ -132,6 +132,7 @@ function msg($txt, $class=null) {
 	echo $txt . NL;
 }
 
+// Reads node #(s) from AMI.conf and AMI creds from manager.conf
 function getAmiCfg(&$msg) {
 	global $amicfg;
 	// Read node number(s) from rpt.conf
@@ -178,7 +179,7 @@ $allmonini = ['allmon.ini', '../supermon/allmon.ini', '/etc/asterisk/allmon.ini.
 // Get nodes list and host IP(s)
 function getNodeCfg(&$msg, &$hosts, &$ports) {
 	global $allmonini, $amicfg;
-	getAmiCfg($msg);
+	getAmiCfg($msg); // Reads node #(s) from AMI.conf and AMI creds from manager.conf
 	// Check for file in our directory and if not found look in $allmonini locations
 	foreach($allmonini as $f) {
 		if(file_exists($f)) {
@@ -237,7 +238,7 @@ function parseAllmonCfg($cfg) {
 function readNodeCfg() {
 	global $allmonini, $amicfg;
 	$msg = [];
-	getAmiCfg($msg);
+	getAmiCfg($msg); // Reads node #(s) from AMI.conf and AMI creds from manager.conf
 	// Check for file in our directory and if not found look in $allmonini locations
 	$ok = false;
 	foreach($allmonini as $f) {
@@ -260,8 +261,8 @@ function readNodeCfg() {
 	}
 	// If got here no node definitions were found in $allmonini locations. Use ASL .conf data
 	if(isset($amicfg->node) && isset($amicfg->host) && isset($amicfg->port) && isset($amicfg->user)) {
-		$cfg = [$amicfg->node =>
-					['host' => $amicfg->host, 'user' => $amicfg->user, 'passwd' => $amicfg->pass]];
+		$cfg = [$amicfg->node => ['host' => $amicfg->host, 'port' => $amicfg->port,
+									'user' => $amicfg->user, 'passwd' => $amicfg->pass]];
 		return $cfg;
 	}
 	return false;
@@ -550,7 +551,7 @@ function getRequestURI() {
 function validIpAddr($ipa) {
 	if(!$ipa)
 		return false;
-	return (filter_var($ipa, FILTER_VALIDATE_IP) !== false);
+	return (filter_var($ipa, FILTER_VALIDATE_IP) !== false || $ipa === 'localhost');
 }
 function validEmail($email) {
 	$emailMatchString = "/^\w+[\+\.\w-]*@([\w-]+\.)*\w+[\w-]*\.([a-z]{2,10}|\d+)$/i";
