@@ -396,8 +396,8 @@ function checkUpdate() {
 }
 
 function getELInfo($n) {
-	global $node, $host, $port;
-	static $ami, $fp, $cfg;
+	global $node, $host, $port, $ami;
+	static $fp, $cfg;
 	if(!$node || !$host) {
 		return;
 	}
