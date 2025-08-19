@@ -5,7 +5,7 @@ class AMI {
 public $aslver = '2.0/unknown';
 
 function connect($ip, $port) {
-	if(!$ip || !$port)
+	if(!validIpAddr($ip) || !$port)
 		return false;
 	return fsockopen($ip, $port, $errno, $errstr, 5);
 }
@@ -16,11 +16,14 @@ function login($fp, $user, $password) {
 	$res = $this->getResponse($fp, $actionID);
 	// logToFile('RES: ' . varDumpClean($res, true), AMI_DEBUG_LOG);
 	$ok = (strpos($res[2], "Authentication accepted") !== false);
+	if(!$ok)
+		return false;
 	// Determine App-rpt version. ASL3 and Asterisk 20 have some differences in AMI commands
 	// eg. in ASL2 restart command is "restart now" but in ASL3 it's "core restart now".
 	$s = $this->command($fp, 'rpt show version');
 	if(preg_match('/app_rpt version: ([0-9\.]{1,9})/', $s, $m) == 1)
 		$this->aslver = $m[1];
+	return $ok;
 }
 
 function command($fp, $cmdString, $debug=false) {

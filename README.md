@@ -121,6 +121,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good idea
 
 # Release Notes
+**v0.95 2025-08-18**<br>
+Fix issue in last checkin where Connection Status table would not be updated on some nodes with ASL2/HV .ini files.
+
 **v0.94 2025-08-15**<br>
 Support reading non-default AMI port# from Allmon3 .ini files. Discontinue copy of /etc/allmon3/allmon.ini to /etc/asterisk/allmon.ini.php during install as the manager.cfg should always have valid AMI cfgs. Use of any AllMon/Supermon .ini files will be phased out in a future release and manager.conf or AllScan DB Cfgs used instead.
 

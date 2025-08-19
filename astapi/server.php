@@ -10,13 +10,13 @@ require_once('AMI.php');
 require_once('nodeInfo.php');
 
 if(!readOk()) {
-	sendData(['status' => 'Insufficient user permission to retrieve data.']);
+	statErr('Insufficient user permission to retrieve data.');
 	exit();
 }
 
 // Validate request
 if(empty($_GET['nodes'])) {
-	sendData(['status' => 'Unknown request!']);
+	statErr('Unknown request');
 	exit();
 }
 
@@ -28,7 +28,7 @@ chdir('..');
 // Load AMI Cfgs
 $cfg = readNodeCfg();
 if($cfg === false) {
-	sendData(['status' => "AMI Cfgs not found."]);
+	statErr('AMI Cfgs not found.');
 	exit();
 }
 
@@ -41,7 +41,7 @@ foreach($passedNodes as $node) {
 	if(isset($cfg[$node])) {
 		$nodes[] = $node;
 	} else {
-		sendData(['node'=>$node, 'status'=>"Node $node not in AMI Cfgs"], 'nodes');
+		statErr("Node $node not in AMI Cfgs");
 	}
 }
 
@@ -50,7 +50,6 @@ set_time_limit(0);
 
 // Open a socket to each Asterisk Manager
 $ami = new AMI();
-$servers = [];
 $fp = [];
 $chandriver = 'Unknown';
 $amicd = '';
@@ -59,38 +58,35 @@ $rxstatssupported = false;
 foreach($nodes as $node) {
 	$arr = parseAllmonCfg($cfg[$node]);
 	if($arr === null) {
-		$data['status'] = "Invalid AMI Cfgs [$node]";
-		sendData($data, 'connection');
+		statErr("Invalid AMI Cfgs [$node]");
 		continue;
 	}
 	$host = $arr[0];
 	$port = $arr[1];
-	$data = ['host'=>$host, 'port'=>$port, 'node'=>$node];
 	// Connect and login to each manager only once
-	if(!array_key_exists($host, $servers)) {
-		$data['status'] = "Connecting to Asterisk Manager $node $host:$port...";
-		$fp[$host] = $ami->connect($host, $port);
-		if($fp[$host] === false) {
-			$data['status'] .= 'Connect Failed. Check AMI Cfgs.';
+	if(!isset($fp[$node])) {
+		$s = "Connecting to Asterisk Manager $node $host:$port...";
+		$fp[$node] = $ami->connect($host, $port);
+		if($fp[$node] === false) {
+			statErr($s . 'Connect Failed. Check AMI host/port Cfgs.');
 		} else {
-			// Try to login
+			// Log in
 			$amiuser = $cfg[$node]['user'];
 			$pass = $cfg[$node]['passwd'];
-			if($ami->login($fp[$host], $amiuser, $pass) !== false) {
-				$servers[$host] = 'y';
-				$data['status'] .= 'Login OK';
+			if($ami->login($fp[$node], $amiuser, $pass) !== false) {
+				statMsg($s . 'Login OK');
 			} else {
-				$data['status'] .= "Login Failed. Check AMI Cfgs.";
+				unset($fp[$node]);
+				statErr($s . 'Login Failed. Check AMI Cfgs.');
 			}
 			// Log version info
-			$data['status'] .= "<br>ASL Ver: $ami->aslver, AllScan Ver: "
-					. substr($AllScanVersion, 1);
+			$s = "ASL Ver: $ami->aslver, AllScan Ver: "	. substr($AllScanVersion, 1);
 			// Check if rxaudiostats supported
-			$msg = checkRxStatsSupport($ami, $fp[$host]);
+			$msg = checkRxStatsSupport($ami, $fp[$node]);
 			if(_count($msg))
-				$data['status'] .= BR . implode(BR, $msg);
+				$s .= BR . implode(BR, $msg);
+			statMsg($s);
 		}
-		sendData($data, 'connection');
 	}
 }
 
@@ -102,11 +98,11 @@ $nodeTime = [];
 while(1) {
 	foreach($nodes as $node) {
 		// Is host of this node logged in?
-		if(!isset($servers[$cfg[$node]['host']]))
+		if(!isset($fp[$node]) || $fp[$node] === false)
 			continue;
-		$connectedNodes = getNode($fp[$cfg[$node]['host']], $node);
+		$connectedNodes = getNode($fp[$node], $node);
 		$sortedConnectedNodes = sortNodes($connectedNodes);
-		$info = getAstInfo($fp[$cfg[$node]['host']], $node);
+		$info = getAstInfo($fp[$node], $node);
 		// Build array of time values
 		$nodeTime[$node]['node'] = $node;
 		$nodeTime[$node]['info'] = $info;
@@ -150,9 +146,16 @@ while(1) {
 	usleep(500000);
 }
 
-fwrite($fp, "ACTION: Logoff\r\n\r\n");
+//fwrite($fp, "ACTION: Logoff\r\n\r\n");
 
 exit();
+
+function statMsg($s) {
+	sendData(['status' => $s], 'connection');
+}
+function statErr($s) {
+	sendData(['status' => 'Error: ' . $s]);
+}
 
 function checkRxStatsSupport($ami, $fp) {
 	global $chandriver, $amicd, $rxstatssupported;
@@ -191,7 +194,7 @@ function checkRxStatsSupport($ami, $fp) {
 function getNode($fp, $node) {
 	global $ami;
 	static $errCnt=0;
-	$actionRand = mt_rand(); // Asterisk Manger Interface an actionID so we can find our own response
+	$actionRand = mt_rand(); // AMI actionID
 	$actionID = 'xstat' . $actionRand;
 	if(fwrite($fp, "ACTION: RptStatus\r\nCOMMAND: XStat\r\nNODE: $node\r\nActionID: $actionID\r\n\r\n") !== false) {
 		$rptStatus = $ami->getResponse($fp, $actionID);

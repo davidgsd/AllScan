@@ -396,20 +396,20 @@ function checkUpdate() {
 }
 
 function getELInfo($n) {
-	global $node, $host, $port, $ami;
-	static $servers, $fp, $cfg;
+	global $node, $host, $port;
+	static $ami, $fp, $cfg;
 	if(!$node || !$host) {
 		return;
 	}
 	if(empty($ami)) {
 		$ami = new AMI();
-		$servers = [];
 		$fp = [];
 		$cfg = readNodeCfg();
+	} elseif(isset($fp[$host]) && $fp[$host] === false) {
+		return;
 	}
 	// Login to AMI
-	if(!array_key_exists($host, $servers)) {
-		// msg("Connecting to Asterisk Manager $node $host:$port...");
+	if(!isset($fp[$host])) {
 		$fp[$host] = $ami->connect($host, $port);
 		if($fp[$host] === false) {
 			//msg('Connect Failed. Check allmon.ini settings.');
@@ -418,9 +418,9 @@ function getELInfo($n) {
 		$amiuser = $cfg[$node]['user'];
 		$pass = $cfg[$node]['passwd'];
 		if($ami->login($fp[$host], $amiuser, $pass) !== false) {
-			$servers[$host] = 'y';
 			//msg('Login OK');
 		} else {
+			unset($fp[$host]);
 			//msg("Login Failed. Check allmon.ini settings.");
 			return;
 		}
