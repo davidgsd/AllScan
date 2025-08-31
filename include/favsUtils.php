@@ -1,5 +1,4 @@
 <?php
-define('CREATE_FAVORITESINI_FILE', 'Create Favorites.ini File');
 
 function showFavsSelect($files, $activeFile) {
 	global $html;
@@ -10,13 +9,6 @@ function showFavsSelect($files, $activeFile) {
 	$out .= $html->select('favsfile', 'Favorites File', $list, $activeFile, null, true, true);
 	$out .= $html->formClose();
 	echo $out . NL;
-}
-
-function showFavsIniForm() {
-	global $asdir;
-	echo '<form id="nodeForm" method="post" action="/' . $asdir . '/"><fieldset>' . NL
-		.'<input type=submit name="Submit" value="' . CREATE_FAVORITESINI_FILE . '">' . NL
-		.'</fieldset></form>' . BR;
 }
 
 function validateFavsFile($file, &$msg, $checkExists=true) {

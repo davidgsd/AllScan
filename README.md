@@ -127,7 +127,7 @@ Use of allmon.ini files has now been removed. Node# and AMI Cfgs can now be set 
 Fix issue in last checkin where Connection Status table would not be updated on some nodes with ASL2/HV .ini files.
 
 **v0.94 2025-08-15**<br>
-Support reading non-default AMI port# from Allmon3 .ini files. Discontinue copy of /etc/allmon3/allmon.ini to /etc/asterisk/allmon.ini.php during install as the manager.cfg should always have valid AMI cfgs. Use of any AllMon/Supermon .ini files will be phased out in a future release and manager.conf or AllScan DB Cfgs used instead.
+Support reading non-default AMI port# from Allmon3 .ini files. Discontinue copy of /etc/allmon3/allmon.ini to /etc/asterisk/allmon.ini.php during install as manager.conf should always have valid AMI cfgs.
 
 **v0.93 2025-05-13**<br>
 Fix bug introduced in v0.90 where for non-logged-in users JavaScript functions would not work.

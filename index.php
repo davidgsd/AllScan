@@ -29,7 +29,6 @@ checkDiskSpace($msg);
 $onLoad = '';
 
 // Load node and host definitions
-// Read node #(s) from rpt.conf and AMI credentials from manager.conf
 if(getAmiCfg($msg)) {
 	$node = $amicfg->node;
 	// Load ASL DB
@@ -83,8 +82,8 @@ h2('Favorites');
 $favs = [];
 $favcmds = [];
 if(!isset($favsFile) || !$favsFile) {
-	msg('favorites.ini not found. Click below to create ' . $gCfg[favsIniLoc][0]);
-	showFavsIniForm();
+	msg('No Favorites file found. Favorites files can be uploaded on the Cfgs Tab. '
+		. 'A favorites-Sample.ini file can be downloaded from the AllScan github page');
 } else {
 	$favsIni = parse_ini_file($favsFile, true);
 	if($favsIni === false) {
@@ -326,17 +325,6 @@ function processForm($parms, &$msg) {
 				$msg[] = error('Error saving Node Info Cfgs: ' . $cfgModel->error);
 			else
 				$msg[] = 'Saved Node Info Cfgs OK';
-			break;
-		case CREATE_FAVORITESINI_FILE:
-			$from = 'docs/favorites.ini.sample';
-			$to = $gCfg[favsIniLoc][0];
-			if(copy($from, $to)) {
-				$msg[] = "Copied $from to $to OK";
-				chmod($to, 0664);
-				$favsFile = $to;
-			} else {
-				$msg[] = error("Copy $from to $to Error. Check directory permissions.");
-			}
 			break;
 	}
 }
