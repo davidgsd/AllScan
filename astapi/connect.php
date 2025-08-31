@@ -20,25 +20,20 @@ if(!preg_match("/^\d+$/", $remotenode) || (!$remotenode && $button !== 'disconne
 
 chdir('..');
 
-// Load allmon.ini
-$cfg = readNodeCfg();
-if($cfg === false)
-	exit("allmon.ini not found\n");
+$msg = [];
+if(!getAmiCfg($msg))
+	exit('AMI credentials not found');
 
-$arr = parseAllmonCfg($cfg[$localnode]);
-if($arr === null)
-	exit("No valid AMI Cfgs\n");
-list($host, $port) = $arr;
+if($localnode != $amicfg->node)
+	exit("Node $localnode not in AMI Cfgs");
 
 // Open socket to Asterisk Manager
 $ami = new AMI();
-$fp = $ami->connect($host, $port);
+$fp = $ami->connect($amicfg->host, $amicfg->port);
 if($fp === false)
 	exit("Could not connect\n");
 
-$amiuser = $cfg[$localnode]['user'];
-$pass = $cfg[$localnode]['passwd'];
-if($ami->login($fp, $amiuser, $pass) === false)
+if($ami->login($fp, $amicfg->user, $amicfg->pass) === false)
 	exit("Could not login\n");
 
 switch($button) {

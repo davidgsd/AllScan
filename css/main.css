@@ -137,7 +137,7 @@ td {
 max-width:32em;
 }
 p {
-max-width:80%;
+max-width:90%;
 margin:0.5em auto;
 font-size:13px;
 }
@@ -313,6 +313,10 @@ color:#fff;
 .greenborder {
 border:solid 3px rgb(39,144,39);
 border-radius:15px;
+display:inline-block;
+padding:0 0.5em;
+margin-top:6px;
+min-width:800px;
 }
 
 pre.error {

@@ -12,6 +12,11 @@ define('call', 3);
 define('location', 4);
 define('title', 5);
 define('autodisc_def', 6);
+define('nodenum', 7);
+define('amihost', 8);
+define('amiport', 9);
+define('amiuser', 10);
+define('amipass', 11);
 
 // Global Cfgs Default Values
 $gCfgDef = [
@@ -20,7 +25,12 @@ $gCfgDef = [
 	call => '',
 	location => '',
 	title => '',
-	autodisc_def => 1
+	autodisc_def => 1,
+	nodenum => '',
+	amihost => '',
+	amiport => '',
+	amiuser => '',
+	amipass => ''
 ];
 
 $gCfgName = [
@@ -29,7 +39,12 @@ $gCfgName = [
 	call => 'Call Sign',
 	location => 'Location',
 	title => 'Node Title',
-	autodisc_def => 'DiscBeforeConn Default'
+	autodisc_def => 'DiscBeforeConn Default',
+	nodenum => 'Node Number',
+	amihost => 'AMI Host',
+	amiport => 'AMI Port',
+	amiuser => 'AMI User',
+	amipass => 'AMI Pass'
 ];
 
 $publicPermissionVals = [
@@ -47,7 +62,12 @@ $gCfgVals = [
 	call => null,
 	location => null,
 	title => null,
-	autodisc_def => $checkboxVals
+	autodisc_def => $checkboxVals,
+	nodenum => null,
+	amihost => null,
+	amiport => null,
+	amiuser => null,
+	amipass => null
 ];
 
 // Global Cfgs structure

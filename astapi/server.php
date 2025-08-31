@@ -25,113 +25,93 @@ $passedNodes = explode(',', trim(strip_tags($_GET['nodes'])));
 
 chdir('..');
 
-// Load AMI Cfgs
-$cfg = readNodeCfg();
-if($cfg === false) {
-	statErr('AMI Cfgs not found.');
+$msg = [];
+if(!getAmiCfg($msg)) {
+	statErr('AMI credentials not found');
 	exit();
 }
 
 // Load ASL DB
 $astdb = readAstDb2();
 
-// Verify nodes are in ini file
-$nodes = [];
-foreach($passedNodes as $node) {
-	if(isset($cfg[$node])) {
-		$nodes[] = $node;
-	} else {
-		statErr("Node $node not in AMI Cfgs");
-	}
+$node = $passedNodes[0];
+if($node != $amicfg->node) {
+	statErr("Node $node not in AMI Cfgs");
+	exit();
 }
 
 // Do not time out
 set_time_limit(0);
 
-// Open a socket to each Asterisk Manager
 $ami = new AMI();
 $fp = [];
 $chandriver = 'Unknown';
 $amicd = '';
 $rxstatssupported = false;
+$host = $amicfg->host;
+$port = $amicfg->port;
 
-foreach($nodes as $node) {
-	$arr = parseAllmonCfg($cfg[$node]);
-	if($arr === null) {
-		statErr("Invalid AMI Cfgs [$node]");
-		continue;
-	}
-	$host = $arr[0];
-	$port = $arr[1];
-	// Connect and login to each manager only once
-	if(!isset($fp[$node])) {
-		$s = "Connecting to Asterisk Manager $node $host:$port...";
-		$fp[$node] = $ami->connect($host, $port);
-		if($fp[$node] === false) {
-			statErr($s . 'Connect Failed. Check AMI host/port Cfgs.');
-		} else {
-			// Log in
-			$amiuser = $cfg[$node]['user'];
-			$pass = $cfg[$node]['passwd'];
-			if($ami->login($fp[$node], $amiuser, $pass) !== false) {
-				statMsg($s . 'Login OK');
-			} else {
-				unset($fp[$node]);
-				statErr($s . 'Login Failed. Check AMI Cfgs.');
-			}
-			// Log version info
-			$s = "ASL Ver: $ami->aslver, AllScan Ver: "	. substr($AllScanVersion, 1);
-			// Check if rxaudiostats supported
-			$msg = checkRxStatsSupport($ami, $fp[$node]);
-			if(_count($msg))
-				$s .= BR . implode(BR, $msg);
-			statMsg($s);
-		}
-	}
+$s = "Connecting to Asterisk Manager $node $host:$port...";
+$fp[$node] = $ami->connect($host, $port);
+if($fp[$node] === false) {
+	statErr($s . 'Failed. Check AMI host/port Cfgs.');
+	exit();
 }
+
+// Log in
+if($ami->login($fp[$node], $amicfg->user, $amicfg->pass) !== false) {
+	statMsg($s . 'Login OK');
+} else {
+	unset($fp[$node]);
+	statErr($s . 'Login Failed. Check AMI Cfgs.');
+	exit();
+}
+
+// Log version info
+$s = "ASL Ver: $ami->aslver, AllScan Ver: "	. substr($AllScanVersion, 1);
+// Check if rxaudiostats supported
+$msg = checkRxStatsSupport($ami, $fp[$node]);
+if(_count($msg))
+	$s .= BR . implode(BR, $msg);
+statMsg($s);
 
 // Main loop - build $data array and output as a json object
 $current = [];
 $saved = [];
 $nodeTime = [];
 //$n = 0;
-while(1) {
-	foreach($nodes as $node) {
-		// Is host of this node logged in?
-		if(!isset($fp[$node]) || $fp[$node] === false)
-			continue;
-		$connectedNodes = getNode($fp[$node], $node);
-		$sortedConnectedNodes = sortNodes($connectedNodes);
-		$info = getAstInfo($fp[$node], $node);
-		// Build array of time values
-		$nodeTime[$node]['node'] = $node;
-		$nodeTime[$node]['info'] = $info;
-		// Build array
-		$current[$node]['node'] = $node;
-		$current[$node]['info'] = $info;
-		// Save remote nodes
-		$current[$node]['remote_nodes'] = [];
-		$i = 0;
-		foreach($sortedConnectedNodes as $arr) {
-			// Store remote nodes time values
-			$nodeTime[$node]['remote_nodes'][$i]['elapsed'] = $arr['elapsed'] ?? 0;
-			$nodeTime[$node]['remote_nodes'][$i]['last_keyed'] = $arr['last_keyed'];
-			// Store remote nodes other than time values
-			// Array key of remote_nodes is not node number to prevent javascript (for in) sorting
-			$current[$node]['remote_nodes'][$i]['node'] = $arr['node'] ?? '';
-			$current[$node]['remote_nodes'][$i]['info'] = $arr['info'] ?? '';
-			$current[$node]['remote_nodes'][$i]['link'] = ucwords(strtolower($arr['link'] ?? ''));
-			$current[$node]['remote_nodes'][$i]['ip'] = $arr['ip'] ?? '';
-			$current[$node]['remote_nodes'][$i]['direction'] = $arr['direction'] ?? '';
-			$current[$node]['remote_nodes'][$i]['keyed'] = $arr['keyed'] ?? '';
-			$current[$node]['remote_nodes'][$i]['mode'] = $arr['mode'] ?? '';
-			$current[$node]['remote_nodes'][$i]['elapsed'] = '&nbsp;';
-			$current[$node]['remote_nodes'][$i]['last_keyed'] = $arr['last_keyed'] === 'Never' ? 'Never' : NBSP;
-			$current[$node]['remote_nodes'][$i]['cos_keyed'] = $arr['cos_keyed'] ?? 0;
-			$current[$node]['remote_nodes'][$i]['tx_keyed'] = $arr['tx_keyed'] ?? 0;
-			$current[$node]['remote_nodes'][$i]['lnodes'] = $arr['lnodes'] ?? [];
-			$i++;
-		}
+while(!empty($fp[$node])) {
+	$connectedNodes = getNode($fp[$node], $node);
+	$sortedConnectedNodes = sortNodes($connectedNodes);
+	$info = getAstInfo($fp[$node], $node);
+	// Build array of time values
+	$nodeTime[$node]['node'] = $node;
+	$nodeTime[$node]['info'] = $info;
+	// Build array
+	$current[$node]['node'] = $node;
+	$current[$node]['info'] = $info;
+	// Save remote nodes
+	$current[$node]['remote_nodes'] = [];
+	$i = 0;
+	foreach($sortedConnectedNodes as $arr) {
+		// Store remote nodes time values
+		$nodeTime[$node]['remote_nodes'][$i]['elapsed'] = $arr['elapsed'] ?? 0;
+		$nodeTime[$node]['remote_nodes'][$i]['last_keyed'] = $arr['last_keyed'];
+		// Store remote nodes other than time values
+		// Array key of remote_nodes is not node number to prevent javascript (for in) sorting
+		$current[$node]['remote_nodes'][$i]['node'] = $arr['node'] ?? '';
+		$current[$node]['remote_nodes'][$i]['info'] = $arr['info'] ?? '';
+		$current[$node]['remote_nodes'][$i]['link'] = ucwords(strtolower($arr['link'] ?? ''));
+		$current[$node]['remote_nodes'][$i]['ip'] = $arr['ip'] ?? '';
+		$current[$node]['remote_nodes'][$i]['direction'] = $arr['direction'] ?? '';
+		$current[$node]['remote_nodes'][$i]['keyed'] = $arr['keyed'] ?? '';
+		$current[$node]['remote_nodes'][$i]['mode'] = $arr['mode'] ?? '';
+		$current[$node]['remote_nodes'][$i]['elapsed'] = '&nbsp;';
+		$current[$node]['remote_nodes'][$i]['last_keyed'] = $arr['last_keyed'] === 'Never' ? 'Never' : NBSP;
+		$current[$node]['remote_nodes'][$i]['cos_keyed'] = $arr['cos_keyed'] ?? 0;
+		$current[$node]['remote_nodes'][$i]['tx_keyed'] = $arr['tx_keyed'] ?? 0;
+		$current[$node]['remote_nodes'][$i]['lnodes'] = $arr['lnodes'] ?? [];
+		$i++;
 	}
 	// Send current nodes only when data changes
 	if($current !== $saved) {
@@ -145,8 +125,6 @@ while(1) {
 	// Wait 500mS
 	usleep(500000);
 }
-
-//fwrite($fp, "ACTION: Logoff\r\n\r\n");
 
 exit();
 

@@ -178,19 +178,6 @@ if(is_executable('/usr/bin/apt')) {
 			passthruCmd("systemctl enable asl3-update-astdb.timer 2> /dev/null");
 			passthruCmd("systemctl start asl3-update-astdb.timer 2> /dev/null");
 		}
-		// Make a readable copy of allmon3.ini (Allmon3 updates can reset the file permissions)
-		/* This should rarely if ever be useful as manager.conf should always have correct AMI cfgs
-		$fname = '/etc/allmon3/allmon3.ini';
-		if(file_exists($fname)) {
-			$fname2 = '/etc/asterisk/allmon.ini.php';
-			if(!file_exists($fname2) || exec("diff $fname $fname2"))
-				execCmd("cp $fname $fname2");
-			if((fileperms($fname2) & 0777) != 0660)
-				execCmd("chmod 660 $fname2");
-			if(getGroupName($fname2) !== $group)
-				execCmd("chgrp $group $fname2");
-		}
-		*/
 	}
 }
 

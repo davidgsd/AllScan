@@ -19,7 +19,7 @@ $cfgModel = new CfgModel($db);
 // Init Users module, validate user
 $userModel = new UserModel($db);
 $user =	$userModel->validate();
-if(!readOk())
+if(!adminUser())
 	redirect('user/');
 
 $msg = [];
@@ -31,7 +31,6 @@ if(isset($parms['Submit']) && adminUser() && $parms['Submit'] !== CANCEL) {
 }
 
 pageInit();
-h1("Manage Cfgs");
 $view = new CfgView();
 
 if(!empty($msg)) {
@@ -40,49 +39,51 @@ if(!empty($msg)) {
 }
 
 // Show Cfgs
+echo '<div class="greenborder">' . NL;
+h1("Manage Cfgs");
 h2("Configuration Parameters");
 $view->showCfgs($gCfg);
+p("Node Number and AMI Cfgs default to values in /etc/asterisk/ rpt.conf and manager.conf if not set here.");
+$view->showForms($cfg ?? null);
+echo '</div>' . BR. NL;
 
-// Show Edit forms
-if(adminUser())
-	$view->showForms($cfg ?? null);
-
-if(adminUser()) {
-	h1("Manage Favorites");
-	h2("View/Download/Delete Favorites Files");
-	chdir('..'); // NOTE: chdir back to pwd later if needed for other file system operations
-	$activeFile = '';
-	$files = findFavsFiles($activeFile);
-	$cnt = 0;
-	$fl = [];
-	foreach($files as $f) {
-		$r = new stdClass();
-		$r->name = $f;
-		$r->size = filesize($f);
-		$r->mtime = getTimestamp(filemtime($f));
-		$fl[] = $r;
-		$cnt++;
-	}
-	if($cnt) {
-		$view->showFiles($fl, $activeFile);
-	}
-
-	if(!$cnt) {
-		p("No Favorites files found.");
-	} else {
-		h2("Copy/Backup Favorites Files");
-
-		$view->showFavsCopyForm($files);
-
-		p('The Favorites file select control on the main page enables easy switching between files, supporting grouping of favorites by location, type, interests, etc. A new favorites file can be created by copying and then editing an existing file, or uploading a new file. Favorites files can be stored in the AllScan web folder or in /etc/allscan/. If you have multiple AllScan instances installed (eg. for different node #s) files in /etc/allscan/ can be used by all instances.', 'w800', false);
-	}
-
-	h2("Upload Favorites File");
-
-	$view->showFavsUploadForm();
-
-	p('Favorites file names must be in the format favorites[-*].ini, ie. with an optional suffix before the .ini extension. Example valid filenames: favorites.ini, favorites-WestCoast.ini, favorites-UK.ini, favorites-nets.ini, etc.', 'w800', false);
+echo '<div class="greenborder">' . NL;
+h1("Manage Favorites");
+h2("View/Download/Delete Favorites Files");
+chdir('..'); // NOTE: chdir back to pwd later if needed for other file system operations
+$activeFile = '';
+$files = findFavsFiles($activeFile);
+$cnt = 0;
+$fl = [];
+foreach($files as $f) {
+	$r = new stdClass();
+	$r->name = $f;
+	$r->size = filesize($f);
+	$r->mtime = getTimestamp(filemtime($f));
+	$fl[] = $r;
+	$cnt++;
 }
+if($cnt) {
+	$view->showFiles($fl, $activeFile);
+}
+
+if(!$cnt) {
+	p("No Favorites files found.");
+} else {
+	h2("Copy/Backup Favorites Files");
+
+	$view->showFavsCopyForm($files);
+
+	p('The Favorites file select control on the main page enables easy switching between files, supporting grouping of favorites by location, type, interests, etc. A new favorites file can be created by copying and then editing an existing file, or uploading a new file. Favorites files can be stored in the AllScan web folder or in /etc/allscan/. If you have multiple AllScan instances installed (eg. for different node #s) files in /etc/allscan/ can be used by all instances.', 'w800', false);
+}
+
+h2("Upload Favorites File");
+
+$view->showFavsUploadForm();
+
+p('Favorites file names must be in the format favorites[-*].ini, ie. with an optional suffix before the .ini extension. Example valid filenames: favorites.ini, favorites-WestCoast.ini, favorites-UK.ini, favorites-nets.ini, etc.', 'w800', false);
+
+echo '</div>' . BR . NL;
 
 asExit();
 

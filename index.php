@@ -25,23 +25,15 @@ if(!readOk())
 	redirect('user/');
 
 $msg[] = "User: $user->name, IP: $user->ip_addr";
-
-// Check disk free space
 checkDiskSpace($msg);
+$onLoad = '';
 
 // Load node and host definitions
-$hosts = [];
-$ports = [];
-$onLoad = '';
-$nodes = getNodeCfg($msg, $hosts, $ports);
-if(!empty($nodes) && !empty($hosts)) {
-	$node = $nodes[0];
-	$host = $hosts[0];
-	$port = $ports[0];
-
+// Read node #(s) from rpt.conf and AMI credentials from manager.conf
+if(getAmiCfg($msg)) {
+	$node = $amicfg->node;
 	// Load ASL DB
 	$astdb = readAstDb($msg);
-
 	if($astdb !== false)
 		$onLoad = " onLoad=\"asInit('server.php?nodes=$node')\"";
 
@@ -396,15 +388,17 @@ function checkUpdate() {
 }
 
 function getELInfo($n) {
-	global $node, $host, $port, $ami;
-	static $fp, $cfg;
-	if(!$node || !$host) {
+	global $amicfg;
+	static $fp, $cfg, $ami;
+	if(empty($amicfg->node) || empty($amicfg->host) || empty($amicfg->port) ||
+		empty($amicfg->user) || empty($amicfg->pass)) {
 		return;
 	}
+	$host = $amicfg->host;
+	$port = $amicfg->port;
 	if(empty($ami)) {
 		$ami = new AMI();
 		$fp = [];
-		$cfg = readNodeCfg();
 	} elseif(isset($fp[$host]) && $fp[$host] === false) {
 		return;
 	}
@@ -412,7 +406,6 @@ function getELInfo($n) {
 	if(!isset($fp[$host])) {
 		$fp[$host] = $ami->connect($host, $port);
 		if($fp[$host] === false) {
-			//msg('Connect Failed. Check allmon.ini settings.');
 			return;
 		}
 		$amiuser = $cfg[$node]['user'];
@@ -421,7 +414,6 @@ function getELInfo($n) {
 			//msg('Login OK');
 		} else {
 			unset($fp[$host]);
-			//msg("Login Failed. Check allmon.ini settings.");
 			return;
 		}
 	}

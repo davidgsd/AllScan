@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.95";
+$AllScanVersion = "v0.96";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -132,140 +132,68 @@ function msg($txt, $class=null) {
 	echo $txt . NL;
 }
 
-// Reads node #(s) from AMI.conf and AMI creds from manager.conf
+// Read node# and AMI Cfgs from AllScan gCfg or rpt.conf and manager.conf
 function getAmiCfg(&$msg) {
-	global $amicfg;
+	global $amicfg, $gCfg;
+	if($gCfg[nodenum] && $gCfg[amihost] && $gCfg[amiport] && $gCfg[amiuser] && $gCfg[amipass]) {
+		$amicfg->node = $gCfg[nodenum];
+		$amicfg->host = $gCfg[amihost];
+		$amicfg->port = $gCfg[amiport];
+		$amicfg->user = $gCfg[amiuser];
+		$amicfg->pass = $gCfg[amipass];
+		$msg[] = "AMI Cfg node#: $amicfg->node, host: $amicfg->host:$amicfg->port";
+		return true;
+	}
 	// Read node number(s) from rpt.conf
 	$f = '/etc/asterisk/rpt.conf';
-	if(!file_exists($f))
-		return;
+	if(!file_exists($f)) {
+		$msg[] = "$f not found";
+		return false;
+	}
 	$rptc = file($f, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 	if($rptc === false) {
 		$msg[] = "Error reading $f";
-		return;
+		return false;
 	}
 	$nnums = [];
 	foreach($rptc as $s) {
 		if(preg_match('/^\[([0-9]{5,6})\]/', $s, $m) == 1)
 			$nnums[] = $m[1];
 	}
-	if(!count($nnums))
-		return;
+	if(!count($nnums)) {
+		$msg[] = "No valid nodes found in $f";
+		return false;
+	}
 	$msg[] = "rpt.conf node #s: " . implode(', ', $nnums);
 	// Read AMI info from manager.conf
 	$f = '/etc/asterisk/manager.conf';
-	if(!file_exists($f))
-		return;
+	if(!file_exists($f)) {
+		$msg[] = "$f not found";
+		return false;
+	}
 	$mcfg = parse_ini_file($f, true);
 	if($mcfg === false) {
 		$msg[] = "Error reading $f";
-		return;
+		return false;
 	}
 	$amicfg->node = $nnums[0];
 	foreach($mcfg as $k => $v) {
 		if($k === 'general' && isset($v['port']) && isset($v['bindaddr'])) {
 			$amicfg->host = $v['bindaddr'];
 			$amicfg->port = $v['port'];
+			$msg[] = "manager.conf host: $amicfg->host:$amicfg->port";
 		} elseif(!isset($amicfg->user) && isset($v['secret'])) {
 			$amicfg->user = $k;
 			$amicfg->pass = $v['secret'];
 		}
 	}
-}
-
-$allmonini = ['allmon.ini', '../supermon/allmon.ini', '/etc/asterisk/allmon.ini.php',
-				'../allmon2/allmon.ini.php', '../supermon2/user_files/allmon.ini'];
-
-// Get nodes list and host IP(s)
-function getNodeCfg(&$msg, &$hosts, &$ports) {
-	global $allmonini, $amicfg;
-	getAmiCfg($msg); // Reads node #(s) from AMI.conf and AMI creds from manager.conf
-	// Check for file in our directory and if not found look in $allmonini locations
-	foreach($allmonini as $f) {
-		if(file_exists($f)) {
-			$cfg = parse_ini_file($f, true);
-			if($cfg === false) {
-				$msg[] = "Error parsing $f";
-				continue;
-			}
-			$nodes = [];
-			foreach($cfg as $n => $c) {
-				if(validDbId($n) && isset($c['host']) && $c['host']) {
-					$arr = parseAllmonCfg($c);
-					if($arr !== null) {
-						$nodes[] = $n;
-						$hosts[] = $arr[0];
-						$ports[] = $arr[1];
-					}
-				}
-			}
-			if(empty($nodes)) {
-				$msg[] = "No valid node found in $f";
-				//$msg[] = varDumpClean($cfg, true);
-			} else {
-				$msg[] = "Node $nodes[0] $hosts[0]:$ports[0] read from $f";
-				if(count($nodes) > 1)
-					$msg[] = "(More than one node is defined in $f, AllScan currently uses only the first.)";
-				return $nodes;
-			}
-		}
+	if( empty($amicfg->node) || empty($amicfg->host) || empty($amicfg->port) ||
+		empty($amicfg->user) || empty($amicfg->pass) ) {
+		$msg[] = "Valid node/AMI definitions not found. "
+				."Run asl-menu to configure AMI credentials, or set on Cfgs Tab";
+		return false;
 	}
-	// If got here no node definitions were found in $allmonini locations. Use ASL .conf data
-	if(isset($amicfg->node) && isset($amicfg->host) && isset($amicfg->port) && isset($amicfg->user)) {
-		$nodes[] = $amicfg->node;
-		$hosts[] = $amicfg->host;
-		$ports[] = $amicfg->port;
-		$msg[] = "Node $nodes[0] $hosts[0]:$ports[0] read from ASL cfgs";
-		return $nodes;
-	}
-	$msg[] = "No valid node/AMI definitions found. Run asl-menu to configure AMI credentials.";
-	return false;
-}
-
-function parseAllmonCfg($cfg) {
-	$host = $cfg['host'];
-	// AllMon2 .ini used format IPV4[:port], AllMon3 has [optional] port on a separate line
-	if(preg_match('/(\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}):(\d{3,5})/', $host, $m) == 1)
-		list($x, $host, $port) = $m;
-	if(validIpAddr($host)) {
-		$port = (isset($cfg['port']) && $cfg['port'] > 80 && $cfg['port'] < 65535) ? $cfg['port'] : 5038;
-		return [$host, $port];
-	}
-}
-
-// Below called by astapi files, which should only happen if controller file eg. index.php already called
-// getNodeCfg() above which confirms there is a valid file available with AMI credentials
-function readNodeCfg() {
-	global $allmonini, $amicfg;
-	$msg = [];
-	getAmiCfg($msg); // Reads node #(s) from AMI.conf and AMI creds from manager.conf
-	// Check for file in our directory and if not found look in $allmonini locations
-	$ok = false;
-	foreach($allmonini as $f) {
-		if(file_exists($f)) {
-			$cfg = parse_ini_file($f, true);
-			if($cfg === false)
-				continue;
-			foreach($cfg as $n => &$c) {
-				// Allmon3 uses 'pass' instead of 'passwd' cfg name, convert here
-				if(isset($c['pass']) && !isset($c['passwd']))
-					$c['passwd'] = $c['pass'];
-				if(validDbId($n) && isset($c['host']) && $c['host'] && isset($c['passwd']) && $c['passwd'])
-					$ok = true;
-			}
-			unset($c);
-			if($ok) {
-				return $cfg;
-			}
-		}
-	}
-	// If got here no node definitions were found in $allmonini locations. Use ASL .conf data
-	if(isset($amicfg->node) && isset($amicfg->host) && isset($amicfg->port) && isset($amicfg->user)) {
-		$cfg = [$amicfg->node => ['host' => $amicfg->host, 'port' => $amicfg->port,
-									'user' => $amicfg->user, 'passwd' => $amicfg->pass]];
-		return $cfg;
-	}
-	return false;
+	return true;
 }
 
 $astdbtxt = ['astdb.txt', '../supermon/astdb.txt', '/var/log/asterisk/astdb.txt'];
@@ -273,24 +201,23 @@ $astdbtxt = ['astdb.txt', '../supermon/astdb.txt', '/var/log/asterisk/astdb.txt'
 // Read AstDB file, looking in all commonly used locations
 function readAstDb(&$msg) {
 	global $astdbtxt;
-	// Check for file in our directory and in the allmon/supermon locations
+	// Check for file in our directory and in Asterisk/Supermon locations
 	// If exists in more than one place use the newest. Download it if not found
 	$mtime = [0, 0, 0];
 	foreach($astdbtxt as $i => $f) {
 		if(file_exists($f)) {
+			$msg[] = "$f last updated " . date('Y-m-d', filemtime($f));
 			if(filesize($f) < 1024) {
-				$msg[] = "$f last updated " . date('Y-m-d', filemtime($f));
-				$msg[] = "$f invalid filesize - try running AllMon/Supermon astdb.php to reload";
+				$msg[] = "$f invalid filesize";
 			} else {
 				$mtime[$i] = filemtime($f);
-				$msg[] = "$f last updated " . date('Y-m-d', $mtime[$i]);
 			}
 		}
 	}
 	arsort($mtime, SORT_NUMERIC);
 	if(!reset($mtime)) {
-		$msg[] = "No astdb.txt file found. Check that you have AllMon2 or Supermon properly installed, "
-			.	"and a cron job or other mechanism set up to periodically update the file.";
+		$msg[] = "No astdb.txt file found. Check that you have asl3-update-astdb service properly installed, "
+				.	"or a cron job or other mechanism set up to periodically update the file";
 		if(!downloadAstDb($msg))
 			return false;
 		$file = 'astdb.txt';
@@ -310,8 +237,7 @@ function readAstDb(&$msg) {
 	unset($rows);
 	$cnt = count($astdb);
 	if(!$cnt) {
-		$msg[] = "$file invalid. Check that you have AllMon2 or Supermon properly installed, "
-			.	"and a cron job or other mechanism set up to periodically update the file.";
+		$msg[] = "$file invalid. Check file and permissions";
 		return false;
 	}
 	$msg[] = "$cnt Nodes in ASL DB";
@@ -322,8 +248,8 @@ function readAstDb(&$msg) {
 // getNodeCfg() above which confirms there is a valid file available
 function readAstDb2() {
 	global $astdbtxt;
-	// Check for file in our directory and if not found look in the asterisk, supermon and allmon2 dirs
-	// If it exists in more than one place use the newest
+	// Check for file in our directory and if not found look in Asterisk/Supermon locations
+	// If exists in more than one place use the newest
 	$mtime = [0, 0, 0];
 	foreach($astdbtxt as $i => $f) {
 		if(file_exists($f) && filesize($f) >= 1024) {
@@ -357,9 +283,9 @@ function downloadAstDb(&$msg) {
 			$msg[] = "Retrieved and saved $file OK";
 			return true;
 		}
-		$msg[] = error("Error saving ./$file. Check directory permissions.");
+		$msg[] = error("Error saving ./$file. Check directory permissions");
 	} else {
-		$msg[] = error("Error retrieving $url.");
+		$msg[] = error("Error retrieving $url");
 	}
 	return false;
 }
