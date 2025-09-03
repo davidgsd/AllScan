@@ -414,7 +414,7 @@ function getELInfo($n) {
 function showCustomCmdButtons() {
 	global $gCfg, $html;
 	foreach($gCfg[cmdbuttons] as $b) {
-		if(!preg_match('/(\*[0-9a-d]{1,20})/', $b, $m))
+		if(!preg_match('/(\*[0-9a-d;]{1,40})/', $b, $m))
 			continue;
 		$cmd = $m[1];
 		echo $html->linkButton($b, null, 'small', null, "setNodeBox('$cmd');dtmfCmd();");
