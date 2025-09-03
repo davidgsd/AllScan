@@ -12,8 +12,8 @@ function showFavsSelect($files, $activeFile) {
 }
 
 function validateFavsFile($file, &$msg, $checkExists=true) {
-	// Allow A-Z a-z 0-9 . _ - chars in name / suffix
-	if(!preg_match('/^[\/\w\-. ]+$/', $file)) {
+	// Allow A-Z a-z 0-9 . _ - ( ) [ ] chars in name / suffix
+	if(!preg_match('/^[\/\w\-. \(\)\[\]]+$/', $file)) {
 		$msg[] = error("Invalid filename");
 		return false;
 	}

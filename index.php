@@ -214,8 +214,11 @@ if(($ct = cpuTemp()))
 // Show function buttons and Links
 echo $html->linkButton('Node Stats', "http://stats.allstarlink.org/stats/$node", 'small', null, null, 'stats');
 
-if(modifyOk())
+if(modifyOk()) {
 	echo $html->linkButton('Restart Asterisk', null, 'small', null, 'astrestart();');
+	if(!empty($gCfg[cmdbuttons]))
+		showCustomCmdButtons();
+}
 
 showFooterLinks();
 
@@ -406,6 +409,16 @@ function getELInfo($n) {
 		}
 	}
 	return getAstInfo($fp[$host], $n);
+}
+
+function showCustomCmdButtons() {
+	global $gCfg, $html;
+	foreach($gCfg[cmdbuttons] as $b) {
+		if(!preg_match('/(\*[0-9a-d]{1,20})/', $b, $m))
+			continue;
+		$cmd = $m[1];
+		echo $html->linkButton($b, null, 'small', null, "setNodeBox('$cmd');dtmfCmd();");
+	}
 }
 
 function sortArray($list, $col, $desc) {

@@ -120,6 +120,12 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good idea
 
 # Release Notes
+**v0.97 2025-09-03**<br>
+Add Custom Cmd Buttons configuration parameter that allows DTMF command buttons to be shown on the main AllScan page (next to the Node Stats and Restart Asterisk buttons). This can be set on the Cfgs tab. Example settings:
+<pre>"*712" - Show a simple command button to say the time of day
+"Say Time *712" - Same as above but with descriptive text
+"Parrot On *921, Parrot Off *922, Say Time *712" - Multiple commands (comma separated)</pre>
+
 **v0.96 2025-08-30**<br>
 Use of allmon.ini files has now been removed. Node# and AMI Cfgs can now be set on the Cfgs Tab, or if not set there will be read from /etc/asterisk/ rpt.conf and manager.conf.
 

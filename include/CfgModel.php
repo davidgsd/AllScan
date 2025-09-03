@@ -17,6 +17,7 @@ define('amihost', 8);
 define('amiport', 9);
 define('amiuser', 10);
 define('amipass', 11);
+define('cmdbuttons', 12);
 
 // Global Cfgs Default Values
 $gCfgDef = [
@@ -30,7 +31,8 @@ $gCfgDef = [
 	amihost => '',
 	amiport => '',
 	amiuser => '',
-	amipass => ''
+	amipass => '',
+	cmdbuttons => []
 ];
 
 $gCfgName = [
@@ -44,7 +46,8 @@ $gCfgName = [
 	amihost => 'AMI Host',
 	amiport => 'AMI Port',
 	amiuser => 'AMI User',
-	amipass => 'AMI Pass'
+	amipass => 'AMI Pass',
+	cmdbuttons => 'Custom Cmd Buttons'
 ];
 
 $publicPermissionVals = [
@@ -67,7 +70,8 @@ $gCfgVals = [
 	amihost => null,
 	amiport => null,
 	amiuser => null,
-	amipass => null
+	amipass => null,
+	cmdbuttons => null
 ];
 
 // Global Cfgs structure

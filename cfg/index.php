@@ -81,7 +81,7 @@ h2("Upload Favorites File");
 
 $view->showFavsUploadForm();
 
-p('Favorites file names must be in the format favorites[-*].ini, ie. with an optional suffix before the .ini extension. Example valid filenames: favorites.ini, favorites-WestCoast.ini, favorites-UK.ini, favorites-nets.ini, etc.', 'w800', false);
+p('Favorites file names must be in the format favorites[*].ini, ie. with an optional suffix before the .ini extension. Example valid filenames: favorites.ini, favorites-WestCoast.ini, favorites-UK.ini, favorites-nets.ini, etc.', 'w800', false);
 
 echo '</div>' . BR . NL;
 
@@ -205,6 +205,8 @@ function processForm($Submit, $cfg, &$msg) {
 			$cfg->val = $gCfg[$cfg->cfg_id];
 			return $cfg;
 		} else {
+			// Currently none of the cfgs should need to contain html
+			$val = strip_tags($val);
 			// Convert array cfgs from csv / validate enumerated cfgs
 			if(is_array($gCfgDef[$id])) {
 				$val = csvToArray($val);
