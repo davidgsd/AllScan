@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.97";
+$AllScanVersion = "v0.98";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -141,30 +141,39 @@ function getAmiCfg(&$msg) {
 		$amicfg->port = $gCfg[amiport];
 		$amicfg->user = $gCfg[amiuser];
 		$amicfg->pass = $gCfg[amipass];
-		$msg[] = "AMI Cfg node#: $amicfg->node, host: $amicfg->host:$amicfg->port";
+		$msg[] = "AllScan Cfg node#: $amicfg->node, host: $amicfg->host:$amicfg->port";
 		return true;
 	}
-	// Read node number(s) from rpt.conf
-	$f = '/etc/asterisk/rpt.conf';
-	if(!file_exists($f)) {
-		$msg[] = "$f not found";
-		return false;
+	if($gCfg[nodenum]) {
+		$amicfg->node = $gCfg[nodenum];
+		$msg[] = "AllScan Cfg node#: $amicfg->node";
+	} else {
+		// Read node number(s) from rpt.conf
+		$f = '/etc/asterisk/rpt.conf';
+		if(!file_exists($f)) {
+			$msg[] = "$f not found";
+			return false;
+		}
+		$rptc = file($f, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+		if($rptc === false) {
+			$msg[] = "Error reading $f";
+			return false;
+		}
+		$nnums = [];
+		foreach($rptc as $s) {
+			if(preg_match('/^\[([0-9]{4,6})\]/', $s, $m) == 1)
+				$nnums[] = $m[1];
+		}
+		if(!count($nnums)) {
+			$msg[] = "No valid nodes found in $f. Check file or set Node Number Cfg on Cfgs Tab.";
+			return false;
+		}
+		$msg[] = "rpt.conf node #s: " . implode(', ', $nnums);
+		$amicfg->node = $nnums[0];
+		if(count($nnums) > 1)
+			$msg[] = "AllScan uses the first node# found in rpt.conf. To use a different node#<br>"
+					."reorder the node stanzas in rpt.conf or set the Node Number parameter on the Cfgs Tab.";
 	}
-	$rptc = file($f, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-	if($rptc === false) {
-		$msg[] = "Error reading $f";
-		return false;
-	}
-	$nnums = [];
-	foreach($rptc as $s) {
-		if(preg_match('/^\[([0-9]{4,6})\]/', $s, $m) == 1)
-			$nnums[] = $m[1];
-	}
-	if(!count($nnums)) {
-		$msg[] = "No valid nodes found in $f";
-		return false;
-	}
-	$msg[] = "rpt.conf node #s: " . implode(', ', $nnums);
 	// Read AMI info from manager.conf
 	$f = '/etc/asterisk/manager.conf';
 	if(!file_exists($f)) {
@@ -176,7 +185,6 @@ function getAmiCfg(&$msg) {
 		$msg[] = "Error reading $f";
 		return false;
 	}
-	$amicfg->node = $nnums[0];
 	foreach($mcfg as $k => $v) {
 		if($k === 'general' && isset($v['port']) && isset($v['bindaddr'])) {
 			$amicfg->host = $v['bindaddr'];
@@ -187,10 +195,10 @@ function getAmiCfg(&$msg) {
 			$amicfg->pass = $v['secret'];
 		}
 	}
-	if( empty($amicfg->node) || empty($amicfg->host) || empty($amicfg->port) ||
+	if( empty($amicfg->host) || empty($amicfg->port) ||
 		empty($amicfg->user) || empty($amicfg->pass) ) {
-		$msg[] = "Valid node/AMI definitions not found. "
-				."Run asl-menu to configure AMI credentials, or set on Cfgs Tab";
+		$msg[] = "Valid Asterisk Manager (AMI) definitions not found in $f.<br>"
+				."Run asl-menu to configure AMI credentials, or set AMI parameters on Cfgs Tab";
 		return false;
 	}
 	return true;

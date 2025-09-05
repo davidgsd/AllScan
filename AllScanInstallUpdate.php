@@ -1,6 +1,6 @@
 #!/usr/bin/php
 <?php
-$AllScanInstallerUpdaterVersion = "1.30";
+$AllScanInstallerUpdaterVersion = "1.31";
 define('NL', "\n");
 // Execute this script by running "sudo ./AllScanInstallUpdate.php" from any directory.
 // We'll then check if AllScan is installed, install it if not, or check the version
@@ -288,8 +288,11 @@ if(preg_match('/bindport = ([0-9]{4,5})/', $bp, $m) == 1) {
 	$port = $m[1];
 }
 
-msg("AllScan can be accessed at:\n\t$lip on the local network, or\n"
-	."\t$wip remotely\n\tif your router has port $port forwarded to this node.");
+msg("AllScan can be accessed at:\n"
+	."\t$lip on the local network, or\n"
+	."\t$wip remotely\n"
+	."\t\tif your router has a TCP/IP port (eg. port 80) forwarded to this node.\n"
+	."\tIt is also recommended to forward the IAX port to the node (currently $port) in your router."
 
 if($dlfiles) {
 	msg("Be sure to bookmark the above URL(s) in your browser.");
