@@ -292,7 +292,7 @@ msg("AllScan can be accessed at:\n"
 	."\t$lip on the local network, or\n"
 	."\t$wip remotely\n"
 	."\t\tif your router has a TCP/IP port (eg. port 80) forwarded to this node.\n"
-	."\tIt is also recommended to forward the IAX port to the node (currently $port) in your router."
+	."\tIt is also recommended to forward the IAX port (currently $port) in your router to the node.");
 
 if($dlfiles) {
 	msg("Be sure to bookmark the above URL(s) in your browser.");

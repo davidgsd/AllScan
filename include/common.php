@@ -165,7 +165,7 @@ function getAmiCfg(&$msg) {
 				$nnums[] = $m[1];
 		}
 		if(!count($nnums)) {
-			$msg[] = "No valid nodes found in $f. Check file or set Node Number Cfg on Cfgs Tab.";
+			$msg[] = "No valid nodes found in $f. Check file or set Node Number parameter on Cfgs Tab.";
 			return false;
 		}
 		$msg[] = "rpt.conf node #s: " . implode(', ', $nnums);
