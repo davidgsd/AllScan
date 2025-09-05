@@ -186,8 +186,8 @@ function getAmiCfg(&$msg) {
 		return false;
 	}
 	foreach($mcfg as $k => $v) {
-		if($k === 'general' && isset($v['port']) && isset($v['bindaddr'])) {
-			$amicfg->host = $v['bindaddr'];
+		if($k === 'general' && isset($v['port'])) {
+			$amicfg->host = empty($v['bindaddr']) ? '127.0.0.1' : $v['bindaddr'];
 			$amicfg->port = $v['port'];
 			$msg[] = "manager.conf host: $amicfg->host:$amicfg->port";
 		} elseif(!isset($amicfg->user) && isset($v['secret'])) {
