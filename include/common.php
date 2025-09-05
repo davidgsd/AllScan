@@ -157,7 +157,7 @@ function getAmiCfg(&$msg) {
 	}
 	$nnums = [];
 	foreach($rptc as $s) {
-		if(preg_match('/^\[([0-9]{5,6})\]/', $s, $m) == 1)
+		if(preg_match('/^\[([0-9]{4,6})\]/', $s, $m) == 1)
 			$nnums[] = $m[1];
 	}
 	if(!count($nnums)) {
