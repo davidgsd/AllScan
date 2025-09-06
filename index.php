@@ -380,35 +380,26 @@ function checkUpdate() {
 
 function getELInfo($n) {
 	global $amicfg;
-	static $fp, $cfg, $ami;
-	if(empty($amicfg->node) || empty($amicfg->host) || empty($amicfg->port) ||
-		empty($amicfg->user) || empty($amicfg->pass)) {
-		return;
-	}
-	$host = $amicfg->host;
-	$port = $amicfg->port;
-	if(empty($ami)) {
-		$ami = new AMI();
-		$fp = [];
-	} elseif(isset($fp[$host]) && $fp[$host] === false) {
+	static $fp, $ami;
+	if( empty($amicfg->host) || empty($amicfg->port) ||
+		empty($amicfg->user) || empty($amicfg->pass) || $fp === false ) {
 		return;
 	}
 	// Login to AMI
-	if(!isset($fp[$host])) {
-		$fp[$host] = $ami->connect($host, $port);
-		if($fp[$host] === false) {
+	if(empty($ami)) {
+		$ami = new AMI();
+	}
+	if(!isset($fp)) {
+		$fp = $ami->connect($amicfg->host, $amicfg->port);
+		if($fp === false) {
 			return;
 		}
-		$amiuser = $cfg[$node]['user'];
-		$pass = $cfg[$node]['passwd'];
-		if($ami->login($fp[$host], $amiuser, $pass) !== false) {
-			//msg('Login OK');
-		} else {
-			unset($fp[$host]);
+		if($ami->login($fp, $amicfg->user, $amicfg->pass) === false) {
+			unset($fp);
 			return;
 		}
 	}
-	return getAstInfo($fp[$host], $n);
+	return getAstInfo($fp, $n);
 }
 
 function showCustomCmdButtons() {
