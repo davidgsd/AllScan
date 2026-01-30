@@ -18,6 +18,10 @@ define('amiport', 9);
 define('amiuser', 10);
 define('amipass', 11);
 define('cmdbuttons', 12);
+define('skywarn_master_enable', 13);
+define('skywarn_api_url', 14);
+define('skywarn_poll_enable', 15);
+define('skywarn_poll_minutes', 16);
 
 // Global Cfgs Default Values
 $gCfgDef = [
@@ -32,7 +36,11 @@ $gCfgDef = [
 	amiport => '',
 	amiuser => '',
 	amipass => '',
-	cmdbuttons => []
+	cmdbuttons => [],
+	skywarn_master_enable => 'no',
+	skywarn_api_url => 'http://localhost:8100',
+	skywarn_poll_enable => 'yes',
+	skywarn_poll_minutes => '3'
 ];
 
 $gCfgName = [
@@ -47,8 +55,14 @@ $gCfgName = [
 	amiport => 'AMI Port',
 	amiuser => 'AMI User',
 	amipass => 'AMI Pass',
-	cmdbuttons => 'Custom Cmd Buttons'
+	cmdbuttons => 'Custom Cmd Buttons',
+	skywarn_master_enable => 'SkywarnPlus Enable',
+	skywarn_api_url => 'SkywarnPlus API URL',
+	skywarn_poll_enable => 'Poll SkywarnPlus API',
+	skywarn_poll_minutes => 'SkywarnPlus Poll Interval (minutes)'
 ];
+
+$skywarnEnableVals = ['no' => 'Off', 'yes' => 'On'];
 
 $publicPermissionVals = [
 	PERMISSION_NONE			=> 'None (No Access)',
@@ -71,7 +85,11 @@ $gCfgVals = [
 	amiport => null,
 	amiuser => null,
 	amipass => null,
-	cmdbuttons => null
+	cmdbuttons => null,
+	skywarn_master_enable => $skywarnEnableVals,
+	skywarn_api_url => null,
+	skywarn_poll_enable => $skywarnEnableVals,
+	skywarn_poll_minutes => null
 ];
 
 // Global Cfgs structure

@@ -76,6 +76,19 @@ $remNode = (isset($parms['node']) && validDbID($parms['node']) && strlen($parms[
 
 showConnStatusTable();
 showNodeCtrlForm();
+if(strtolower($gCfg[skywarn_master_enable] ?? '') === 'yes') {
+	echo '<div class="skywarn-wrapper">';
+	showSkywarnAlerts();
+	echo '</div>';
+	if(strtolower($gCfg[skywarn_poll_enable] ?? '') === 'yes') {
+		$pollMins = (int)($gCfg[skywarn_poll_minutes] ?? 3);
+		if($pollMins < 1)
+			$pollMins = 1;
+		elseif($pollMins > 1440)
+			$pollMins = 1440;
+		echo '<script>initSkywarnPoll(' . $pollMins . ');</script>' . NL;
+	}
+}
 
 h2('Favorites');
 // Read in favorites.ini

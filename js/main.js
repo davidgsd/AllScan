@@ -35,6 +35,28 @@ function asInit(url) {
 	statsTmr = setTimeout(getStats, 250);
 }
 
+/**
+ * Poll SkywarnPlus-NG API via AllScan (mins = interval in minutes; default 3 from Cfgs).
+ */
+function initSkywarnPoll(mins) {
+	if(typeof fetch === 'undefined' || !mins || mins < 1)
+		return;
+	var ms = mins * 60 * 1000;
+	var url = apiDir + 'skywarn.php';
+	setInterval(function() {
+		fetch(url, {credentials: 'same-origin', cache: 'no-store'})
+			.then(function(r) { return r.json(); })
+			.then(function(d) {
+				if(d && d.html !== undefined) {
+					var el = document.getElementById('skywarn-msg');
+					if(el)
+						el.innerHTML = d.html;
+				}
+			})
+			.catch(function() {});
+	}, ms);
+}
+
 function initEventSrc() {
 	if(source) {
 		window.removeEventListener('beforeunload', closeEventSrc);

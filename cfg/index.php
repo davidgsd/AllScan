@@ -44,6 +44,7 @@ h1("Manage Cfgs");
 h2("Configuration Parameters");
 $view->showCfgs($gCfg);
 p("Node Number and AMI Cfgs default to values in /etc/asterisk/ rpt.conf and manager.conf if not set here.");
+p("SkywarnPlus cfgs integrate weather alerts from " . $html->a('https://github.com/hardenedpenguin/SkywarnPlus-NG', null, 'SkywarnPlus-NG', null, '_blank') . ". Enable and set API URL (e.g. http://localhost:8100). When SkywarnPlus is enabled, optional cfgs appear for polling that URL (default every 3 minutes) so the alert line updates without reloading the page.", 'w800', false);
 $view->showForms($cfg ?? null);
 echo '</div>' . BR. NL;
 
@@ -207,6 +208,14 @@ function processForm($Submit, $cfg, &$msg) {
 		} else {
 			// Currently none of the cfgs should need to contain html
 			$val = strip_tags($val);
+			if($id === skywarn_poll_minutes) {
+				$n = (int)trim($val);
+				if($n < 1 || $n > 1440) {
+					$msg[] = error('SkywarnPlus poll interval must be between 1 and 1440 minutes');
+					return;
+				}
+				$val = (string)$n;
+			}
 			// Convert array cfgs from csv / validate enumerated cfgs
 			if(is_array($gCfgDef[$id])) {
 				$val = csvToArray($val);

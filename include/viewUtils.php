@@ -22,6 +22,52 @@ function showConnStatusTable() {
 ';
 }
 
+/**
+ * Fetch SkywarnPlus-NG status HTML (same output as main page alert line). For main page and api/skywarn.php.
+ */
+function getSkywarnAlertHtml() {
+	global $gCfg;
+	$apiUrl = trim($gCfg[skywarn_api_url] ?? '');
+	if(!$apiUrl) {
+		return 'SkyWarn+NG: API URL not configured';
+	}
+	$statusUrl = rtrim($apiUrl, '/') . '/api/status';
+	$ctx = stream_context_create(['http' => ['timeout' => 5]]);
+	$json = @file_get_contents($statusUrl, false, $ctx);
+	if($json === false) {
+		return 'SkyWarn+NG: API Offline';
+	}
+	$data = json_decode($json, true);
+	if(!is_array($data)) {
+		return 'SkyWarn+NG: API Error';
+	}
+	if(!empty($data['error'])) {
+		return 'SkyWarn+NG: ' . htmlspecialchars($data['error'], ENT_QUOTES, 'UTF-8');
+	}
+	if(empty($data['has_alerts']) || empty($data['alerts'])) {
+		return 'SkyWarn+NG: No Alerts';
+	}
+	$alerts = array_slice($data['alerts'], 0, 3);
+	$severityColors = [
+		'Extreme' => '#FF0000',
+		'Severe'  => '#FF6600',
+		'Moderate'=> '#FFCC00',
+		'Minor'   => '#FFFF00'
+	];
+	$alertParts = [];
+	foreach($alerts as $alert) {
+		$event = htmlspecialchars($alert['event'] ?? 'Unknown', ENT_QUOTES, 'UTF-8');
+		$severity = $alert['severity'] ?? 'Unknown';
+		$color = $severityColors[$severity] ?? '#FF0000';
+		$alertParts[] = '<span style="color: ' . $color . ';">' . $event . '</span>';
+	}
+	return 'SkyWarn+NG: ' . implode(', ', $alertParts);
+}
+
+function showSkywarnAlerts() {
+	echo '<p id="skywarn-msg" class="skywarn-simple">' . getSkywarnAlertHtml() . '</p>' . NL;
+}
+
 function showNodeCtrlForm() {
 	global $node, $remNode, $favsFile, $asdir, $gCfg;
 	if(modifyOk())

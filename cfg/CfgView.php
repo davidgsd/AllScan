@@ -16,7 +16,10 @@ function showCfgs($cfgs) {
 	$hdrCols = ['ID', 'Name', 'Value', 'Default Value', 'Last Updated'];
 	$out = $html->tableOpen($hdrCols, null, 'favs', null);
 	$nullVal = '-';
+	$skywarnOn = strtolower($cfgs[skywarn_master_enable] ?? '') === 'yes';
 	foreach($cfgs as $id => $val) {
+		if(!$skywarnOn && ($id === skywarn_poll_enable || $id === skywarn_poll_minutes))
+			continue;
 		$name = $gCfgName[$id];
 		$updated = $gCfgUpdated[$id] ?? null;
 		if($updated) {
@@ -84,9 +87,14 @@ function showForms($cfg) {
 		echo htmlForm($form) . BR;
 	} else {
 		// Show Edit request form
+		global $gCfg;
+		$skywarnOn = strtolower($gCfg[skywarn_master_enable] ?? '') === 'yes';
 		$list = [];
-		foreach($gCfgName as $k => $name)
+		foreach($gCfgName as $k => $name) {
+			if(!$skywarnOn && ($k === skywarn_poll_enable || $k === skywarn_poll_minutes))
+				continue;
 			$list[$k] = $name;
+		}
 		$form->fieldsetLegend = EDIT_CFG;
 		$form->submit = [EDIT_CFG, DEFAULT_CFG];
 		$form->id = 'editCfgForm';
