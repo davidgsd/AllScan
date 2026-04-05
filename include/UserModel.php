@@ -168,7 +168,7 @@ function validate() {
 		return null;
 	if(!$this->validateName($u->name))
 		return null;
-	$users = $this->getUsers("name='$u->name'");
+	$users = $this->getUsers("name='$u->name' COLLATE NOCASE");
 	if(!$users || $this->error)
 		return null;
 	foreach($users as $user) {
@@ -208,7 +208,7 @@ function validateLogin($name, $pass, $remember) {
 		$this->error = 'Invalid Password';
 		return false;
 	}
-	$users = $this->getUsers("name='$name'");
+	$users = $this->getUsers("name='$name' COLLATE NOCASE");
 	if($this->error)
 		return false;
 	if(!$users) {
