@@ -12,9 +12,9 @@ function showFavsSelect($files, $activeFile) {
 }
 
 function validateFavsFile($file, &$msg, $checkExists=true) {
-	// Allow A-Z a-z 0-9 . _ - ( ) [ ] chars in name / suffix
-	if(!preg_match('/^[\/\w\-. \(\)\[\]]+$/', $file)) {
-		$msg[] = error("Invalid filename");
+	// Allow A-Z a-z 0-9 . _ - [ ] chars in name / suffix
+	if(!preg_match('/^[\/\w\-.\[\]]+$/', $file)) {
+		$msg[] = error("Invalid filename. May contain only 'A-Z a-z 0-9 . _ - [ ]' chars");
 		return false;
 	}
 	if(!preg_match('/.ini$/', $file)) {
