@@ -368,8 +368,8 @@ function handleNodesEvent(event) {
 						tablehtml += '<tr>';
 					}
 					var id = 't' + n + 'c0' + 'r' + row;
-					tablehtml += '<td id="' + id + '" class="nodeNum" onClick="setNodeBox(' + nodeNum + ')">' +
-						nodeNum + '</td>';
+					tablehtml += '<td id="' + id + '" class="nodeNum" onClick="setNodeBox(' + nodeNum +
+						')" onDblClick="disconnectNode();">' + nodeNum + '</td>';
 					// Show info or IP
 					if(rowdata.info != "") {
 						tablehtml += '<td>' + rowdata.info + '</td>';
@@ -539,6 +539,14 @@ function handleXhttpResponse() {
 			statMsg('Error response from server: ' + xh.status);
 		}
 	}
+}
+
+function confirmFavAction(actionLabel) {
+	var nodeEl = document.getElementById('node');
+	if(!nodeEl || !nodeEl.value)
+		return false;
+	nodeVal = nodeEl.value.trim();
+	return window.confirm(`${actionLabel} node ${nodeVal}?`);
 }
 
 function setNodeBox(n) {

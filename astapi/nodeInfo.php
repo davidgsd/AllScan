@@ -6,13 +6,15 @@ function getAstInfo($fp, $nodeNum) {
 	if(isset($astdb[$nodeNum])) {
 		$dbNode = $astdb[$nodeNum];
 		$info = $dbNode[1] . ' ' . $dbNode[2] . ' ' . $dbNode[3];
-		// Link to ASL stats page
-		$info = "<a href=\"http://stats.allstarlink.org/stats/$nodeNum\" target=\"stats\">$info</a>";
+		// Link to ASL stats page if a public node#
+		if($nodeNum >= 2000 && $nodeNum < 3000000) {
+			$info = "<a href=\"http://stats.allstarlink.org/stats/$nodeNum\" target=\"stats\">$info</a>";
+		}
 	} elseif($nodeNum > 3000000) {
 		$info = getEchoLinkInfo($fp, $nodeNum);
 	} elseif(!empty($node['ip'])) {
 		if(strlen(trim($node['ip'])) > 3) {
-			$info = 'Web Txcvr / Phone Portal (' . $node['ip'] . ')';
+			$info = 'Web Xcvr / Phone Portal (' . $node['ip'] . ')';
 		} else {
 			$info = 'Unknown Mode';
 		}

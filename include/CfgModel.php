@@ -18,6 +18,7 @@ define('amiport', 9);
 define('amiuser', 10);
 define('amipass', 11);
 define('cmdbuttons', 12);
+define('updatecheck', 13);
 
 // Global Cfgs Default Values
 $gCfgDef = [
@@ -32,7 +33,8 @@ $gCfgDef = [
 	amiport => '',
 	amiuser => '',
 	amipass => '',
-	cmdbuttons => []
+	cmdbuttons => [],
+	updatecheck => 1
 ];
 
 $gCfgName = [
@@ -47,7 +49,8 @@ $gCfgName = [
 	amiport => 'AMI Port',
 	amiuser => 'AMI User',
 	amipass => 'AMI Pass',
-	cmdbuttons => 'Custom Cmd Buttons'
+	cmdbuttons => 'Custom Cmd Buttons',
+	updatecheck => 'Check For Updates'
 ];
 
 $publicPermissionVals = [
@@ -71,7 +74,8 @@ $gCfgVals = [
 	amiport => null,
 	amiuser => null,
 	amipass => null,
-	cmdbuttons => null
+	cmdbuttons => null,
+	updatecheck => $checkboxVals
 ];
 
 // Global Cfgs structure
@@ -247,34 +251,6 @@ function validateVal($c) {
 		return false;
 	}
 	return true;
-}
-
-// Do not call below prior to htmlInit(), global.inc include may cause whitespace to be output
-function checkGlobalInc() {
-	global $gCfg, $subdir, $userModel;
-	if($gCfg[call] && $gCfg[location] || !isset($userModel))
-		return true;
-	// If Call and Location cfgs not set try importing from ../supermon/global.inc
-	$loc = '../supermon/global.inc';
-	if($subdir)
-		$loc = "../$loc";
-	if(strpos($subdir, '/'))
-		$loc = "../$loc";
-	if(file_exists($loc)) {
-		include($loc);
-		if(!$CALL || !$LOCATION || strlen($CALL) > 9 ||
-		   !$userModel->validateName($CALL) || !$userModel->validateLocation($LOCATION)) {
-			unset($userModel->error);
-			return false;
-		}
-		$gCfg[call] = $CALL;
-		$gCfg[location] = $LOCATION;
-		if($TITLE2)
-			$gCfg[title] = $TITLE2;
-		$this->saveCfgs();
-		return true;
-	}
-	return false;
 }
 
 private function checkDbError($method, $extraTxt='') {

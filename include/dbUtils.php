@@ -1,8 +1,6 @@
 <?php
 // dbUtils.php
 // Author: David Gleason - AllScan.info
-$asdbdir = '/etc/allscan';
-$asdbfile = '';
 
 function dbInit() {
 	global $asdir, $asdbdir, $asdbfile;

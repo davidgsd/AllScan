@@ -137,6 +137,8 @@ function showForms($newUser) {
 		separate account with their name or callsign for the Name.
 	<li>Additional user accounts can be created and edited on the "Users" page.
 	<li>Your user account settings can be changed on the "Settings" page.
+	<li>User names and passwords are case sensitive. Be sure when logging in to use the same case
+	    that the user account was set up with, and that Caps Lock is not on.
 	<li>Do not lose your Login Name and Password. Admin passwords can be changed only by another
 		Superuser or via SSH.
 	</ul><br>

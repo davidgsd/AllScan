@@ -72,7 +72,8 @@ if(!$gCfg[call] && adminUser()) {
 if(!isset($parms))
 	$parms = [];
 
-$remNode = (isset($parms['node']) && validDbID($parms['node']) && strlen($parms['node']) < 9) ? $parms['node'] : '';
+$remNode = (isset($parms['node']) && validDbID($parms['node']) &&
+			strlen($parms['node']) < 9) ? $parms['node'] : '';
 
 showConnStatusTable();
 showNodeCtrlForm();
@@ -123,6 +124,7 @@ if(!isset($favsFile) || !$favsFile) {
 }
 // Combine favs node, label data with astdb data into favList
 $favList = [];
+$trimchars = " .,;\n\r\t\v\x00";
 foreach($favs as $n => $f) {
 	if(array_key_exists($f->node, $astdb)) {
 		list($x, $call, $desc, $loc) = $astdb[$f->node];
@@ -140,15 +142,36 @@ foreach($favs as $n => $f) {
 			}
 		}
 	}
+	// Te keep Favs table compact remove redundant text that exists in multiple fields
 	$name = str_replace([$f->node, $call, $desc, $loc, ' ,'], ' ', $f->label);
 	//$msg[] = "$x, $call, $desc, $loc, $f->label";
 	//$msg[] = $name;
+	// Remove unnecessary white space and punctuation
 	foreach(['call', 'name', 'desc', 'loc'] as $var)
-		$$var = trim(str_replace('  ', ' ', $$var), " .,;\n\r\t\v\x00");
+		$$var = trim(str_replace('  ', ' ', $$var), $trimchars);
+	// Fix common misspellings
+	foreach(['name', 'desc'] as $var)
+		$$var = str_replace(['mhz', 'MHZ', 'hz'], ['MHz', 'MHz', 'Hz'], $$var);
+	// Name is derived from favorites file text, but if that contained only redundant information to what
+	// was in astdb and is thus now blank, use the call sign
 	if(!$name)
 		$name = $call;
+	// Confirm call sign is present in name
 	elseif(strpos($name, $call) === false && $call !== '-')
 		$name = $call . ' ' . $name;
+	// Many nodes in astdb have descriptive text in the name field but then a blank description. In this
+	// case, to make the table look more consistent and clean move any text from the name (except for the
+	// call sign) to the description column
+	if(empty($desc) && strlen($name) > strlen($call) && strlen($call) > 2) {
+		if(strpos($name, $call) === 0) {
+			$desc = trim(substr($name, strlen($call)), $trimchars);
+			$name = $call;
+		}
+	}
+	// Remove redundant call sign data from the description
+	if(strpos($name, $call) !== false && strpos($desc, "$call ") !== false) {
+		$desc = trim(str_replace($call, '', $desc), $trimchars);
+	}
 	//$msg[] = $name;
 	$favList[] = [$n, $f->node, $name, $desc, $loc, NBSP, NBSP];
 }
@@ -333,8 +356,8 @@ function processForm($parms, &$msg) {
 }
 
 function checkUpdate() {
-	global $msg;
-	if(!adminUser())
+	global $msg, $gCfg;
+	if(!$gCfg[updatecheck] || !adminUser())
 		return false;
 	$fname = "include/common.php";
 	$vpat = '/^\$AllScanVersion = "v([0-9\.]{3,4})"/';

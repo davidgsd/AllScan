@@ -78,7 +78,7 @@ if(is_dir($asdir)) {
 } else {
 	msg("$asdir dir not found.");
 	$s = readline("Ready to Install AllScan. Enter 'y' to confirm, any other key to exit: ");
-	if($s !== 'y')
+	if($s !== 'y' && $s !== 'Y')
 		exit();
 }
 
@@ -268,12 +268,13 @@ if(!filter_var($lanip, FILTER_VALIDATE_IP)) {
 		$lanip = exec("ifconfig | grep inet | tail -1 | awk '{print $2}'");
 }
 $lip = '';
-if($lanip)
-	$lip = "http://$lanip/$asdir/";
 if($hn) {
+	$lip = "http://$hn.local/$asdir/";
+}
+if($lanip) {
 	if($lip)
 		$lip .= ' or ';
-	$lip .= "http://$hn.local/$asdir/";
+	$lip .= "http://$lanip/$asdir/";
 }
 if(!$lip)
 	$lip = '[Local IPV4 address / hostname could not be determined]';

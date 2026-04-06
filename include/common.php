@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.98";
+$AllScanVersion = "v0.99";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -35,6 +35,10 @@ $asdir = '';	// eg. allscan
 $subdir = '';	// eg. '' or user
 $relpath = '';	// eg. allscan or allscan/user
 $urlbase = '';	// eg. /allscan (prepended to url paths eg. <img src=\"$urlbase/AllScan.png\">)
+$asdbdir = '/etc/allscan';
+$asdbfile = '';
+$asdbfile2 = $asdbdir . '/asdb.txt';
+
 // Title cfgs
 $title = '';
 $title2 = '';
@@ -68,14 +72,13 @@ function htmlInit($title) {
 }
 
 function pageInit($onload='', $showHdrLinks=true, $showUpdateLink=false) {
-	global $html, $AllScanVersion, $gCfg, $urlbase, $subdir, $title, $title2, $cfgModel, $userCnt;
+	global $html, $AllScanVersion, $gCfg, $urlbase, $title, $title2, $userCnt;
 	// Return now if not called from an HTML context
 	if(!isset($html))
 		return;
-
 	htmlInit('AllScan - AllStarLink Favorites Management & Scanning');
-	// Load Title cfgs. Do this after htmlInit(), global.inc can cause whitespace output
-	if(isset($cfgModel) && $cfgModel->checkGlobalInc()) {
+	// Load Title cfgs
+	if(checkTitleCfgs()) {
 		$title2 = $title = $gCfg[call] . ' ' . $gCfg[location];
 		if($gCfg[title])
 			$title2 .= ' - ' . $gCfg[title];
@@ -95,6 +98,26 @@ function pageInit($onload='', $showHdrLinks=true, $showUpdateLink=false) {
 	$hdr[] = implode(" | \n", $lnk);
 	$hdr[] = "<span id=\"hb\"><img src=\"$urlbase/AllScan.png\" width=16 height=16 alt=\"*\"></span>";
 	echo "<body$onload>" . NL . '<header>' . NL . implode(ENSP . NL, $hdr) . '</header>' . NL . BR;
+}
+
+function checkTitleCfgs() {
+	global $gCfg, $astdb, $amicfg, $msg;
+	if(!isset($amicfg->node))
+		getAmiCfg($msg);
+	$node = $amicfg->node;
+	if($node && is_numeric($node)) {
+		if(empty($astdb))
+			$astdb = readAstDb($msg);
+		if(array_key_exists($node, $astdb))
+			list($x, $call, $desc, $loc) = $astdb[$node];
+		if(empty($gCfg[call]) && $call)
+			$gCfg[call] = $call;
+		if(empty($gCfg[location]) && $loc)
+			$gCfg[location] = $loc;
+		if(empty($gCfg[title]) && $desc)
+			$gCfg[title] = $desc;
+	}
+	return (!empty($gCfg[call]));
 }
 
 function getHdrLinks() {
@@ -208,7 +231,7 @@ $astdbtxt = ['astdb.txt', '../supermon/astdb.txt', '/var/log/asterisk/astdb.txt'
 
 // Read AstDB file, looking in all commonly used locations
 function readAstDb(&$msg) {
-	global $astdbtxt;
+	global $astdbtxt, $asdbfile2;
 	// Check for file in our directory and in Asterisk/Supermon locations
 	// If exists in more than one place use the newest. Download it if not found
 	$mtime = [0, 0, 0];
@@ -234,21 +257,28 @@ function readAstDb(&$msg) {
 		$file = $astdbtxt[$keys[0]];
 	}
 	$msg[] = "Reading $file...";
+	$astdb = [];
 	$rows = readFileLines($file, $msg);
 	if(!$rows) {
-		return false;
+		if(!readAsDb($astdb)) {
+			return false;
+		}
+	} else {
+		foreach($rows as $row) {
+			$arr = explode('|', trim($row));
+			if(_count($arr) < 4 || !is_numeric($arr[0]))
+				continue;
+			$astdb[$arr[0]] = $arr;
+		}
+		unset($rows);
 	}
-	foreach($rows as $row) {
-		$arr = explode('|', trim($row));
-		$astdb[$arr[0]] = $arr;
-	}
-	unset($rows);
+	$np = readAsDb($astdb);
 	$cnt = count($astdb);
 	if(!$cnt) {
 		$msg[] = "$file invalid. Check file and permissions";
 		return false;
 	}
-	$msg[] = "$cnt Nodes in ASL DB";
+	$msg[] = "$cnt Nodes in ASL DB, $np Nodes in $asdbfile2";
 	return $astdb;
 }
 
@@ -274,12 +304,38 @@ function readAstDb2() {
 	if(!$rows) {
 		return false;
 	}
+	$astdb = [];
 	foreach($rows as $row) {
 		$arr = explode('|', trim($row));
+		if(_count($arr) < 4 || !is_numeric($arr[0]))
+			continue;
 		$astdb[$arr[0]] = $arr;
 	}
 	unset($rows);
+	readAsDb($astdb);
 	return $astdb;
+}
+
+// Below reads a local database file (same format as astdb.txt) that allows private nodes
+// to be defined or for the text of existing nodes in astdb.txt to be overridden
+function readAsDb(&$astdb) {
+	global $asdbfile2;
+	$n = 0;
+	if(is_array($astdb) && file_exists($asdbfile2)) {
+		$rows = [];
+		$rows = readFileLines($asdbfile2, $msg);
+		if($rows) {
+			foreach($rows as $row) {
+				$arr = explode('|', trim($row));
+				if(_count($arr) < 4 || !is_numeric($arr[0]))
+					continue;
+				$astdb[$arr[0]] = $arr;
+				$n++;
+			}
+			unset($rows);
+		}
+	}
+	return $n;
 }
 
 function downloadAstDb(&$msg) {

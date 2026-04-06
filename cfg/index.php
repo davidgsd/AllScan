@@ -22,20 +22,21 @@ $user =	$userModel->validate();
 if(!adminUser())
 	redirect('user/');
 
-$msg = [];
+$msg2 = [];
 $parms = getRequestParms();
 // Ignore Add/Edit requests if not Admin user
 if(isset($parms['Submit']) && adminUser() && $parms['Submit'] !== CANCEL) {
 	$formvars = ['cfg_id', 'val', 'file', 'dir', 'suffix', 'confirm'];
-	$cfg = processForm($parms['Submit'], arrayToObj($parms, $formvars), $msg);
+	$cfg = processForm($parms['Submit'], arrayToObj($parms, $formvars), $msg2);
 }
 
+$msg = [];
 pageInit();
 $view = new CfgView();
 
-if(!empty($msg)) {
+if(!empty($msg2)) {
 	h3("Process Form Results:");
-	echo implode(BR, $msg) . BR;
+	echo implode(BR, $msg2) . BR;
 }
 
 // Show Cfgs

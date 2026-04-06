@@ -32,7 +32,8 @@ function showNodeCtrlForm() {
 <label for="node">Node#</label><input type="text" inputmode="tel" pattern="[0-9a-dA-D\*#]*"
 	id="node" name="node" maxlength="10" value="' . $remNode . '">
 <input type=submit name="Submit" value="Add Favorite" class="small">
-<input type=submit name="Submit" value="Delete Favorite" class="small">
+<input type=submit name="Submit" value="Delete Favorite" class="small"
+	onClick="return confirmFavAction(\'Delete Favorite\');">
 <br>
 <input type=button value="Connect" onClick="connectNode(\'connect\');">
 <input type=button value="Disconnect" onClick="disconnectNode();">

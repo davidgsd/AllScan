@@ -5,13 +5,13 @@ See [screenshot.png](https://github.com/davidgsd/AllScan/blob/main/screenshot.pn
 * Shows your favorites in a Dashboard summary table with Keyed status, Connected Node count and other statistics.
 * Continually scans the status of each favorite using ASL's Statistics API and shows which favorites are active and have recently been active.
 * Allows favorites to be connected with a single click (optionally automatically disconnecting any currently connected nodes first).
-* Allows the Favorites Table to be sorted by Node#, Name, Description, Location, etc.
+* Allows the Favorites Table to be sorted by Node#, Name, Description or Location.
 * Favorites can be added/deleted simply by entering the node# and clicking a button.
 * Favorites files/groups can be easily created, copied, backed up, uploaded, downloaded and switched between
 
-These features give AllStar nodes similar memory management and scan capabilities that analog radios have had for decades. AllScan is mobile-friendly and optimized for ease of use on both small and large screens. AllScan follows the latest web development standards, with PHP, JavaScript, SQL, HTML, and CSS cleanly partitioned, runs on both ASL and HamVOIP, and is simple to install, configure, and update.
+These features give AllStar nodes similar memory management and scan capabilities that analog radios have had for decades. AllScan is mobile-friendly and optimized for ease of use on both small and large screens. AllScan follows the latest web development standards, with PHP, JavaScript, SQL, HTML, and CSS cleanly partitioned, runs on ASL and HamVOIP, and is simple to install, configure, and update.
 
-Prior to installing AllScan it is recommended that you have a working install of Supermon or Allmon. Currently AllScan supports favorites.ini entries that refer to connecting to nodes eg. 'cmd[] = "rpt cmd %node% ilink 3 [node#]"' but may also support other types of commands in the future.
+AllScan supports favorites.ini file entries that refer to connecting to nodes eg. 'cmd[] = "rpt cmd %node% ilink 3 [node#]"' but may also support other types of commands in the future.
 
 As AllScan receives data from the ASL stats server it updates the Favorites Table rows with color coded details showing the following:
 
@@ -27,7 +27,7 @@ Color codes for 'Node' column:
 
 'LCnt' column: The reported number of Connected Links (ie. user nodes, hubs, bridges, or other links).
 
-ASL's stats APIs are limited to 30 requests/minute per IP Address. AllScan uses a dynamic request timing algorithm to prevent exceeding this limit, even if multiple web clients are using AllScan on a node.
+ASL's stats APIs are limited to 30 requests/minute per IP Address. AllScan uses a dynamic request timing algorithm to prevent exceeding this limit, even if multiple web clients are using AllScan on one node.
 
 AllScan also implements User Authentication, User Account Administration, Login/Logout, User Settings and Cfg Management functions. After install AllScan will automatically create its database and necessary tables, and when you first visit the allscan/ url will prompt you to create an Admin user account. By default, public (not logged-in) users will have Read-Only access and will be able to see the Connection Status and Favorites data, but will not be able to make changes or view any admin (Cfgs / Users) pages. To change this setting, Log in, click the "Cfgs" link, and edit the "Public Permission" parameter.
 
@@ -40,7 +40,7 @@ Additional screenshots:
 Multiple copies of AllScan can be installed on one node (server) if desired, each with their own separate configuration, Favorites, and/or different node numbers. Just make copies of the /var/www/html/allscan/ dir eg. to "allscan2" and update the config settings accordingly on the Cfgs Tab.
 
 # Pre-Install Notes
-It is highly recommended to use ASL3 and to have Allmon3 or Supermon properly configured and working. AllScan works great on HamVOIP and older ASL versions but ASL3 has numerous major improvements and supports x64 platforms. If you have Supermon installed AllScan will give you the option to use the favorites.ini file in the supermon directory. See the Supermon groups.io page for details on how to install Supermon. If you use Supermon2 instead of Supermon or want to put your favorites.ini file in some other folder, the favorites.ini search location(s) can be set on the AllScan Cfgs Page.
+It is highly recommended to use ASL3 and to have Allmon3 properly configured and working. AllScan works great on HamVOIP and older ASL versions but ASL3 has numerous major improvements and supports x64 platforms. If you have Supermon installed AllScan will give you the option to use the favorites.ini file in the supermon directory. See the Supermon groups.io page for details on how to install Supermon. If you use Supermon2 instead of Supermon or want to put your favorites.ini file in some other folder, the favorites.ini search location(s) can be set on the AllScan Cfgs Page.
 
 # Install / Update
 The AllScan Install/Update script automatically checks system configuration details, checks if AllScan is already installed and what version, and if a newer version is available will prompt you to continue with the Install/Update. Just enter 'y' and seconds later the install/update will be complete.
@@ -77,8 +77,8 @@ AllScan nodes, node modules, and USB interfaces provide extensive features and o
 # Configuration Files and Parameters
 Files used by AllScan:
 1. **astdb.txt**: The ASL database file with the list of all nodes provisioned on the AllStarLink network. In ASL3 this is maintained by the asl3-update-nodelist service which will be set up automatically by the AllScan Installer/Updater script. In ASL2/HV this file should already exist in ../supermon/astdb.txt or /var/log/asterisk/astdb.txt. If the file is not found it will be automatically downloaded into the allscan directory. AllScan shows the status of these files and their last modification times in the status messages box (below the Favorites Table).
-2. **global.inc**: Cfg file in the supermon directory with user settings such as your name, call sign, node title, etc. AllScan will automatically import the following variables from global.inc if found: $CALL, $LOCATION, and $TITLE2. Otherwise you will be prompted to enter them after first setting up AllScan. The Call Sign and Location parameters are shown in the AllScan Page Header, and the Node Title parameter is shown in the Connection Status Table header.
-3. **favorites.ini**: The favorites file can be found in the supermon directory or in the allscan directory. Or if you have the file somewhere else (eg. ../supermon2/) you can set that location in the 'Favorites.ini Locations' Cfgs Parameter. A sample favorites file is also included.
+2. **favorites.ini**: The favorites file can be found in the supermon directory or in the allscan directory. Or if you have the file somewhere else (eg. ../supermon2/) you can set that location in the 'Favorites.ini Locations' Cfgs Parameter. A sample favorites file is also included.
+3. (optional) **asdb.txt**: If you have private nodes or want to override the description text in astdb.txt for certain node #s you can create a file named asdb.txt in /etc/allscan/, and enter lines in the same format used in astdb.txt (Node#|CallSign|Desc|Location) eg. "1999|W1AW|Private Node #1|Los Angeles, CA"
 
 All AllScan Cfg parameters can be viewed and set on the Cfgs page if you are logged in as an Admin user. Just click the 'Cfgs' link and all Cfgs are then shown along with an Edit form.
 
@@ -99,10 +99,8 @@ If you are still unable to get things working after trying the above, **email me
 1. All messages shown when you run the install/update script.
 2. Directory listing of the web root folder and the allscan folder. Do this by running "cd /var/www/html; ls -la . allscan" (or for HamVOIP "cd /srv/http; ls -la . allscan").
 
-For fastest response support requests / questions / inquiries should be emailed to me, rather than posted on FB or github.
-
 # Contact
-If you have any questions email david at allscan.info. Also see [AllScan.info](https://AllScan.info), and the [AllScan FB Group](https://www.facebook.com/groups/allscan). Note that any tech support questions should be emailed to me &ndash; not posted to the FB group.
+If you have any questions email david at allscan.info. Also see [AllScan.info](https://AllScan.info), and the [AllScan FB Group](https://www.facebook.com/groups/allscan). Note that any tech support questions should be emailed to me &ndash; not posted to the FB group. I usually respond to emails very quickly.
 
 <a href="https://allscan.info/"><img src="docs/AllScan.info.png"></a>
 
@@ -122,6 +120,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good idea
 
 # Release Notes
+**v0.99 2026-04-05**<br>
+Optimizations to Favorites table text parsing. Add support for /etc/allscan/asdb.txt file where description text for private nodes can be defined. Enable double-click of node# in Connection Status Table to disconnect that node. Display confirmation dialog when deleting favorites to help prevent accidental deletion. Add configuration parameter to allow update check to be turned off. Use call sign, location and description in astdb.txt for the configured node# if the node call sign, location or title are not set in the AllScan Cfgs; Supermon global.inc is no longer checked for this information. Validate astdb.txt and asdb.txt rows.
+
 **v0.97 2025-09-03**<br>
 Add Custom Cmd Buttons configuration parameter that allows DTMF command buttons to be shown on the main AllScan page (next to the Node Stats and Restart Asterisk buttons). This can be set on the Cfgs tab. Example settings:
 <pre>"*712" - Show a simple command button to say the time of day
