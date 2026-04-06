@@ -45,6 +45,7 @@ h1("Manage Cfgs");
 h2("Configuration Parameters");
 $view->showCfgs($gCfg);
 p("Node Number and AMI Cfgs default to values in /etc/asterisk/ rpt.conf and manager.conf if not set here.");
+p("Call Sign, Location, and Node Title default to fields in astdb.txt if not set here.");
 $view->showForms($cfg ?? null);
 echo '</div>' . BR. NL;
 
