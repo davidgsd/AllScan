@@ -40,7 +40,7 @@ Additional screenshots:
 Multiple copies of AllScan can be installed on one node (server) if desired, each with their own separate configuration, Favorites, and/or different node numbers. Just make copies of the /var/www/html/allscan/ dir eg. to "allscan2" and update the config settings accordingly on the Cfgs Tab.
 
 # Pre-Install Notes
-It is highly recommended to use ASL3 and to have Allmon3 properly configured and working. AllScan works great on HamVOIP and older ASL versions but ASL3 has numerous major improvements and supports x64 platforms. If you have Supermon installed AllScan will give you the option to use the favorites.ini file in the supermon directory. See the Supermon groups.io page for details on how to install Supermon. If you use Supermon2 instead of Supermon or want to put your favorites.ini file in some other folder, the favorites.ini search location(s) can be set on the AllScan Cfgs Page.
+It is highly recommended to use ASL3. AllScan works great on HamVOIP and older ASL versions but ASL3 has numerous major improvements and supports x64 platforms. If you have Supermon installed AllScan will give you the option to use the favorites.ini file in the supermon directory. See the Supermon groups.io page for details on how to install Supermon. If you use Supermon2 instead of Supermon or want to put your favorites.ini file in some other folder, the favorites.ini search location(s) can be set on the AllScan Cfgs Page.
 
 # Install / Update
 The AllScan Install/Update script automatically checks system configuration details, checks if AllScan is already installed and what version, and if a newer version is available will prompt you to continue with the Install/Update. Just enter 'y' and seconds later the install/update will be complete.
@@ -57,7 +57,7 @@ Log into your node by SSH and run the following commands:
 
 The Install/Update script will provide detailed status messages on each step of the process. Carefully review all output messages and confirm no errors occur.
 
-Now open a browser and go to your node's mDNS or IP address followed by /allscan/, eg. `http://[hostname].local/allscan/` and be sure to add a browser bookmark. (It is recommended to set your node's host name to 'node' followed by your node# eg. 'node567890'. You can check the host name with the 'hostname' command, and can change the host name by running 'sudo hostnamectl set-hostname [new hostname]'.) If the node's IAX port is forwarded in your router it can be accessed from the internet at `http://[node#].nodes.allstarlink.org`.
+Now open a browser and go to your node's mDNS or IP address followed by /allscan/, eg. `http://[hostname].local/allscan/` and be sure to add a browser bookmark. (It is recommended to set your node's host name to 'node' followed by your node# eg. 'node567890'. You can check the host name with the 'hostname' command, and can change the host name by running 'sudo hostnamectl set-hostname [new hostname]'.) If the node's http port is forwarded in your router AllScan can be accessed from the internet at `http://[node#].nodes.allstarlink.org/allscan/`.
 
 If you did a new install AllScan will prompt you to create an admin account. Be sure to do this right away. You can then configure the permission settings for AllScan. These default to Read-Only for public (not logged-in) users. This setting can be changed on the "Cfgs" page.
 
@@ -76,7 +76,7 @@ AllScan nodes, node modules, and USB interfaces provide extensive features and o
 
 # Configuration Files and Parameters
 Files used by AllScan:
-1. **astdb.txt**: The ASL database file with the list of all nodes provisioned on the AllStarLink network. In ASL3 this is maintained by the asl3-update-nodelist service which will be set up automatically by the AllScan Installer/Updater script. In ASL2/HV this file should already exist in ../supermon/astdb.txt or /var/log/asterisk/astdb.txt. If the file is not found it will be automatically downloaded into the allscan directory. AllScan shows the status of these files and their last modification times in the status messages box (below the Favorites Table).
+1. **astdb.txt**: The ASL database file with the list of all nodes provisioned on the AllStarLink network. In ASL3 this is maintained by the asl3-update-nodelist service which will be set up automatically by the AllScan Install/Update script. In ASL2/HV this file should already exist in ../supermon/astdb.txt or /var/log/asterisk/astdb.txt. If the file is not found it will be automatically downloaded into the allscan directory. AllScan shows the status of these files and their last modification times in the status messages box (below the Favorites Table).
 2. **favorites.ini**: The favorites file can be found in the supermon directory or in the allscan directory. Or if you have the file somewhere else (eg. ../supermon2/) you can set that location in the 'Favorites.ini Locations' Cfgs Parameter. A sample favorites file is also included.
 3. (optional) **asdb.txt**: If you have private nodes or want to override the description text in astdb.txt for certain node #s you can create a file named asdb.txt in /etc/allscan/, and enter lines in the same format used in astdb.txt (Node#|CallSign|Desc|Location) eg. "1999|W1AW|Private Node #1|Los Angeles, CA"
 
@@ -133,15 +133,9 @@ Add Custom Cmd Buttons configuration parameter that allows DTMF command buttons 
 Use of allmon.ini files has now been removed. Node# and AMI Cfgs can now be set on the Cfgs Tab, or if not set there will be read from /etc/asterisk/ rpt.conf and manager.conf.
 
 **v0.95 2025-08-18**<br>
-Fix issue in last checkin where Connection Status table would not be updated on some nodes with ASL2/HV .ini files.
-
-**v0.94 2025-08-15**<br>
 Support reading non-default AMI port# from Allmon3 .ini files. Discontinue copy of /etc/allmon3/allmon.ini to /etc/asterisk/allmon.ini.php during install as manager.conf should always have valid AMI cfgs.
 
 **v0.93 2025-05-13**<br>
-Fix bug introduced in v0.90 where for non-logged-in users JavaScript functions would not work.
-
-**v0.92 2025-05-05**<br>
 When loading main page check if a newer AllScan version is available and if so display a lighting bolt icon link next to the version number in the page header. This link then opens the AllScan github page and update instructions. JS optimizations to prevent duplicate error messages eg. if node is offline.
 
 **v0.91 2025-05-04**<br>
@@ -157,9 +151,6 @@ Enable nodes to be connected by double-clicking on node# links. This has the sam
 Enable reading AMI cfgs from rpt.conf and manager.conf if not found in .ini search locations.
 
 **v0.87 2024-10-18**<br>
-Fix bug where on new installs on nodes with no existing favorites files the main page would not fully load. Other minor optimizations.
-
-**v0.86 2024-10-15**<br>
 Add Favorites File Management functions to the Cfgs Tab, and a Favorites File Select control to the main page. These functions support viewing, downloading, copying, deleting, renaming and uploading favorites files, and enable simple switching between them. Simplify entry of node Call Sign, Location and Title configs for installs that do not have a Supermon global.inc file.
 
 **v0.83 2024-09-12**<br>
