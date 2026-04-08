@@ -368,8 +368,8 @@ function handleNodesEvent(event) {
 						tablehtml += '<tr>';
 					}
 					var id = 't' + n + 'c0' + 'r' + row;
-					tablehtml += '<td id="' + id + '" class="nodeNum" onClick="setNodeBox(' + nodeNum +
-						')" onDblClick="disconnectNode();">' + nodeNum + '</td>';
+					tablehtml += '<td id="' + id + '" class="nodeNum" onClick="setNodeBox(\'' +
+						nodeNum + '\')" onDblClick="disconnectNode();">' + nodeNum + '</td>';
 					// Show info or IP
 					if(rowdata.info != "") {
 						tablehtml += '<td>' + rowdata.info + '</td>';

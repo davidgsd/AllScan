@@ -15,8 +15,14 @@ $autodisc = ($autodisc === 'true');
 if(!preg_match("/^\d+$/", $localnode) || !$localnode)
 	exit("Invalid local node number\n");
 
-if(!preg_match("/^\d+$/", $remotenode) || (!$remotenode && $button !== 'disconnect'))
-	exit("Invalid remote node number\n");
+// WT clients will have a call sign as the 'node#'. Allow disconnects
+if($button === 'disconnect') {
+	if(empty($remotenode) || !ctype_alnum($remotenode) || strlen($remotenode) > 7)
+		exit("Invalid remote node number/callsign\n");
+} else {
+	if(!$remotenode || !ctype_digit($remotenode) || strlen($remotenode) > 7)
+		exit("Invalid remote node number\n");
+}
 
 chdir('..');
 

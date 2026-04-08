@@ -1,26 +1,22 @@
 <?php
 
-function getAstInfo($fp, $nodeNum) {
+function getAstInfo($fp, $node) {
 	global $astdb;
 	// Build info string
-	if(isset($astdb[$nodeNum])) {
-		$dbNode = $astdb[$nodeNum];
+	if(isset($astdb[$node])) {
+		$dbNode = $astdb[$node];
 		$info = $dbNode[1] . ' ' . $dbNode[2] . ' ' . $dbNode[3];
 		// Link to ASL stats page if a public node#
-		if($nodeNum >= 2000 && $nodeNum < 3000000) {
-			$info = "<a href=\"http://stats.allstarlink.org/stats/$nodeNum\" target=\"stats\">$info</a>";
+		if($node >= 2000 && $node < 3000000) {
+			$info = "<a href=\"http://stats.allstarlink.org/stats/$node\" target=\"stats\">$info</a>";
 		}
-	} elseif($nodeNum > 3000000) {
-		$info = getEchoLinkInfo($fp, $nodeNum);
-	} elseif(!empty($node['ip'])) {
-		if(strlen(trim($node['ip'])) > 3) {
-			$info = 'Web Xcvr / Phone Portal (' . $node['ip'] . ')';
-		} else {
-			$info = 'Unknown Mode';
-		}
-	} elseif(is_numeric($nodeNum)) {
+	} elseif((int)$node >= 3000000) {
+		$info = getEchoLinkInfo($fp, $node);
+	} elseif(is_numeric($node)) {
 		$info = 'Node not in database';
-	} elseif(`echo $nodeNum |egrep -c "\-P"` > 0) {
+	} elseif(validIpAddr($node)) {
+		$info = "Web Transceiver / Phone Portal";
+	} elseif(preg_match('/-P$/', $node)) {
 		$info = 'AllStar Phone Portal user';
 	} else {
 		$info = 'IaxRpt / Web Transceiver client';

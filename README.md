@@ -120,6 +120,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good idea
 
 # Release Notes
+**v1.0 2026-04-07**<br>
+Fix issue where Web Transceiver connections would not show correct info in Connection Status table and could not be disconnected. Require favorites .ini files to contain only <code>A-Z a-z 0-9 . _ - [ ]</code> chars.
+
 **v0.99 2026-04-05**<br>
 Optimizations to Favorites table text parsing. Add support for /etc/allscan/asdb.txt file where description text for private nodes can be defined. Enable double-click of node# in Connection Status Table to disconnect that node. Display confirmation dialog when deleting favorites to help prevent accidental deletion. Add configuration parameter to allow update check to be turned off. Use call sign, location and description in astdb.txt for the configured node# if the node call sign, location or title are not set in the AllScan Cfgs; Supermon global.inc is no longer checked for this information. Validate astdb.txt and asdb.txt rows.
 

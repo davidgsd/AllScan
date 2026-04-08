@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v0.99";
+$AllScanVersion = "v1.0";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -18,9 +18,10 @@ define('GET_CPU_TEMP', 'getCpuTemp');
 // Enable files to be written with group writeable permissions
 umask(0002);
 
-/*	AllScan can be installed in any top level folder within the www server root folder. allscan/ is the default,
-	additional copies can be installed in other test/version-specific/backup dirs.
-	This enables servers with multiple nodes to have separate allscan installs for each, eg. allscan567890/, ...
+/*	AllScan can be installed in any top level folder within the www server root folder.
+	allscan/ is the default, additional copies can be installed in other test / version-specific /
+	backup dirs. This enables servers with multiple nodes to have separate allscan installs for
+	each, eg. allscan567890/, ...
 	Each install requires its own DB file in /etc/allscan/. Examples:
 	Install Dir				DB File name
 	wwwroot/allscan/		/etc/allscan/allscan.db			(default)
