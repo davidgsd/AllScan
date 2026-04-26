@@ -214,6 +214,9 @@ border-bottom-left-radius:10px;
 table tr:last-child td:last-child {
 border-bottom-right-radius:10px;
 }
+table tbody tr:hover {
+background-color:rgba(51,51,119,0.67);
+}
 
 table.noborder, table.noborder tr th, table.noborder tr td {
 border:0;
