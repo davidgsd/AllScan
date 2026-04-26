@@ -318,6 +318,8 @@ function handleNodesEvent(event) {
 		var cos_keyed = 0;
 		var tx_keyed = 0;
 		var pgTitlePrefix = '';
+		var num_Links = 0;
+		var num_ALinks = 0;
 		for(row in tabledata[n].remote_nodes) {
 			var rowdata = tabledata[n].remote_nodes[row];
 			if(rowdata.cos_keyed == 1)
@@ -357,6 +359,8 @@ function handleNodesEvent(event) {
 						lnodes = rowdata.lnodes;
 						updateFavsTableNodeCol();
 					}
+					num_Links = rowdata.num_links;
+					num_ALinks = rowdata.num_alinks;
 				} else {
 					total_nodes++
 					// Set background color
@@ -396,7 +400,8 @@ function handleNodesEvent(event) {
 		}
 		// Display Count
 		if(total_nodes > 1) {
-			tablehtml += '<tr><td colspan="6">' + total_nodes + ' nodes connected</td></tr>';
+			tablehtml += '<tr><td colspan="6">' + total_nodes + ' nodes listed. ' + num_ALinks +
+				' nodes connected. ' + num_Links + ' nodes linked.</td></tr>';
 		}
 		// $('#table_' + n + ' tbody:first').html(tablehtml);
 		const cstbl = document.getElementById('table_' + n);
