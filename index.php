@@ -237,7 +237,7 @@ if(($ct = cpuTemp()))
 // Show function buttons and Links
 echo $html->linkButton('Node Stats', "http://stats.allstarlink.org/stats/$node", 'small', null, null, 'stats');
 
-if(modifyOk()) {
+if(writeOk()) {
 	echo $html->linkButton('Restart Asterisk', null, 'small', null, 'astrestart();');
 	if(!empty($gCfg[cmdbuttons]))
 		showCustomCmdButtons();
