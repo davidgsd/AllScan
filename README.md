@@ -120,6 +120,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good idea
 
 # Release Notes
+**v1.01 2026-05-07**<br>
+Show direct and adjacent link counts in Connection Status table if more than one node connected. CSS/HTML optimizations.
+
 **v1.0 2026-04-07**<br>
 Fix issue where Web Transceiver connections would not show correct info in Connection Status table and could not be disconnected. Require favorites\*.ini filenames to contain only <code>A-Z a-z 0-9 . _ - [ ]</code> characters.
 

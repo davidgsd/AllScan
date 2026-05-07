@@ -399,9 +399,12 @@ function handleNodesEvent(event) {
 			}
 		}
 		// Display Count
+		// total_nodes is the count of nodes in the table, connected in any mode
+		// num_Links is the count of nodes connected in any mode other than Local monitor
+		// num_Alinks is the total count of direct or adjacent connected nodes
 		if(total_nodes > 1) {
-			tablehtml += '<tr><td colspan="6">' + total_nodes + ' nodes listed. ' + num_ALinks +
-				' nodes connected. ' + num_Links + ' nodes linked.</td></tr>';
+			tablehtml += '<tr><td colspan="6">' + total_nodes + ' nodes connected (' + num_ALinks +
+				' direct, ' + num_Links + ' adjacent)</td></tr>';
 		}
 		// $('#table_' + n + ' tbody:first').html(tablehtml);
 		const cstbl = document.getElementById('table_' + n);
