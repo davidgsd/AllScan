@@ -214,7 +214,7 @@ border-bottom-left-radius:10px;
 table tr:last-child td:last-child {
 border-bottom-right-radius:10px;
 }
-table tbody tr:hover {
+table.favs tbody tr:hover, table.grid tbody tr:hover {
 background-color:rgba(51,51,119,0.67);
 }
 
