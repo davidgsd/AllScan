@@ -200,16 +200,23 @@ function updateState(directNodes, keyed, txKeyed, connecting) {
 	});
 	var hasExternalOnly = !activeNode && directNodes.length > 0;
 	var hasExtras = extras.length > 0 || hasExternalOnly;
-	var label = 'NO CONNECTION';
-	var detail = 'Tap a channel to connect.';
+	var label = 'Idle';
 	var state = 'idle';
+	var detail = 'Tap a channel to connect.';
 
 	if(hasExtras) {
-		label = 'EXTRA CONNECTIONS';
+		label = 'Extra Connections';
 		detail = activeNode ? channelTitle(activeNode) + ' plus ' + extras.join(', ') : 'Connected to ' + directNodes.join(', ');
 		state = 'warning';
 	} else if(activeNode) {
-		label = txKeyed ? 'TX ACTIVE' : (keyed ? 'RX ACTIVE' : (connecting ? 'CONNECTING' : 'CONNECTED'));
+		if(txKeyed && keyed)
+			label = 'COS & PTT Keyed';
+		else if(txKeyed)
+			label = 'PTT Keyed';
+		else if(keyed)
+			label = 'COS Keyed';
+		else
+			label = connecting ? 'Connecting' : 'Connected';
 		detail = channelTitle(activeNode);
 		state = txKeyed ? 'tx' : (keyed ? 'rx' : (connecting ? 'connecting' : 'connected'));
 	}
