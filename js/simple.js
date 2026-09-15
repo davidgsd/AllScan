@@ -162,6 +162,7 @@ function handleNodesEvent(event) {
 	var keyed = false;
 	var txKeyed = false;
 	var connecting = false;
+	var connectingNode = '';
 
 	nodeData.remote_nodes.forEach(function(row) {
 		if(row.cos_keyed == 1)
@@ -174,16 +175,18 @@ function handleNodesEvent(event) {
 			return;
 		if(row.node)
 			directNodes.push(String(row.node));
-		if(row.mode === 'C')
+		if(row.mode === 'C') {
 			connecting = true;
+			connectingNode = String(row.node);
+		}
 	});
 
 	directNodes = unique(directNodes);
 	simple.connectedNodes = directNodes;
-	updateState(directNodes, keyed, txKeyed, connecting);
+	updateState(directNodes, keyed, txKeyed, connecting, connectingNode);
 }
 
-function updateState(directNodes, keyed, txKeyed, connecting) {
+function updateState(directNodes, keyed, txKeyed, connecting, connectingNode) {
 	var activeNode = '';
 	directNodes.some(function(node) {
 		if(simple.channelByNode[node]) {
@@ -202,13 +205,10 @@ function updateState(directNodes, keyed, txKeyed, connecting) {
 	var hasExtras = extras.length > 0 || hasExternalOnly;
 	var label = 'Idle';
 	var state = 'idle';
-	var detail = 'Tap a channel to connect.';
+	var detail = hasExternalOnly ? 'Only unlisted node(s) connected.' : 'Tap a channel to connect.';
 
-	if(hasExtras) {
-		label = 'Extra Connections';
-		detail = activeNode ? channelTitle(activeNode) + ' plus ' + extras.join(', ') : 'Connected to ' + directNodes.join(', ');
-		state = 'warning';
-	} else if(activeNode) {
+	var statusNode = connectingNode || activeNode;
+	if(statusNode) {
 		if(txKeyed && keyed)
 			label = 'COS & PTT Keyed';
 		else if(txKeyed)
@@ -217,7 +217,7 @@ function updateState(directNodes, keyed, txKeyed, connecting) {
 			label = 'COS Keyed';
 		else
 			label = connecting ? 'Connecting' : 'Connected';
-		detail = channelTitle(activeNode);
+		detail = channelTitle(statusNode);
 		state = txKeyed ? 'tx' : (keyed ? 'rx' : (connecting ? 'connecting' : 'connected'));
 	}
 
@@ -238,10 +238,9 @@ function updateWarning(show, activeNode, extras, directNodes) {
 		simple.warningPanel.classList.add('hidden');
 		return;
 	}
-	var nodes = activeNode ? extras : directNodes;
-	simple.warningDetail.textContent = nodes.length
-		? 'Additional connected node(s): ' + nodes.join(', ')
-		: 'Additional nodes are connected.';
+	simple.warningDetail.textContent = directNodes.length
+		? 'Connected node(s): ' + directNodes.join(', ')
+		: 'Nodes are connected.';
 	simple.warningPanel.classList.remove('hidden');
 	simple.disconnectAllBtn.disabled = !simple.canModify;
 }
