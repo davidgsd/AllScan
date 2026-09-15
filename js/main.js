@@ -88,6 +88,9 @@ function getStats() {
 	var rnodes=[], node;
 	switch(statsState) {
 		case 0: // init
+			// No favorites table exists if no favorites have been added yet
+			if(!ftbl)
+				return;
 			// Parse favorites table for node numbers
 			for(var r=1, i=0; r < ftbl.rows.length; r++) {
 				node = ftbl.rows[r].cells[1].innerHTML
@@ -151,6 +154,8 @@ function handleStatsResponse() {
 	var time = unixtime();
 	var row, lum;
 	// Update favs table
+	if(!ftbl)
+		return;
 	for(var r=0, n=ftbl.rows.length-1; r < n; r++) {
 		//for(var c=0, m=ftbl.rows[r].cells.length; c < m; c++) {
 		var cells = ftbl.rows[r+1].cells;
@@ -445,6 +450,8 @@ function handleNodetimesEvent(event) {
 }
 
 function updateFavsTableNodeCol() {
+	if(!ftbl)
+		return;
 	for(var r=0, n=ftbl.rows.length-1; r < n; r++) {
 		var cells = ftbl.rows[r+1].cells;
 		var c1 = cells[1];
