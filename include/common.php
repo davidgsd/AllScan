@@ -124,6 +124,11 @@ function checkTitleCfgs() {
 function getHdrLinks() {
 	global $html, $urlbase, $user;
 	$lnk = [];
+	if(readOk()) {
+		$url = "$urlbase/simple/";
+		$title = 'Simple';
+		$lnk[] = ($url === getScriptName()) ? $title : $html->a($url, null, $title);
+	}
 	if(isset($user->user_id) && validDbID($user->user_id)) {
 		// Show links to Cfg and User modules if Admin user
 		if(adminUser()) {
