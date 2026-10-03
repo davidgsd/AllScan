@@ -17,7 +17,7 @@ if(!preg_match("/^\d+$/", $localnode) || !$localnode)
 
 // WT clients will have a call sign as the 'node#'. Allow disconnects
 if($button === 'disconnect') {
-	if(empty($remotenode) || !ctype_alnum($remotenode) || strlen($remotenode) > 7)
+	if($remotenode === '' || !ctype_alnum($remotenode) || strlen($remotenode) > 7)
 		exit("Invalid remote node number/callsign\n");
 } else {
 	if(!$remotenode || !ctype_digit($remotenode) || strlen($remotenode) > 7)

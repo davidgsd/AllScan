@@ -336,16 +336,16 @@ function handleNodesEvent(event) {
 			if(tx_keyed == 0) {
 				tablehtml += '<tr class="gColor"><td>' + n + '</td><td>Idle</td><td colspan="4"></td></tr>';
 			} else {
-				tablehtml += '<tr class="tColor"><td>' + n + '</td><td>PTT-Keyed</td><td colspan="4"></td></tr>';
+				tablehtml += '<tr class="tColor"><td>' + n + '</td><td>PTT Keyed</td><td colspan="4"></td></tr>';
 				pgTitlePrefix = '\u{1F534} '; // Red Circle
 			}
 		} else {
 			if(tx_keyed == 0) {
-				tablehtml += '<tr class="lColor"><td>' + n + '</td><td>COS-Detected</td><td colspan="4"></td></tr>';
+				tablehtml += '<tr class="lColor"><td>' + n + '</td><td>COS Keyed</td><td colspan="4"></td></tr>';
 				pgTitlePrefix = '\u{1F7E2} '; // Green Circle
 			} else {
 				tablehtml += '<tr class="bColor"><td>' + n +
-					'</td><td colspan="2">COS-Detected, PTT-Keyed</td><td colspan="4"></td></tr>';
+					'</td><td colspan="2">COS & PTT Keyed</td><td colspan="4"></td></tr>';
 				pgTitlePrefix = '\u{1F7E1} '; // Orange Circle
 			}
 		}

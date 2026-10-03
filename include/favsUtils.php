@@ -74,3 +74,132 @@ function findFavsFiles(&$activeFile) {
 		$activeFile = $vfiles[0];
 	return $vfiles;
 }
+
+function getFavsData($favsFile, $node, $astdb, &$msg) {
+	// Read in favorites.ini
+	$favs = [];
+	$favcmds = [];
+	$favList = [];
+	$error = '';
+	if(!isset($favsFile) || !$favsFile) {
+		return ['favs' => $favs, 'favcmds' => $favcmds, 'favList' => $favList, 'error' => $error];
+	}
+	$favsIni = parse_ini_file($favsFile, true);
+	if($favsIni === false) {
+		$error = "Error parsing $favsFile. Check file format/permissions or create file with www-data writeable permissions.";
+		return ['favs' => $favs, 'favcmds' => $favcmds, 'favList' => $favList, 'error' => $error];
+	}
+	// Combine [general] stanza with this node's stanza
+	$favsCfg = ['label' => [], 'cmd' => []];
+	if(isset($favsIni['general']))
+		$favsCfg = array_merge($favsCfg, $favsIni['general']);
+	if(isset($favsIni[$node])) {
+		foreach($favsIni[$node] as $type => $arr) {
+			if($type == 'label') {
+				foreach($arr as $label)
+					$favsCfg['label'][] = $label;
+			} elseif($type == 'cmd') {
+				foreach($arr as $cmd)
+					$favsCfg['cmd'][] = $cmd;
+			}
+		}
+	}
+	$favsCfg['label'] = array_map('trim', $favsCfg['label'] ?? []);
+	$favsCfg['cmd'] = array_map('trim', $favsCfg['cmd'] ?? []);
+	foreach($favsCfg['cmd'] as $i => $c) {
+		$label = $favsCfg['label'][$i] ?? '';
+		if(!$c) {
+			unset($favsCfg['cmd'][$i], $favsCfg['label'][$i]);
+		} else {
+			if(preg_match('/[0-9]{4,8}/', $c, $m) == 1)
+				$favs[$i] = (object)['node'=>$m[0], 'label'=>$label, 'cmd'=>$c];
+			else
+				$favcmds[$i] = (object)['label'=>$label, 'cmd'=>$c];
+		}
+	}
+	// if(count($favcmds))
+		// varDump($favcmds);
+	$msg[] = _count($favs) . " favorites read from $favsFile";
+	$favList = buildFavList($favs, $astdb);
+	return ['favs' => $favs, 'favcmds' => $favcmds, 'favList' => $favList, 'error' => $error];
+}
+
+function buildFavList($favs, $astdb) {
+	// Combine favs node, label data with astdb data into favList
+	$favList = [];
+	$trimchars = " .,;\n\r\t\v\x00";
+	foreach($favs as $n => $f) {
+		if(array_key_exists($f->node, $astdb)) {
+			list($x, $call, $desc, $loc) = $astdb[$f->node];
+		} else {
+			if($f->node < 3000000) {
+				list($x, $call, $desc, $loc) = [$n, '-', '[Not in ASL DB]', '[Check Node Number]'];
+			} else {
+				$info = getELInfo($f->node);
+				if(empty($info))
+					list($x, $call, $desc, $loc) = [$n, '-', '[EchoLink Node]', '-'];
+				else {
+					if(preg_match('/(.*) (\[.*\])/', $info, $m) != 1)
+						$m = [1=>'-', 2=>"[EchoLink $f->node]"];
+					list($x, $call, $desc, $loc) = [$n, $m[1], $m[2], '-'];
+				}
+			}
+		}
+		// Te keep Favs table compact remove redundant text that exists in multiple fields
+		$name = str_replace([$f->node, $call, $desc, $loc, ' ,'], ' ', $f->label);
+		//$msg[] = "$x, $call, $desc, $loc, $f->label";
+		//$msg[] = $name;
+		// Remove unnecessary white space and punctuation
+		foreach(['call', 'name', 'desc', 'loc'] as $var)
+			$$var = trim(str_replace('  ', ' ', $$var), $trimchars);
+		// Fix common misspellings
+		foreach(['name', 'desc'] as $var)
+			$$var = str_replace(['mhz', 'MHZ', 'hz'], ['MHz', 'MHz', 'Hz'], $$var);
+		// Name is derived from favorites file text, but if that contained only redundant information to what
+		// was in astdb and is thus now blank, use the call sign
+		if(!$name)
+			$name = $call;
+		// Confirm call sign is present in name
+		elseif(strpos($name, $call) === false && $call !== '-')
+			$name = $call . ' ' . $name;
+		// Many nodes in astdb have descriptive text in the name field but then a blank description. In this
+		// case, to make the table look more consistent and clean move any text from the name (except for the
+		// call sign) to the description column
+		if(empty($desc) && strlen($name) > strlen($call) && strlen($call) > 2) {
+			if(strpos($name, $call) === 0) {
+				$desc = trim(substr($name, strlen($call)), $trimchars);
+				$name = $call;
+			}
+		}
+		// Remove redundant call sign data from the description
+		if(strpos($name, $call) !== false && strpos($desc, "$call ") !== false)
+			$desc = trim(str_replace($call, '', $desc), $trimchars);
+		//$msg[] = $name;
+		$favList[] = [$n, $f->node, $name, $desc, $loc, NBSP, NBSP];
+	}
+	return $favList;
+}
+
+function getELInfo($n) {
+	global $amicfg, $ami;
+	static $fp;
+	if( empty($amicfg->host) || empty($amicfg->port) ||
+		empty($amicfg->user) || empty($amicfg->pass) || $fp === false ) {
+		return;
+	}
+	// Login to AMI
+	if(empty($ami)) {
+		$ami = new AMI();
+	}
+	if(!isset($fp)) {
+		$fp = $ami->connect($amicfg->host, $amicfg->port);
+		if($fp === false) {
+			return;
+		}
+		if($ami->login($fp, $amicfg->user, $amicfg->pass) === false) {
+			unset($fp);
+			return;
+		}
+	}
+	return getAstInfo($fp, $n);
+}
