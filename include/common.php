@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v1.01";
+$AllScanVersion = "v1.02";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -124,11 +124,6 @@ function checkTitleCfgs() {
 function getHdrLinks() {
 	global $html, $urlbase, $user;
 	$lnk = [];
-	if(readOk()) {
-		$url = "$urlbase/simple/";
-		$title = 'Simple';
-		$lnk[] = ($url === getScriptName()) ? $title : $html->a($url, null, $title);
-	}
 	if(isset($user->user_id) && validDbID($user->user_id)) {
 		// Show links to Cfg and User modules if Admin user
 		if(adminUser()) {
@@ -143,6 +138,11 @@ function getHdrLinks() {
 		$url = "$urlbase/user/settings/";
 		$title = 'Settings';
 		$lnk[] = ($url === getScriptName()) ? $title : $html->a($url, null, $title);
+		if(readOk()) {
+			$url = "$urlbase/simple/";
+			$title = 'TouchGUI';
+			$lnk[] = ($url === getScriptName()) ? $title : $html->a($url, null, $title);
+		}
 		$lnk[] = $html->a("$urlbase/user/", ['logout'=>1], 'Logout');
 	} else {
 		// Show Login link

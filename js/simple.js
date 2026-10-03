@@ -230,7 +230,7 @@ function setStatus(label, detail, state) {
 	simple.statusLabel.textContent = label;
 	simple.statusDetail.textContent = detail;
 	simple.statusPanel.className = 'status-panel state-' + state;
-	document.title = label + ' - AllScan Simple';
+	document.title = label + ' - AllScan TouchGUI';
 }
 
 function updateWarning(show, activeNode, extras, directNodes) {

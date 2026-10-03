@@ -1,5 +1,5 @@
 <?php
-// AllScan simplified touch interface
+// AllScan Touch GUI interface
 require_once('../include/common.php');
 require_once('../include/hwUtils.php');
 require_once('../astapi/AMI.php');
@@ -56,7 +56,7 @@ foreach($favsData['favList'] as $f) {
 
 checkTitleCfgs();
 $canModify = modifyOk();
-$pageTitle = 'AllScan Simple';
+$pageTitle = 'AllScan TouchGUI';
 $jsonFlags = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
 $channelJson = json_encode($channels, $jsonFlags);
 $titleJson = json_encode($title2, $jsonFlags);
