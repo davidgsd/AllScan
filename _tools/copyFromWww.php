@@ -11,6 +11,7 @@ $excludes = ['test', 'old', '*.tmp', '*.bak', 'log.txt'];
 // Do below if might be called from somewhere else
 $pwd = getcwd();
 chdir($pwd);
+$pwd .= '/';
 echo "pwd = $pwd, webRoot = $webRoot\n";
 if(!is_dir($webRoot)) {
 	echo "webRoot dir not found\n";

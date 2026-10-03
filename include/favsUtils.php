@@ -174,6 +174,9 @@ function buildFavList($favs, $astdb) {
 		// Remove redundant call sign data from the description
 		if(strpos($name, $call) !== false && strpos($desc, "$call ") !== false)
 			$desc = trim(str_replace($call, '', $desc), $trimchars);
+		// Shorten long names
+		if(strlen($name) > 33)
+			$name = substr($name, 0, 33) . '&hellip;';
 		//$msg[] = $name;
 		$favList[] = [$n, $f->node, $name, $desc, $loc, NBSP, NBSP];
 	}

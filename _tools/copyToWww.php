@@ -12,6 +12,7 @@ $excludes = array('.git', '.gitignore');
 // Do below if might be called from somewhere else
 $pwd = getcwd();
 chdir($pwd);
+$pwd .= '/';
 echo "pwd = $pwd, webRoot = $webRoot\n";
 if($webRoot === $pwd) {
 	echo "Can't run script from web root folder. Go to dev folder.\n";
