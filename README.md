@@ -32,10 +32,11 @@ ASL's stats APIs are limited to 30 requests/minute per IP Address. AllScan uses 
 AllScan also implements User Authentication, User Account Administration, Login/Logout, User Settings and Cfg Management functions. After install AllScan will automatically create its database and necessary tables, and when you first visit the allscan/ url will prompt you to create an Admin user account. By default, public (not logged-in) users will have Read-Only access and will be able to see the Connection Status and Favorites data, but will not be able to make changes or view any admin (Cfgs / Users) pages. To change this setting, Log in, click the "Cfgs" link, and edit the "Public Permission" parameter.
 
 Additional screenshots:
-[init.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/init.png)
-[cfgs.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/cfgs.png)
-[users.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/users.png)
-[settings.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/settings.png)
+[Init.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/init.png)
+[Cfgs.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/cfgs.png)
+[Users.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/users.png)
+[Settings.png](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/settings.png)
+[TouchGUI.jpg](https://github.com/davidgsd/AllScan/blob/main/docs/screenshots/TouchGUI.jpg)
 
 Multiple copies of AllScan can be installed on one node (server) if desired, each with their own separate configuration, Favorites, and/or different node numbers. Just make copies of the /var/www/html/allscan/ dir eg. to "allscan2" and update the config settings accordingly on the Cfgs Tab.
 
@@ -120,6 +121,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good idea
 
 # Release Notes
+**v1.02 2026-10-03**<br>
+Added a new touchscreen / small screen optimized GUI that can be accessed by clicking/touching the "TouchGUI" link in the header links at the top of the page. To then exit the TouchGUI just click/touch the AllScan link at the top left. Thanks to Ben WY2K for this contribution.
+
 **v1.01 2026-05-07**<br>
 Show direct and adjacent link counts in Connection Status table if more than one node connected. CSS/HTML optimizations.
 
