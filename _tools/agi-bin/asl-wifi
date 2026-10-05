@@ -1,0 +1,18 @@
+#!/bin/bash
+# asl-wifi: turn the node's Wi-Fi off or on. Usage: asl-wifi down|up
+# Install: /usr/local/sbin/asl-wifi (root-owned, mode 755)
+# Sudoers: asterisk ALL = NOPASSWD: /usr/local/sbin/asl-wifi
+case "$1" in
+  up|down) ;;
+  *) echo "usage: $0 down|up" >&2; exit 2 ;;
+esac
+IF=""
+for d in /sys/class/net/*; do
+  if [ -d "$d/wireless" ]; then IF=$(basename "$d"); break; fi
+done
+if [ -z "$IF" ]; then echo "no wireless interface found" >&2; exit 1; fi
+if command -v nmcli >/dev/null 2>&1 && systemctl is-active --quiet NetworkManager; then
+  if [ "$1" = "down" ]; then nmcli radio wifi off; else nmcli radio wifi on; fi
+else
+  ip link set "$IF" "$1"
+fi
