@@ -104,6 +104,30 @@ function getFavsData($favsFile, $node, $astdb, &$msg) {
 			}
 		}
 	}
+	// Check other node# stanzas. To prevent issues when later adding a favorite, read in and use all
+	// favorites in the file even if for a different node#. Otherwise when adding a favorite to the end
+	// of the file it might not get read back in if under a different node#. It's not clear what other apps
+	// would be writing favorites only to a specific node# stanza rather than to 'general', but favs files
+	// ideally should be interchangeable between various nodes. If someone needs to have different
+	// favorites for different nodes it's probably better to do that by having separate favorites files.
+	$fnodes = array_keys($favsIni);
+	foreach($fnodes as $fnode) {
+		if($fnode != $node && $fnode !== 'general') {
+			$count = _count($favsIni[$fnode]['label']);
+			if($count) {
+				$msg[] = "Merging $count favorite(s) for node $fnode from $favsFile";
+				foreach($favsIni[$fnode] as $type => $arr) {
+					if($type == 'label') {
+						foreach($arr as $label)
+							$favsCfg['label'][] = $label;
+					} elseif($type == 'cmd') {
+						foreach($arr as $cmd)
+							$favsCfg['cmd'][] = $cmd;
+					}
+				}
+			}
+		}
+	}
 	$favsCfg['label'] = array_map('trim', $favsCfg['label'] ?? []);
 	$favsCfg['cmd'] = array_map('trim', $favsCfg['cmd'] ?? []);
 	foreach($favsCfg['cmd'] as $i => $c) {
