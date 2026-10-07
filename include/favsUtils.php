@@ -130,15 +130,21 @@ function getFavsData($favsFile, $node, $astdb, &$msg) {
 	}
 	$favsCfg['label'] = array_map('trim', $favsCfg['label'] ?? []);
 	$favsCfg['cmd'] = array_map('trim', $favsCfg['cmd'] ?? []);
+	$favsnodes = [];
 	foreach($favsCfg['cmd'] as $i => $c) {
 		$label = $favsCfg['label'][$i] ?? '';
 		if(!$c) {
 			unset($favsCfg['cmd'][$i], $favsCfg['label'][$i]);
 		} else {
-			if(preg_match('/[0-9]{4,8}/', $c, $m) == 1)
-				$favs[$i] = (object)['node'=>$m[0], 'label'=>$label, 'cmd'=>$c];
-			else
+			if(preg_match('/[0-9]{4,8}/', $c, $m) == 1) {
+				// Ignore duplicate node #s
+				if(array_search($m[0], $favsnodes) === false) {
+					$favs[$i] = (object)['node'=>$m[0], 'label'=>$label, 'cmd'=>$c];
+					$favsnodes[] = $m[0];
+				}
+			} else {
 				$favcmds[$i] = (object)['label'=>$label, 'cmd'=>$c];
+			}
 		}
 	}
 	// if(count($favcmds))

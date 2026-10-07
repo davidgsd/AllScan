@@ -69,10 +69,14 @@ echo $html->htmlOpen($pageTitle)
 	. "<script src=\"$urlbase/js/simple.js\"></script>" . NL
 	. '</head>' . NL
 	. '<body onload="simpleInit()">' . NL;
+
+$main = $urlbase;
+if(isset($parms['favsfile']))
+	$main .= '?favsfile=' . urlencode($parms['favsfile']);
 ?>
 <div id="app" class="simple-app">
 	<header class="topbar">
-		<a class="brand" href="<?php echo $urlbase; ?>/">AllScan</a>
+		<a class="brand" href="<?php echo $main; ?>">AllScan</a>
 		<div class="node-title"><?php echo htmlspecial($title2); ?></div>
 		<div class="node-number">Node <?php echo htmlspecial($node); ?></div>
 	</header>
