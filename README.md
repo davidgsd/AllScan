@@ -121,7 +121,7 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good idea
 
 # Release Notes
-**v1.02 2026-10-07**<br>
+**v1.03 2026-10-07**<br>
 Fix issue in TouchGUI where it would not use the favorites file selected in the main GUI. Add check to ignore duplicate node entries in favorites files.
 
 **v1.02 2026-10-03**<br>
