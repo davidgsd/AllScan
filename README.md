@@ -122,7 +122,7 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 
 # Release Notes
 **v1.04 2026-10-14**<br>
-Integrate enhancements from KE2HNI supporting editing of Favorites description text and ordering, sorting of Favorites table by Rx% or LCnt columns, and other GUI optimizations. See  https://github.com/davidgsd/AllScan/pull/37 for details.
+Integrate enhancements from KE2HNI supporting editing of Favorites description text and ordering, sorting of Favorites table by Rx% or LCnt columns, and other GUI optimizations. See  https://github.com/davidgsd/AllScan/pull/37 for details. Note that due to how the Favorites table columns are derived from ASTDB and favorites\*.ini file data the Edit Favorites function may not always work as expected. Manually editing the favorites file and or keeping a backup copy is recommended.
 
 **v1.03 2026-10-07**<br>
 Fix issue in TouchGUI where it would not use the favorites file selected in the main GUI. Add check to ignore duplicate node entries in favorites files.
