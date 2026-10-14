@@ -46,8 +46,8 @@ function showNodeCtrlForm() {
 <input type=button value="DTMF" onClick="dtmfCmd();">
 <br>
 <span style="white-space:nowrap"><input type=checkbox id="permanent"><label for="permanent">Permanent</label>&nbsp;
-<input type=checkbox id="autodisc"' . ($gCfg[autodisc_def] ? ' checked' : '') . ' data-autodisc-default="' . ($gCfg[autodisc_def] ? 'true' : 'false') . '"><label
-	for="autodisc">Disconnect before Connect</label>&nbsp;
+<input type=checkbox id="autodisc"' . ($gCfg[autodisc_def] ? ' checked' : '') . ' data-autodisc-default="'
+	. ($gCfg[autodisc_def] ? 'true' : 'false') . '"><label for="autodisc">Disconnect before Connect</label>&nbsp;
 <input type=checkbox id="automondisc"><label
 	for="automondisc">Disconnect before Monitor</label></span>
 

@@ -4,7 +4,7 @@ if(isset($_SERVER['REMOTE_ADDR']) || isset($_SERVER['HTTP_HOST'])) {
 	echo "This script must be run via CLI.<br>\n";
 	exit(0);
 }
-$webRoot = '/var/www/html/allscan/';
+$webRoot = '/var/www/html/allscan';
 // Copy files to webroot, with exception of the following dirs/files:
 $excludes = array('.git', '.gitignore');
 
@@ -12,8 +12,7 @@ $excludes = array('.git', '.gitignore');
 // Do below if might be called from somewhere else
 $pwd = getcwd();
 chdir($pwd);
-$pwd .= '/';
-echo "pwd = $pwd, webRoot = $webRoot\n";
+echo "pwd = $pwd/, webRoot = $webRoot/\n";
 if($webRoot === $pwd) {
 	echo "Can't run script from web root folder. Go to dev folder.\n";
 	exit(1);
@@ -29,15 +28,17 @@ function copyFiles($excludes, $test=false, $toWww=true) {
 			$exclude .= "--exclude='$pat' ";
 	}
 	$opts = $test ? '--list-only' : '';
-	$dirs = $toWww ? '. ' . $webRoot : $webRoot . ' .';
+	$dirs = $toWww ? '. ' . $webRoot . '/' : $webRoot . '/ .';
 	$cmd = "rsync -avC $exclude $opts $dirs";
 	passthru($cmd);
 	if($toWww) {
 		// change remote favs files group to www-data
-		$cmd = "sudo chgrp www-data {$webRoot}*.ini";
+		$cmd = "sudo chgrp www-data $webRoot $webRoot/*.ini";
 		passthru($cmd);
-		$cmd = "sudo chmod 664 {$webRoot}*.ini";
+		$cmd = "sudo chmod 775 $webRoot";
 		passthru($cmd);
+                $cmd = "sudo chmod 664 $webRoot/*.ini";
+                passthru($cmd);
 	}
 	echo "Done\n";
 }
