@@ -32,5 +32,12 @@ function copyFiles($excludes, $test=false, $toWww=true) {
 	$dirs = $toWww ? '. ' . $webRoot : $webRoot . ' .';
 	$cmd = "rsync -avC $exclude $opts $dirs";
 	passthru($cmd);
+	if($toWww) {
+		// change remote favs files group to www-data
+		$cmd = "sudo chgrp www-data {$webRoot}*.ini";
+		passthru($cmd);
+		$cmd = "sudo chmod 664 {$webRoot}*.ini";
+		passthru($cmd);
+	}
 	echo "Done\n";
 }
