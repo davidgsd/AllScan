@@ -333,3 +333,15 @@ color:#0f0;
 font-size:12px;
 content:"\200A\25BC";
 }
+
+/* Local modification: AllScan Favorites editor dialog. */
+.favEditModal {position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:12px;background-color:rgba(0,0,0,0.72);}
+.favEditModal[hidden] {display:none;}
+.favEditPanel {box-sizing:border-box;width:min(420px,95vw);padding:12px 16px;border:3px solid rgb(51,51,119);border-radius:10px;background-color:hsl(240,25%,12%);box-shadow:0 8px 30px rgba(0,0,0,0.75);text-align:left;}
+.favEditPanel h3 {margin:0 0 10px;text-align:center;font-size:16px;color:hsl(240,30%,70%);}
+.favEditPanel label {display:block;margin-top:7px;color:#edc;}
+.favEditPanel input[type=text] {box-sizing:border-box;width:100%;margin:2px 0 5px;padding:5px 7px;border:2px solid hsl(240,40%,60%);font-size:14px;}
+.favEditActions {margin-top:10px;text-align:center;}
+.favEditActions button {color:#fff;margin:2px 1px;background-color:#444;border-radius:3px;font:12px/1.25 Verdana,Arial,Helvetica,sans-serif;}
+.favEditActions button:hover {background-color:#777;}
+
