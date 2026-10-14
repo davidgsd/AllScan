@@ -87,7 +87,10 @@ if(isset($parms['favsfile']))
 				<div id="statusLabel" class="status-label">NO CONNECTION</div>
 				<div id="statusDetail" class="status-detail">Waiting for node status...</div>
 			</div>
-			<button id="disconnectBtn" class="disconnect-btn" type="button" disabled>Disconnect</button>
+			<div class="status-actions">
+				<button id="autodiscBtn" class="autodisc-btn" type="button" aria-pressed="true">Disconnect before Connect: ON</button>
+				<button id="disconnectBtn" class="disconnect-btn" type="button" disabled>Disconnect</button>
+			</div>
 		</section>
 
 		<section id="warningPanel" class="warning-panel hidden">
@@ -128,6 +131,7 @@ window.simpleConfig = {
 	localNode: <?php echo json_encode((string)$node, $jsonFlags); ?>,
 	title: <?php echo $titleJson; ?>,
 	canModify: <?php echo $canModify ? 'true' : 'false'; ?>,
+	autodiscDefault: <?php echo $gCfg[autodisc_def] ? 'true' : 'false'; ?>,
 	channels: <?php echo $channelJson; ?>,
 	startupMessages: <?php echo $msgJson; ?>
 };

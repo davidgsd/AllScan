@@ -6,11 +6,12 @@ if(!modifyOk())
 	exit("Insufficient user permission to execute commands\n");
 
 // Filter and validate user input
-$fields = ['remotenode', 'button', 'localnode', 'perm', 'autodisc'];
+$fields = ['remotenode', 'button', 'localnode', 'perm', 'autodisc', 'automondisc'];
 foreach($fields as $f)
 	$$f = isset($_POST[$f]) ? trim(strip_tags($_POST[$f])) : '';
 $perm = ($perm === 'true');
 $autodisc = ($autodisc === 'true');
+$automondisc = ($automondisc === 'true');
 
 if(!preg_match("/^\d+$/", $localnode) || !$localnode)
 	exit("Invalid local node number\n");
@@ -59,6 +60,12 @@ switch($button) {
 		}
 		break;
 	case 'monitor':
+		if($automondisc) {
+			echo "Disconnect all nodes from $localnode before Monitor...";
+			$resp = $ami->command($fp, "rpt cmd $localnode ilink 6 0");
+			echo $resp . BR;
+			usleep(500000);
+		}
 		if($perm) {
 			$ilink = 12;
 			echo "Permanently Monitor $remotenode from $localnode...";

@@ -505,11 +505,15 @@ function connectNode(button) {
 		return;
 	}
 	var perm = document.getElementById('permanent').checked;
-	// Disconnect before Connect checkbox. Only applies if conncnt > 0
+	// Independent disconnect-before actions. They apply only when links are connected.
 	var autodisc = document.getElementById('autodisc').checked;
-	if(conncnt.value < 1)
+	var automondisc = (button === 'monitor') && document.getElementById('automondisc').checked;
+	if(conncnt.value < 1) {
 		autodisc = false;
-	parms = 'remotenode='+remoteNode + '&perm='+perm + '&button='+button + '&localnode='+localNode + '&autodisc='+autodisc;
+		automondisc = false;
+	}
+	parms = 'remotenode='+remoteNode + '&perm='+perm + '&button='+button + '&localnode='+localNode
+		+ '&autodisc='+autodisc + '&automondisc='+automondisc;
 	xhttpSend(astApiDir + 'connect.php', parms);
 }
 function disconnectNode() {
@@ -576,3 +580,144 @@ function varDump(v) {
 		logLines.push(`${prop} (${typeof v[prop]}): ${v[prop] || "n/a"}`);
 	console.log(logLines.join("\n"));
 }
+
+function initAutodiscPreference() {
+	var checkbox = document.getElementById('autodisc');
+	if(!checkbox)
+		return;
+	var key = 'allscan.autodisc.' + (document.getElementById('localnode') || {}).value;
+	function save(value) {
+		try { localStorage.setItem(key, value ? 'true' : 'false'); } catch(e) {}
+	}
+	function load() {
+		try {
+			var value = localStorage.getItem(key);
+			if(value === 'true' || value === 'false')
+				checkbox.checked = value === 'true';
+			else {
+				checkbox.checked = checkbox.dataset.autodiscDefault === 'true';
+				save(checkbox.checked);
+			}
+		} catch(e) {}
+	}
+	load();
+	checkbox.addEventListener('change', function() { save(checkbox.checked); });
+	window.addEventListener('storage', function(event) {
+		if(event.key === key && (event.newValue === 'true' || event.newValue === 'false'))
+			checkbox.checked = event.newValue === 'true';
+	});
+}
+
+if(document.readyState === 'loading')
+	document.addEventListener('DOMContentLoaded', initAutodiscPreference);
+else
+	initAutodiscPreference();
+
+// Local modification: client-side sorting for Favorites Rx% and LCnt columns.
+var favStatsSortCol = -1;
+var favStatsSortAsc = true;
+
+function sortFavStats(col)
+{
+	var table = document.getElementById('favs');
+	if(!table || !table.tBodies.length || table.tBodies[0].rows.length < 2 || (col !== 5 && col !== 6))
+		return;
+	if(favStatsSortCol === col)
+		favStatsSortAsc = !favStatsSortAsc;
+	else {
+		favStatsSortCol = col;
+		favStatsSortAsc = false;
+	}
+	var tbody = table.tBodies[0];
+	var rows = Array.from(tbody.rows);
+	var sortedRows = rows.map(function(row, index) {
+		var text = row.cells[col] ? row.cells[col].textContent.trim() : '';
+		var value = parseFloat(text);
+		return {row:row, index:index, value:value, missing:isNaN(value)};
+	});
+	sortedRows.sort(function(a, b) {
+		if(a.missing && b.missing) return a.index - b.index;
+		if(a.missing) return 1;
+		if(b.missing) return -1;
+		if(a.value === b.value) return a.index - b.index;
+		return favStatsSortAsc ? a.value - b.value : b.value - a.value;
+	});
+	sortedRows.forEach(function(item) { tbody.appendChild(item.row); });
+	var rxArrow = document.getElementById('rxSortArrow');
+	var lcntArrow = document.getElementById('lcntSortArrow');
+	if(rxArrow) rxArrow.textContent = '';
+	if(lcntArrow) lcntArrow.textContent = '';
+	if(col === 5 && rxArrow) rxArrow.textContent = favStatsSortAsc ? '▲' : '▼';
+	if(col === 6 && lcntArrow) lcntArrow.textContent = favStatsSortAsc ? '▲' : '▼';
+}
+
+// Local modification: AllScan-styled Favorites editor with Node, Order, and Friendly Label fields.
+function selectFavorite(cell) {
+	if(!cell) return;
+	var node = cell.textContent.trim();
+	setNodeBox(node);
+	rnode.dataset.favoriteNode = node;
+	rnode.dataset.favoriteLabel = cell.getAttribute('data-fav-label') || '';
+}
+function findSelectedFavorite() {
+	var currentNode = rnode.value.trim();
+	var selectedNode = rnode.dataset.favoriteNode || '';
+	if(currentNode && selectedNode === currentNode) return true;
+	var cells = document.querySelectorAll('#favs td.nodeNum');
+	for(var i = 0; i < cells.length; i++) {
+		if(cells[i].textContent.trim() === currentNode) {
+			selectFavorite(cells[i]);
+			return true;
+		}
+	}
+	return false;
+}
+function openFavoriteEditor() {
+	if(!findSelectedFavorite()) {
+		alert('Select an existing favorite by clicking its node number before editing.');
+		return;
+	}
+	var modal = document.getElementById('favoriteEditModal');
+	var nodeInput = document.getElementById('favoriteEditNode');
+	var labelInput = document.getElementById('favoriteEditLabel');
+	var orderInput = document.getElementById('favoriteEditOrder');
+	nodeInput.value = rnode.dataset.favoriteNode || '';
+	labelInput.value = rnode.dataset.favoriteLabel || '';
+	var favCells = document.querySelectorAll('#favs td.nodeNum');
+	for(var oi = 0; oi < favCells.length; oi++) if(favCells[oi].textContent.trim() === (rnode.dataset.favoriteNode || '')) { orderInput.value = oi + 1; break; }
+	modal.hidden = false;
+	nodeInput.focus();
+	nodeInput.select();
+}
+function closeFavoriteEditor() {
+	var modal = document.getElementById('favoriteEditModal');
+	if(modal) modal.hidden = true;
+}
+function favoriteEditorBackdrop(event) {
+	if(event.target && event.target.id === 'favoriteEditModal') closeFavoriteEditor();
+}
+function submitFavoriteEdit() {
+	var originalNode = rnode.dataset.favoriteNode || '';
+	var newNode = document.getElementById('favoriteEditNode').value.trim();
+	var newLabel = document.getElementById('favoriteEditLabel').value.trim();
+	var newOrder = document.getElementById('favoriteEditOrder').value.trim();
+	if(!/^[0-9]{4,8}$/.test(newNode)) {
+		alert('Node number must contain 4 to 8 digits.');
+		return false;
+	}
+	if(!newLabel || newLabel.length > 120 || /["\r\n]/.test(newLabel)) {
+		alert('Friendly label must be 1 to 120 characters and cannot contain double quotes or line breaks.');
+		return false;
+	}
+	if(!/^[1-9][0-9]*$/.test(newOrder)) { alert('Order must be a positive number.'); return false; }
+	document.getElementById('originalnode').value = originalNode;
+	document.getElementById('editlabel').value = newLabel;
+	document.getElementById('editorder').value = newOrder;
+	rnode.value = newNode;
+	return true;
+}
+document.addEventListener('keydown', function(event) {
+	var modal = document.getElementById('favoriteEditModal');
+	if(event.key === 'Escape' && modal && !modal.hidden) closeFavoriteEditor();
+});
+

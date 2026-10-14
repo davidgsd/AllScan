@@ -29,21 +29,44 @@ function showNodeCtrlForm() {
 <input type=hidden id="localnode" name="localnode" value="' . $node . '">
 <input type=hidden id="conncnt" name="conncnt" value="0">
 <input type=hidden id="favsfile" name="favsfile" value="' . $favsFile .'">
+<input type=hidden id="originalnode" name="originalnode" value="">
+<input type=hidden id="editlabel" name="editlabel" value="">
+<input type=hidden id="editorder" name="editorder" value="">
 <label for="node">Node#</label><input type="text" inputmode="tel" pattern="[0-9a-dA-D\*#]*"
 	id="node" name="node" maxlength="10" value="' . $remNode . '">
-<input type=submit name="Submit" value="Add Favorite" class="small">
-<input type=submit name="Submit" value="Delete Favorite" class="small"
-	onClick="return confirmFavAction(\'Delete Favorite\');">
-<br>
 <input type=button value="Connect" onClick="connectNode(\'connect\');">
 <input type=button value="Disconnect" onClick="disconnectNode();">
 <input type=button value="Monitor" onClick="connectNode(\'monitor\');">
+<br>
+<input type=submit name="Submit" value="Add Favorite" class="small">
+<input type=button value="Edit Favorite" class="small" onClick="openFavoriteEditor();">
+<input type=submit name="Submit" value="Delete Favorite" class="small"
+	onClick="return confirmFavAction(\'Delete Favorite\');">
 <input type=button value="Local Mon" onClick="connectNode(\'localmonitor\');">
 <input type=button value="DTMF" onClick="dtmfCmd();">
 <br>
-<input type=checkbox id="permanent"><label for="permanent">Permanent</label>&nbsp;
-<input type=checkbox id="autodisc"' . ($gCfg[autodisc_def] ? ' checked' : '') . '><label
-	for="autodisc">Disconnect before Connect</label>
+<span style="white-space:nowrap"><input type=checkbox id="permanent"><label for="permanent">Permanent</label>&nbsp;
+<input type=checkbox id="autodisc"' . ($gCfg[autodisc_def] ? ' checked' : '') . ' data-autodisc-default="' . ($gCfg[autodisc_def] ? 'true' : 'false') . '"><label
+	for="autodisc">Disconnect before Connect</label>&nbsp;
+<input type=checkbox id="automondisc"><label
+	for="automondisc">Disconnect before Monitor</label></span>
+
+<div id="favoriteEditModal" class="favEditModal" hidden onClick="favoriteEditorBackdrop(event);">
+<div class="favEditPanel" role="dialog" aria-modal="true" aria-labelledby="favoriteEditTitle">
+<h3 id="favoriteEditTitle">Edit Favorite</h3>
+<label for="favoriteEditNode">Node Number</label>
+<input type="text" inputmode="numeric" pattern="[0-9]*" id="favoriteEditNode" maxlength="8">
+<label for="favoriteEditOrder">Order</label>
+<input type="number" min="1" step="1" id="favoriteEditOrder">
+<label for="favoriteEditLabel">Friendly Name/Label</label>
+<input type="text" id="favoriteEditLabel" maxlength="120">
+<div class="favEditActions">
+<button type="submit" name="Submit" value="Edit Favorite" class="small"
+	onClick="return submitFavoriteEdit();">Save &amp; Close</button>
+<input type="button" value="Cancel" class="small" onClick="closeFavoriteEditor();">
+</div>
+</div>
+</div>
 </fieldset></form>
 ';
 	else

@@ -208,7 +208,7 @@ function buildFavList($favs, $astdb) {
 		if(strlen($name) > 33)
 			$name = substr($name, 0, 33) . '&hellip;';
 		//$msg[] = $name;
-		$favList[] = [$n, $f->node, $name, $desc, $loc, NBSP, NBSP];
+		$favList[] = [$n, $f->node, $name, $desc, $loc, NBSP, NBSP, $name];
 	}
 	return $favList;
 }

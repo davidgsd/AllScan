@@ -5,6 +5,10 @@ var simple = {
 	currentNode: '',
 	connectedNodes: [],
 	canModify: false,
+	autodiscDefault: true,
+	autodisc: true,
+	autodiscBtn: null,
+	autodiscStorageKey: '',
 	baseUrl: '',
 	loginUrl: '',
 	localNode: '',
@@ -30,6 +34,7 @@ function simpleInit() {
 	var cfg = window.simpleConfig || {};
 	simple.channels = cfg.channels || [];
 	simple.canModify = !!cfg.canModify;
+	simple.autodiscDefault = cfg.autodiscDefault !== false;
 	simple.baseUrl = cfg.baseUrl || '';
 	simple.loginUrl = cfg.loginUrl || (simple.baseUrl + '/user/');
 	simple.localNode = cfg.localNode || '';
@@ -43,6 +48,9 @@ function simpleInit() {
 	simple.readonlyPanel = document.getElementById('readonlyPanel');
 	simple.loginBtn = document.getElementById('loginBtn');
 	simple.disconnectBtn = document.getElementById('disconnectBtn');
+	simple.autodiscBtn = document.getElementById('autodiscBtn');
+	simple.autodiscStorageKey = 'allscan.autodisc.' + simple.localNode;
+	initAutodiscPreference();
 	simple.disconnectAllBtn = document.getElementById('disconnectAllBtn');
 	simple.channelsViewport = document.getElementById('channelsViewport');
 	simple.channelsGrid = document.getElementById('channelsGrid');
@@ -59,6 +67,8 @@ function simpleInit() {
 }
 
 function bindControls() {
+	simple.autodiscBtn.addEventListener('click', toggleAutodiscPreference);
+	window.addEventListener('storage', handleAutodiscStorage);
 	simple.disconnectBtn.addEventListener('click', function() {
 		if(simple.currentNode)
 			disconnectNode(simple.currentNode);
@@ -260,7 +270,7 @@ function connectChannel(node) {
 	statMsg('Connecting to channel ' + node + '...');
 	sendControl('remotenode=' + encodeURIComponent(node)
 		+ '&perm=false&button=connect&localnode=' + encodeURIComponent(simple.localNode)
-		+ '&autodisc=true');
+		+ '&autodisc=' + simple.autodisc);
 }
 
 function disconnectNode(node) {
@@ -358,4 +368,43 @@ function escapeHtml(txt) {
 
 function escapeRegExp(txt) {
 	return String(txt).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function initAutodiscPreference() {
+	try {
+		var value = localStorage.getItem(simple.autodiscStorageKey);
+		if(value === 'true' || value === 'false')
+			simple.autodisc = value === 'true';
+		else {
+			simple.autodisc = simple.autodiscDefault;
+			localStorage.setItem(simple.autodiscStorageKey, simple.autodisc ? 'true' : 'false');
+		}
+	} catch(e) {
+		simple.autodisc = simple.autodiscDefault;
+	}
+	updateAutodiscButton();
+}
+
+function saveAutodiscPreference() {
+	try { localStorage.setItem(simple.autodiscStorageKey, simple.autodisc ? 'true' : 'false'); } catch(e) {}
+	updateAutodiscButton();
+}
+
+function toggleAutodiscPreference() {
+	simple.autodisc = !simple.autodisc;
+	saveAutodiscPreference();
+}
+
+function updateAutodiscButton() {
+	if(!simple.autodiscBtn)
+		return;
+	simple.autodiscBtn.textContent = 'Disconnect before Connect: ' + (simple.autodisc ? 'ON' : 'OFF');
+	simple.autodiscBtn.setAttribute('aria-pressed', simple.autodisc ? 'true' : 'false');
+}
+
+function handleAutodiscStorage(event) {
+	if(event.key === simple.autodiscStorageKey && (event.newValue === 'true' || event.newValue === 'false')) {
+		simple.autodisc = event.newValue === 'true';
+		updateAutodiscButton();
+	}
 }
