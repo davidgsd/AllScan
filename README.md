@@ -115,8 +115,8 @@ AllScan stickers are now available and are also a great way to help support the 
 <img src="docs/AllScan-Sticker-1603x1351.jpg" width=401 height=338>
 
 # Road Map
-As of version 0.65, AllScan implements the main features I originally planned, and works very well for the use case of personal nodes that have one or two primary users and/or a small number of occasional other users. A future version of AllScan will add enhanced support for a larger number of simultaneous web-client users (which will require ASL stats caching so that numerous web-clients would not each be making separate ASL stats requests which would significantly slow down the stats scanning functions). However this is not a common use case and is not a current priority. AllScan will also at some point more fully support nodes with more than one node number eg. allowing the local node to be selected from a select box control. Other changes planned:
-1. Enhanced Favorites management features, saving favorites in AllScan DB rather than in other folders, editing favorites text, reordering table.
+As of version 0.65, AllScan implements the main features I originally planned, and works well for the use case of personal nodes that have one or two primary users and/or a small number of occasional other users. A future version of AllScan may add enhanced support for a larger number of simultaneous web-client users, which might require ASL stats caching so that numerous web-clients would not each be making separate stats requests, but this is not a common use case and is not a current priority, and AllStarLink is now in the process of updating the stats API to support retrieving stats data much more efficiently. AllScan will also at some point more fully support servers (ie. a node device) that have more than one node number eg. allowing the local node to be selected from a select box control. Other changes planned:
+1. Enhanced Favorites management features, saving favorites in AllScan DB rather than in other folders.
 2. Enhanced stats features, caching of stats data to AllScan DB
 3. Other features that are highly requested or that seem like a good idea
 
