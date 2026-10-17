@@ -227,6 +227,15 @@ overflow:hidden;
 .channel-btn:enabled:active {
 transform:translateY(1px);
 }
+.channel-btn[data-activity="active"] {
+background-color:hsl(150,50%,15%);
+}
+.channel-btn[data-activity="active-wt"] {
+background-color:hsl(150,50%,20%);
+}
+.channel-btn[data-activity="keyed"] {
+color:#fff;
+}
 .channel-btn.active {
 border-color:#30c66d;
 background:#123d27;
@@ -415,3 +424,55 @@ min-height:86px;
 display:none;
 }
 }
+/* AllScan Mods: TouchGUI activity colors, Rx%/LCnt, and centered status footer v1.11. */
+.channel-stats {
+grid-column:2;
+display:flex;
+justify-content:space-between;
+gap:4px;
+min-width:0;
+font-size:11px;
+font-weight:normal;
+line-height:1.15;
+color:#c8d8e5;
+white-space:nowrap;
+}
+.channel-btn {
+grid-template-rows:auto auto auto;
+min-height:120px;
+}
+.channel-index {
+grid-row:1 / span 3;
+}
+@media (max-width:700px) {
+.channel-btn { min-height:112px; }
+.channel-stats { font-size:10px; gap:3px; }
+}
+@media (max-height:430px) {
+.channel-btn { min-height:108px; }
+.channel-label { font-size:15px; }
+.channel-meta { font-size:12px; }
+.channel-stats { font-size:10px; }
+}
+.simple-app {
+height:100vh;
+height:100dvh;
+}
+@media (max-height:430px) {
+.simple-footer { display:grid; }
+}
+.simple-footer { height:auto; min-height:30px; flex:0 0 auto; overflow:visible; }
+.simple-footer #scanmsg,
+.simple-footer #statmsg { white-space:normal; overflow:visible; overflow-wrap:anywhere; min-width:0; }
+@media (max-width:700px) {
+.simple-footer { grid-template-columns:1fr; gap:0; }
+.simple-footer #scanmsg,
+.simple-footer #statmsg { font-size:11px; line-height:1.2; }
+}
+@media (max-width:430px) {
+.simple-footer #statmsg { font-size:9px; line-height:1.15; }
+}
+@media (max-width:380px) {
+.simple-footer #statmsg { font-size:8px; }
+}
+.simple-footer #statmsg { grid-column:1 / -1; text-align:center; }
