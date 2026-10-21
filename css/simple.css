@@ -415,3 +415,238 @@ min-height:86px;
 display:none;
 }
 }
+/* AllScan Mods: TouchGUI activity colors, Rx%/LCnt, main-table color mapping and rounded value badges v1.17. */
+.channel-btn {
+grid-template-rows:auto;
+min-height:86px;
+padding:8px;
+align-items:stretch;
+}
+.channel-side {
+grid-column:1;
+grid-row:1;
+display:flex;
+flex-direction:column;
+align-items:flex-start;
+justify-content:flex-start;
+gap:4px;
+min-width:52px;
+}
+.channel-index {
+grid-row:auto;
+flex:0 0 34px;
+border-radius:8px;
+}
+.channel-stats {
+display:flex;
+flex-direction:column;
+align-items:flex-start;
+gap:2px;
+min-width:0;
+font-size:12px;
+font-weight:normal;
+line-height:1;
+color:#c8d8e5;
+white-space:nowrap;
+}
+.channel-stats span {
+padding:1px 4px;
+border-radius:8px;
+}
+.channel-content {
+grid-column:2;
+grid-row:1;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+min-width:0;
+}
+.channel-meta {
+grid-column:auto;
+max-width:100%;
+}
+@media (max-width:700px) {
+.channel-btn { min-height:82px; padding:7px; }
+.channel-side { min-width:48px; }
+.channel-index { flex-basis:30px; width:30px; height:30px; }
+.channel-stats { font-size:11px; }
+}
+@media (max-height:430px) {
+.channel-btn { min-height:78px; }
+}
+.simple-app {
+height:100vh;
+height:100dvh;
+}
+@media (max-height:430px) {
+.simple-footer { display:grid; }
+}
+.simple-footer { height:auto; min-height:30px; flex:0 0 auto; overflow:visible; }
+.simple-footer #scanmsg,
+.simple-footer #statmsg { white-space:normal; overflow:visible; overflow-wrap:anywhere; min-width:0; }
+@media (max-width:700px) {
+.simple-footer { grid-template-columns:1fr; gap:0; }
+.simple-footer #scanmsg,
+.simple-footer #statmsg { font-size:11px; line-height:1.2; }
+}
+@media (max-width:430px) {
+.simple-footer #statmsg { font-size:9px; line-height:1.15; }
+}
+@media (max-width:380px) {
+.simple-footer #statmsg { font-size:8px; }
+}
+.simple-footer #statmsg { grid-column:1 / -1; text-align:center; }
+/* AllScan Mods: TouchGUI centered card text v1.17. */
+.channel-content {
+width:100%;
+box-sizing:border-box;
+}
+.channel-label, .channel-meta {
+width:100%;
+min-width:0;
+box-sizing:border-box;
+text-align:center;
+}
+.channel-label {
+font-size:16px;
+overflow-wrap:anywhere;
+}
+/* AllScan Mods: TouchGUI single-line label fit v1.37. */
+.channel-content { overflow:visible; }
+.channel-label {
+ display:block;
+ white-space:nowrap;
+ overflow:visible;
+ overflow-wrap:normal;
+ text-overflow:clip;
+ transform-origin:center;
+}
+/* AllScan Mods: TouchGUI top-aligned callsign with description gap v1.47. */
+.channel-content {
+justify-content:flex-start;
+}
+.channel-meta {
+margin-bottom:6px;
+}
+/* AllScan Mods: TouchGUI bold node/callsign line v1.48. */
+.channel-meta {
+font-weight:bold;
+}
+/* AllScan Mods: TouchGUI landscape callsign fit v1.50. */
+@media (orientation: landscape) {
+.channel-meta { display:block; width:calc(100% + 1.5ch); max-width:none; min-width:0; position:relative; left:-0.75ch; overflow:visible; }
+}
+/* AllScan Mods: Responsive TouchGUI label auto-fit v1.37. */
+.channel-btn {
+column-gap:4px;
+}
+.channel-content {
+container-type:inline-size;
+}
+.channel-label {
+font-size:18px;
+line-height:1.12;
+}
+.channel-meta {
+font-size:14px;
+line-height:1.1;
+white-space:nowrap;
+overflow:hidden;
+text-overflow:clip;
+transform-origin:center;
+}
+@media (max-width:700px) {
+.channel-label { font-size:16px; }
+}
+@media (max-height:430px) {
+.channel-label { font-size:15px; }
+.channel-meta { font-size:12px; }
+}
+@media (orientation: portrait) {
+.channel-meta { display:block; width:calc(100% + 1.5ch); max-width:none; min-width:0; position:relative; left:-1.5ch; overflow:visible; }
+}
+/* AllScan Mods: TouchGUI three-row card styling v1.52. */
+.channels-grid {
+grid-template-columns:repeat(auto-fit, minmax(calc(180px + 5ch), 1fr));
+}
+.channel-description,
+.channel-note {
+display:block;
+width:100%;
+min-width:0;
+box-sizing:border-box;
+text-align:center;
+font-size:14px;
+font-weight:bold;
+line-height:1.05;
+overflow:hidden;
+overflow-wrap:anywhere;
+}
+.channel-description { color:#00f5f5; }
+.channel-note { color:#f8fbff; }
+.channel-description:empty,
+.channel-note:empty { display:none; }
+@media (max-width:700px) {
+.channels-grid { grid-template-columns:repeat(auto-fit, minmax(calc(145px + 5ch), 1fr)); }
+}
+/* AllScan Mods: TouchGUI aqua row spacing v1.53. */
+.channel-description {
+position:relative;
+top:-2px;
+}
+/* AllScan Mods: TouchGUI aqua description font size v1.54. */
+.channel-description { font-size:13px; }
+/* AllScan Mods: TouchGUI centered node line v1.55. */
+@media (orientation: portrait) {
+.channel-meta { left:-0.75ch; }
+}
+/* AllScan Mods: TouchGUI note separation v1.56. */
+.channel-note { margin-top:3px; }
+/* AllScan Mods: TouchGUI bottom-aligned note row v1.58. */
+.channel-note {
+margin-top:auto;
+padding-top:3px;
+}
+/* AllScan Mods: TouchGUI raised white note row v1.60. */
+.channel-note {
+position:relative;
+top:-3px;
+}
+/* AllScan Mods: TouchGUI aqua row alignment and note clearance v1.61. */
+.channel-description { left:-0.5ch; }
+.channel-note { top:-5px; }
+/* AllScan Mods: TouchGUI white note glyph clearance v1.62. */
+.channel-note { overflow:visible; }
+/* AllScan Mods: TouchGUI name/location card row styling v1.63. */
+.channel-note-name,
+.channel-location {
+display:block;
+width:100%;
+}
+.channel-location { position:absolute; visibility:hidden; }
+/* AllScan Mods: TouchGUI row centering and descender clearance v1.65. */
+.channel-note { left:-0.5ch; }
+.channel-description { overflow:visible; }
+/* AllScan Mods: TouchGUI aqua descender clearance v1.70. */
+.channel-description { line-height:1.2; margin-bottom:-2px; }
+/* AllScan Mods: TouchGUI card text descender clearance v1.71. */
+.channel-description,
+.channel-note { line-height:1.2; margin-bottom:-2px; }
+/* AllScan Mods: TouchGUI card-edge descender visibility v1.73. */
+.channel-btn { overflow:visible; }
+.channel-note { line-height:1.05; margin-bottom:0; }
+/* AllScan Mods: TouchGUI white name/location spacing v1.76. */
+.channel-note-name + .channel-location { position:relative; top:2px; }
+/* AllScan Mods: TouchGUI card row spacing balance v1.82. */
+.channel-meta { margin-bottom:3px; }
+.channel-note { top:-3px; }
+.channel-note-name + .channel-location { margin-top:2px; top:0; }
+/* AllScan Mods: TouchGUI white row breathing room v1.83. */
+.channel-note { top:-1px; }
+.channel-note-name + .channel-location { margin-top:4px; top:0; }
+/* AllScan Mods: TouchGUI original white text font restored v1.86. */
+/* AllScan Mods: TouchGUI balanced white text line spacing v1.87. */
+.channel-note-name,
+.channel-location { line-height:16px; }
+.channel-note-name + .channel-location { margin-top:1px; }
