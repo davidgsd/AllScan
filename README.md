@@ -121,6 +121,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good idea
 
 # Release Notes
+**v1.05 2026-10-21**<br>
+Enhancements from KE2HNI to the Touch GUI, adding ASL statistics data and better support for separate Name, Description, Location, and User Note fields.
+
 **v1.04 2026-10-14**<br>
 Integrate enhancements from KE2HNI supporting editing of Favorites description text and ordering, sorting of Favorites table by Rx% or LCnt columns, and other GUI optimizations. See  https://github.com/davidgsd/AllScan/pull/37 for details. Note that due to how the Favorites table columns are derived from ASTDB and favorites\*.ini file data the Edit Favorites function may not always work as expected. Manually editing the favorites file and or keeping a backup copy is recommended.
 
