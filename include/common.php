@@ -109,6 +109,8 @@ function checkTitleCfgs() {
 	if($node && is_numeric($node)) {
 		if(empty($astdb))
 			$astdb = readAstDb($msg);
+		if(!_count($astdb))
+			return false;
 		if(array_key_exists($node, $astdb))
 			list($x, $call, $desc, $loc) = $astdb[$node];
 		if(empty($gCfg[call]) && $call)
