@@ -41,15 +41,11 @@ function findFavsFiles(&$activeFile) {
 	// Search for files in local dir and /etc/allscan/ dir named favorites*.ini
 	$ldir = asDir();
 	$gdir = asDir(false);
-	$lfiles = trim(shell_exec("ls {$ldir}favorites*.ini"));
-	if($lfiles) {
-		$files = explode(NL, $lfiles);
-	}
+	$files = glob("{$ldir}favorites*.ini");
 	if($ldir !== $gdir) {
-		$gfiles = trim(shell_exec("ls {$gdir}favorites*.ini"));
-		if($gfiles) {
-			$files = array_merge($files, explode(NL, $gfiles));
-		}
+		$gfiles = glob("{$gdir}favorites*.ini");
+		if($gfiles)
+			$files = array_merge($files, $gfiles);
 	}
 	// Build list, determine active file (first file found)
 	$activeFile = '';
