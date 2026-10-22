@@ -42,9 +42,11 @@ function findFavsFiles(&$activeFile) {
 	$ldir = asDir();
 	$gdir = asDir(false);
 	$files = glob("{$ldir}favorites*.ini");
+	if(!is_array($files))
+		$files = [];
 	if($ldir !== $gdir) {
 		$gfiles = glob("{$gdir}favorites*.ini");
-		if($gfiles)
+		if(_count($gfiles))
 			$files = array_merge($files, $gfiles);
 	}
 	// Build list, determine active file (first file found)
