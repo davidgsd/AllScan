@@ -188,10 +188,12 @@ if(isPackageInstalled('asl3-asterisk') && is_dir('/etc/apache2/conf-available'))
 ##
 ## Configuration for the AllScan application
 ##
-Alias $asdir $webdir/$asdir
-<Directory $webdir/$asdir>
-    AllowOverride all
-</Directory>
+Alias /$asdir $webdir/$asdir
+
+## Uncomment if .htaccess support is needed
+#<Directory $webdir/$asdir>
+#    AllowOverride all
+#</Directory>
 
 EOT;
 	if(file_put_contents('/etc/apache2/conf-available/allscan.conf', $aconf) === false)
