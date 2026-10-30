@@ -181,6 +181,25 @@ if(is_executable('/usr/bin/apt')) {
 	}
 }
 
+// Configure the Apache conf-available snippet if this is an ASL3 Appliance
+if(isPackageInstalled('asl3-asterisk') && is_dir('/etc/apache2/conf-available')){
+	msg("Configuring AllScan for ASL3 Appliance");
+	$aconf = <<<EOT
+##
+## Configuration for the AllScan application
+##
+Alias $asdir $webdir/$asdir
+<Directory $webdir/$asdir>
+    AllowOverride all
+</Directory>
+
+EOT;
+	if(file_put_contents('/etc/apache2/conf-available/allscan.conf', $aconf) === false)
+		msg("ERROR: Unable to write /etc/apache2/conf-available/allscan.conf");
+	elseif(execCmd('a2enconf -q allscan'))
+		restartWebServer();
+}
+
 // Confirm SQLite3 is enabled in php.ini
 // Check that class exists may not be accurate since this script is run from CLI vs wep app is
 // run under apache and the CLI and Apache php.ini may differ
@@ -463,4 +482,10 @@ function msg($s) {
 function errExit($s) {
 	msg("\nERROR: $s\n");
 	exit();
+}
+
+function isPackageInstalled($package) {
+	$cmd = sprintf('dpkg-query -W -f=%s %s 2>/dev/null', escapeshellarg('${Status}'), escapeshellarg($package));
+	$output = shell_exec($cmd);
+	return $output !== null && $output !== false && trim($output) === 'install ok installed';
 }
