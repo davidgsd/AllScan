@@ -2,14 +2,15 @@
 // scheduleUtils.php - Scheduled node connect/disconnect support
 //
 // Schedules are stored as JSON in /etc/allscan/schedule.json (web server writeable).
-// They are executed by _tools/runSchedule.php, which must be called once per minute from
-// root's crontab. The web UI only edits the JSON file, it never touches crontab.
+// They are executed by _tools/runSchedule.php, which is called once per minute from the web
+// server user's crontab. An admin enables/disables that cron entry on the Settings page.
+// The scheduler is disabled by default.
 
 define('SCHED_FILE', '/etc/allscan/schedule.json');
 // Written by runSchedule.php each time it runs. Used by the UI to detect a missing cron entry
 define('SCHED_HEARTBEAT', '/etc/allscan/schedule.heartbeat');
 define('SCHED_MAX_ENTRIES', 50);
-// Activity lines appended by runSchedule.php (root). astapi/server.php forwards new lines to the
+// Activity lines appended by runSchedule.php. astapi/server.php forwards new lines to the
 // browser's status message box
 define('SCHED_ACTIVITY', '/etc/allscan/schedule.activity');
 define('SCHED_ACTIVITY_MAXLINES', 200);
