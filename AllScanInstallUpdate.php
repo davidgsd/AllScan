@@ -254,6 +254,12 @@ if(!$ls0) {
 	msg("See $webdir/$asdir/docs/rpt.conf and extensions.conf for DTMF command setup notes.");
 }
 
+// Scheduled connect/disconnect support is disabled by default. An admin can enable it on the
+// Settings page. Just make sure the runner script is executable so that it can be enabled there.
+$runner = "$webdir/$asdir/_tools/runSchedule.php";
+if(is_file($runner) && !is_executable($runner))
+	chmod($runner, 0775);
+
 msg("Install/Update Complete.");
 
 // Show URLs where AllScan can be accessed and other notes

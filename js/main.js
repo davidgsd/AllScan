@@ -721,3 +721,61 @@ document.addEventListener('keydown', function(event) {
 	if(event.key === 'Escape' && modal && !modal.hidden) closeFavoriteEditor();
 });
 
+
+// Scheduled connect/disconnect dialog. Schedules are stored server side and run by _tools/runSchedule.php
+function schedPost(parms, cb) {
+	var x = new XMLHttpRequest();
+	x.onreadystatechange = function() {
+		if(x.readyState !== 4) return;
+		var r;
+		try { r = JSON.parse(x.responseText); } catch(e) { r = {ok:false, msg:'Error response from server: ' + x.status}; }
+		cb(r);
+	};
+	x.open('POST', astApiDir + 'schedule.php', true);
+	x.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+	x.send(parms);
+}
+function schedRender(r) {
+	var msg = document.getElementById('schedMsg');
+	msg.textContent = r.ok ? '' : r.msg;
+	if(!r.ok) return;
+	document.getElementById('schedWarn').hidden = r.runner;
+	document.getElementById('schedServerTime').textContent = 'server time ' + r.servertime;
+	var t = document.getElementById('schedList');
+	t.textContent = '';
+	r.entries.forEach(function(e) {
+		var tr = t.insertRow();
+		tr.insertCell().textContent = e.desc + (e.autodisc ? ' (disc first)' : '') + (e.enabled ? '' : ' [off]');
+		var c = tr.insertCell();
+		[['toggle', e.enabled ? 'Disable' : 'Enable'], ['delete', 'Delete']].forEach(function(a) {
+			var b = document.createElement('input');
+			b.type = 'button'; b.className = 'small'; b.value = a[1];
+			b.onclick = function() { schedPost('action=' + a[0] + '&id=' + e.id, schedRender); };
+			c.appendChild(b);
+		});
+	});
+}
+function openScheduleDialog() {
+	document.getElementById('schedNode').value = rnode.value.trim();
+	document.getElementById('scheduleModal').hidden = false;
+	schedPost('action=list', schedRender);
+}
+function closeScheduleDialog() {
+	document.getElementById('scheduleModal').hidden = true;
+}
+function scheduleBackdrop(event) {
+	if(event.target && event.target.id === 'scheduleModal') closeScheduleDialog();
+}
+function addSchedule() {
+	var days = [];
+	document.querySelectorAll('.schedDay').forEach(function(c) { if(c.checked) days.push(c.value); });
+	var node = document.getElementById('schedNode').value.trim();
+	if(!/^[0-9]{1,7}$/.test(node)) {
+		alert('Enter a valid node number.');
+		return;
+	}
+	schedPost('action=add&action2=' + document.getElementById('schedAction').value
+		+ '&node=' + node + '&time=' + document.getElementById('schedTime').value
+		+ '&days=' + days.join(',') + '&perm=' + document.getElementById('schedPerm').checked
+		+ '&autodisc=' + document.getElementById('schedAutodisc').checked, schedRender);
+}

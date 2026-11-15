@@ -83,6 +83,13 @@ Files used by AllScan:
 
 All AllScan Cfg parameters can be viewed and set on the Cfgs page if you are logged in as an Admin user. Just click the 'Cfgs' link and all Cfgs are then shown along with an Edit form.
 
+# Scheduled Connects
+AllScan can connect, monitor, local monitor or disconnect a node at set times, eg. to join a weekly net or to disconnect a hub every night. This feature is **off by default**. To enable it, log in as an Admin user, go to the Settings page and click **Enable Scheduler** under "Scheduled Connects". A **Schedule** button then appears next to Add/Edit/Delete Favorite on the main page. The scheduler can be turned off again from the same place. Saved schedules are kept while it is disabled.
+
+To add a schedule click a favorite's node number (or type a node number in the Node# box) and click **Schedule**. Choose the action, time (24 hour, in the node's system timezone, shown in the dialog), the days of the week (none checked = every day), and optionally Permanent or "Disconnect all first". Schedules can be disabled or deleted from the list in the same dialog. When a schedule runs, the result is shown in the status message area at the bottom of the page.
+
+How it works: schedules are saved in /etc/allscan/schedule.json, which is kept when AllScan is updated. Enabling the scheduler adds a once-per-minute cron entry for the web server user (eg. www-data) that runs _tools/runSchedule.php. It does not need root. Results are also logged to /etc/allscan/schedule.log and /etc/allscan/schedule.activity. If the Settings page cannot edit the web user's crontab (eg. cron is restricted in /etc/cron.allow or /etc/cron.deny), add the line shown on the Settings page by running "sudo crontab -u www-data -e". You can test what would run in the current minute with "sudo _tools/runSchedule.php --dry-run".
+
 # Troubleshooting
 For any issues including directory/file permissions issues or issues with SQLite not being available it is recommended to run the update script, which will check if you have the latest version of AllScan, update your install if not, and validate all directory and file permissions. Refer to the "Install / Update" section above, run the update script, reboot the node, and then see if the issue was resolved.
 
@@ -121,6 +128,9 @@ As of version 0.65, AllScan implements the main features I originally planned, a
 3. Other features that are highly requested or that seem like a good idea
 
 # Release Notes
+**Unreleased**<br>
+Add scheduled connects. A new Schedule button on the main page enables recurring Connect, Monitor, Local Monitor and Disconnect actions at specified times and days, and results are shown in the status message area. The feature is disabled by default and is enabled by an Admin user on the Settings page, which adds a once-per-minute cron entry for the web server user. See the Scheduled Connects section above for details.
+
 **v1.05 2026-10-21**<br>
 Enhancements from KE2HNI to the Touch GUI, adding ASL statistics data and better support for separate Name, Description, Location, and User Note fields.
 

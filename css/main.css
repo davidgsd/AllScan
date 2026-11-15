@@ -345,3 +345,8 @@ content:"\200A\25BC";
 .favEditActions button {color:#fff;margin:2px 1px;background-color:#444;border-radius:3px;font:12px/1.25 Verdana,Arial,Helvetica,sans-serif;}
 .favEditActions button:hover {background-color:#777;}
 
+.schedWarn {margin-bottom:8px;padding:6px;border:1px solid #c80;font-size:0.85em;}
+.schedWarn code {word-break:break-all;}
+.schedDays label {margin-right:6px;white-space:nowrap;}
+#schedMsg {color:#f66;margin:4px 0;}
+#scheduleModal .favEditPanel {max-height:90vh;overflow-y:auto;}

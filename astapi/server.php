@@ -8,6 +8,7 @@ date_default_timezone_set('America/New_York');
 require_once('../include/apiInit.php');
 require_once('AMI.php');
 require_once('nodeInfo.php');
+require_once('../include/scheduleUtils.php');
 
 if(!readOk()) {
 	statErr('Insufficient user permission to retrieve data.');
@@ -75,6 +76,9 @@ if(_count($msg))
 	$s .= BR . implode(BR, $msg);
 statMsg($s);
 
+// Scheduled connect/disconnect activity. Only report events that occur after this page loaded
+$schedPos = file_exists(SCHED_ACTIVITY) ? filesize(SCHED_ACTIVITY) : 0;
+
 // Main loop - build $data array and output as a json object
 $current = [];
 $saved = [];
@@ -124,6 +128,7 @@ while(!empty($fp[$node])) {
 	}
 	// Send times every cycle
 	sendData($nodeTime, 'nodetimes');
+	checkScheduleActivity();
 	// Wait 500mS
 	usleep(500000);
 }
@@ -132,6 +137,27 @@ exit();
 
 function statMsg($s) {
 	sendData(['status' => $s], 'connection');
+}
+// Forward any new lines written by _tools/runSchedule.php to the status message box
+function checkScheduleActivity() {
+	global $schedPos;
+	clearstatcache(true, SCHED_ACTIVITY);
+	$size = file_exists(SCHED_ACTIVITY) ? filesize(SCHED_ACTIVITY) : 0;
+	if($size < $schedPos)
+		$schedPos = 0; // File was trimmed
+	if($size == $schedPos)
+		return;
+	$fh = fopen(SCHED_ACTIVITY, 'r');
+	if(!$fh)
+		return;
+	fseek($fh, $schedPos);
+	$new = fread($fh, $size - $schedPos);
+	fclose($fh);
+	$schedPos = $size;
+	foreach(explode("\n", trim($new)) as $line) {
+		if($line !== '')
+			statMsg(htmlspecialchars($line));
+	}
 }
 function statErr($s) {
 	sendData(['status' => 'Error: ' . $s]);

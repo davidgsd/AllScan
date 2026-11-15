@@ -2,6 +2,7 @@
 // User Module Settings controller
 // Author: David Gleason - AllScan.info
 require_once('../../include/common.php');
+require_once('../../include/scheduleUtils.php');
 $html = new Html();
 $msg = [];
 
@@ -23,6 +24,8 @@ if(!readOk())
 
 define('UPDATE_SETTINGS', 'Update Settings');
 define('CHANGE_PASSWORD', 'Change Password');
+define('ENABLE_SCHEDULER', 'Enable Scheduler');
+define('DISABLE_SCHEDULER', 'Disable Scheduler');
 
 $post = arrayToObj($_POST, ['name', 'email', 'location', 'nodenums', 'timezone_id', 'pass', 'confirm']);
 $post->nodenums = isset($post->nodenums) ? parseIntList($post->nodenums) : [];
@@ -58,6 +61,18 @@ switch($Submit) {
 				$user = $userModel->getUserById($user->user_id);
 			}
 		}
+		break;
+	case ENABLE_SCHEDULER:
+	case DISABLE_SCHEDULER:
+		if(!adminUser()) {
+			errMsg('Admin permission is required.');
+			break;
+		}
+		$err = '';
+		if($Submit === ENABLE_SCHEDULER ? schedCronEnable($err) : schedCronDisable($err))
+			okMsg($Submit === ENABLE_SCHEDULER ? 'Scheduler enabled' : 'Scheduler disabled');
+		else
+			errMsg(htmlspecialchars($err));
 		break;
 	case CHANGE_PASSWORD:
 		if(!$userModel->validatePassword($post->pass)) {
@@ -108,5 +123,30 @@ echo '<ul class="left">
 	<li><b>Password</b>: Must be 6-16 printable ASCII characters
 	</ul><br>
 ';
+
+// Scheduled Connects (admin only). Same layout as the forms above, shown below the Form Notes
+if(adminUser()) {
+	$cron = schedCronRead();
+	$mine = schedCronHasEntry($cron);
+	$active = schedRunnerActive();
+	if($mine)
+		$st = 'Enabled. The cron entry is installed for the web server user.';
+	elseif($active)
+		$st = 'The scheduler last ran ' . (time() - filemtime(SCHED_HEARTBEAT)) . ' seconds ago, but it is not in this user\'s crontab.<br>'
+			. 'It is running from another crontab (eg. root\'s or /etc/cron.d). If you just removed it, wait 3 minutes and reload.';
+	elseif($cron === false)
+		$st = 'Unavailable. The web server user cannot read or edit its crontab.<br>'
+			. 'Check /etc/cron.allow and /etc/cron.deny, or add the line below<br>to root\'s crontab with "sudo crontab -e".';
+	else
+		$st = 'Disabled. The Schedule button is hidden on the main page.';
+	$sform = new stdClass();
+	$sform->class = 'left';
+	$sform->id = 'schedulerForm';
+	$sform->fieldsetLegend = 'Scheduled Connects';
+	$sform->hdr = $st . '<br><small>Cron line: <code>' . htmlspecialchars(schedCronLine()) . '</code></small>';
+	$sform->fields = [];
+	$sform->submit = $mine ? DISABLE_SCHEDULER : (($cron !== false && !$active) ? ENABLE_SCHEDULER : []);
+	echo htmlForm($sform) . BR;
+}
 
 asExit();
