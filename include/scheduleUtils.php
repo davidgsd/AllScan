@@ -3,8 +3,8 @@
 //
 // Schedules are stored as JSON in /etc/allscan/schedule.json (web server writeable).
 // They are executed by _tools/runSchedule.php, which is called once per minute from the web
-// server user's crontab. An admin enables/disables that cron entry on the Settings page.
-// The scheduler is disabled by default.
+// server user's crontab. An admin enables/disables the scheduler with the 'Scheduled Connects'
+// cfg on the Cfgs page, which also adds/removes that cron entry. Disabled by default.
 
 define('SCHED_FILE', '/etc/allscan/schedule.json');
 // Written by runSchedule.php each time it runs. Used by the UI to detect a missing cron entry
@@ -195,10 +195,14 @@ function schedCronHasEntry($lines) {
 function schedRunnerActive() {
 	return file_exists(SCHED_HEARTBEAT) && time() - filemtime(SCHED_HEARTBEAT) < 180;
 }
-// Scheduling is available if our crontab has the entry or the runner has run recently
-// (eg. from root's crontab)
+// Scheduling is enabled by the Scheduled Connects cfg
 function schedEnabled() {
-	return schedCronHasEntry(schedCronRead()) || schedRunnerActive();
+	global $gCfg;
+	return !empty($gCfg[schedulerEnabled]);
+}
+// Add or remove the cron entry to match the cfg. Returns false with $err set on failure
+function schedCronSync($enable, &$err) {
+	return $enable ? schedCronEnable($err) : schedCronDisable($err);
 }
 function schedCronWrite($lines, &$err) {
 	$bin = schedCrontabBin();
@@ -229,6 +233,10 @@ function schedCronEnable(&$err) {
 		return false;
 	}
 	if(schedCronHasEntry($lines))
+		return true;
+	// The runner is already being called from another crontab (eg. root's from an earlier manual
+	// setup). Don't add a second entry or schedules would run twice
+	if(schedRunnerActive())
 		return true;
 	if(!schedRunnerPath()) {
 		$err = '_tools/runSchedule.php not found';

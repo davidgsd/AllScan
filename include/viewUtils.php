@@ -73,7 +73,7 @@ function showNodeCtrlForm() {
 <div id="scheduleModal" class="favEditModal" hidden onClick="scheduleBackdrop(event);">
 <div class="favEditPanel" role="dialog" aria-modal="true" aria-labelledby="scheduleTitle">
 <h3 id="scheduleTitle">Schedule Connect/Disconnect</h3>
-<div id="schedWarn" class="schedWarn" hidden>The scheduler has not run yet. It starts within a minute of being enabled. If this message persists, check Scheduled Connects on the Settings page.</div>
+<div id="schedWarn" class="schedWarn" hidden>The scheduler has not run yet. It starts within a minute of being enabled. If this message persists, check the cron setup described in the README.</div>
 <label for="schedAction">Action</label>
 <select id="schedAction"><option value="connect">Connect</option><option value="monitor">Monitor</option>
 <option value="localmonitor">Local Monitor</option><option value="disconnect">Disconnect</option></select>

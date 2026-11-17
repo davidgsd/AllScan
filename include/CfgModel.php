@@ -19,6 +19,7 @@ define('amiuser', 10);
 define('amipass', 11);
 define('cmdbuttons', 12);
 define('updatecheck', 13);
+define('schedulerEnabled', 14);
 
 // Global Cfgs Default Values
 $gCfgDef = [
@@ -34,7 +35,8 @@ $gCfgDef = [
 	amiuser => '',
 	amipass => '',
 	cmdbuttons => [],
-	updatecheck => 1
+	updatecheck => 1,
+	schedulerEnabled => 0
 ];
 
 $gCfgName = [
@@ -50,7 +52,8 @@ $gCfgName = [
 	amiuser => 'AMI User',
 	amipass => 'AMI Pass',
 	cmdbuttons => 'Custom Cmd Buttons',
-	updatecheck => 'Check For Updates'
+	updatecheck => 'Check For Updates',
+	schedulerEnabled => 'Scheduled Connects'
 ];
 
 $publicPermissionVals = [
@@ -75,7 +78,8 @@ $gCfgVals = [
 	amiuser => null,
 	amipass => null,
 	cmdbuttons => null,
-	updatecheck => $checkboxVals
+	updatecheck => $checkboxVals,
+	schedulerEnabled => $checkboxVals
 ];
 
 // Global Cfgs structure

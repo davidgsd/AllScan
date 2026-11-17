@@ -8,6 +8,8 @@ function reply($ok, $msg, $extra=[]) {
 	exit(json_encode(array_merge(['ok' => $ok, 'msg' => $msg], $extra)));
 }
 
+if(!schedEnabled())
+	reply(false, 'Scheduled Connects is disabled. An Admin can enable it on the Cfgs page');
 if(!modifyOk())
 	reply(false, 'Insufficient user permission');
 

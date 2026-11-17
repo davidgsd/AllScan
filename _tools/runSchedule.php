@@ -1,7 +1,7 @@
 #!/usr/bin/php
 <?php
 // Run scheduled node connects/disconnects defined on the AllScan main page ("Schedule" button).
-// Call once per minute from cron. Enable from the Settings page (admin) or the update script, or
+// Call once per minute from cron. Enable with the Scheduled Connects cfg on the Cfgs page (admin), or
 // manually: * * * * * /var/www/html/allscan/_tools/runSchedule.php >> /etc/allscan/schedule.log 2>&1
 // Options: --dry-run  show what would run now without sending any commands
 $dryRun = in_array('--dry-run', $argv);
@@ -23,8 +23,14 @@ $cfgModel = new CfgModel($db);
 
 schedSetTimezone();
 $now = time();
+// Heartbeat is written even when disabled so that enabling the cfg can detect that the runner is
+// already being called from another crontab
 if(!$dryRun)
 	schedWrite(SCHED_HEARTBEAT, date('c'));
+
+// Do nothing else if the Scheduled Connects cfg is off
+if(!schedEnabled())
+	exit(0);
 
 $due = [];
 foreach(schedLoad() as $e) {

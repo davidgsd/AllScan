@@ -3,6 +3,7 @@
 // Author: David Gleason - AllScan.info
 require_once('../include/common.php');
 require_once('CfgView.php');
+require_once('../include/scheduleUtils.php');
 $html = new Html();
 $msg = [];
 
@@ -45,6 +46,7 @@ h1("Manage Cfgs");
 h2("Configuration Parameters");
 $view->showCfgs($gCfg);
 p("Node Number and AMI Cfgs default to values in /etc/asterisk/ rpt.conf and manager.conf if not set here.");
+p("Scheduled Connects is off by default. Enable to turn on the node schedule button");
 p("Call Sign, Location, and Node Title default to fields in astdb.txt if not set here.");
 $view->showForms($cfg ?? null);
 echo '</div>' . BR. NL;
@@ -202,6 +204,7 @@ function processForm($Submit, $cfg, &$msg) {
 		$msg[] = error('Cfg not found');
 		return;
 	}
+	$oldVal = $gCfg[$id];
 	if($Submit === EDIT_CFG) {
 		if($val === null) {
 			$cfg->val = $gCfg[$cfg->cfg_id];
@@ -242,6 +245,18 @@ function processForm($Submit, $cfg, &$msg) {
 		unset($gCfgUpdated[$id]);
 	} else {
 		return null;
+	}
+	if($id == schedulerEnabled) {
+		// Add/remove the cron entry that runs _tools/runSchedule.php. Revert the cfg if that fails
+		$err = '';
+		if(!schedCronSync(!empty($gCfg[$id]), $err)) {
+			// Restore the in-memory value so the Cfgs table below does not show the unsaved change
+			$gCfg[$id] = $oldVal;
+			$msg[] = error(htmlspecialchars($err));
+			$msg[] = 'Cfg not changed. To enable manually add this to the web server user\'s crontab: <code>'
+				. htmlspecialchars(schedCronLine()) . '</code>';
+			return null;
+		}
 	}
 	$msg[] = 'Saving Cfgs';
 	$cfgModel->saveCfgs();
