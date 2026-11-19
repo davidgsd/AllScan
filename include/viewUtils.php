@@ -2,6 +2,7 @@
 // viewUtils.php
 // Author: David Gleason - AllScan.info
 require_once('commonForms.php');
+require_once('scheduleUtils.php');
 
 define('SET_NODE_INFO_CFGS', 'Set Node Info Cfgs');
 
@@ -42,7 +43,8 @@ function showNodeCtrlForm() {
 <input type=button value="Edit Favorite" class="small" onClick="openFavoriteEditor();">
 <input type=submit name="Submit" value="Delete Favorite" class="small"
 	onClick="return confirmFavAction(\'Delete Favorite\');">
-<input type=button value="Local Mon" onClick="connectNode(\'localmonitor\');">
+' . (schedEnabled() ? '<input type=button value="Schedule" class="small" onClick="openScheduleDialog();">
+' : '') . '<input type=button value="Local Mon" onClick="connectNode(\'localmonitor\');">
 <input type=button value="DTMF" onClick="dtmfCmd();">
 <br>
 <span style="white-space:nowrap"><input type=checkbox id="permanent"><label for="permanent">Permanent</label>&nbsp;
@@ -68,6 +70,32 @@ function showNodeCtrlForm() {
 </div>
 </div>
 </fieldset></form>
+<div id="scheduleModal" class="favEditModal" hidden onClick="scheduleBackdrop(event);">
+<div class="favEditPanel" role="dialog" aria-modal="true" aria-labelledby="scheduleTitle">
+<h3 id="scheduleTitle">Schedule Connect/Disconnect</h3>
+<div id="schedWarn" class="schedWarn" hidden>The scheduler has not run yet. It starts within a minute of being enabled. If this message persists, check the cron setup described in the README.</div>
+<label for="schedAction">Action</label>
+<select id="schedAction"><option value="connect">Connect</option><option value="monitor">Monitor</option>
+<option value="localmonitor">Local Monitor</option><option value="disconnect">Disconnect</option></select>
+<label for="schedNode">Node Number (0 = disconnect all)</label>
+<input type="text" inputmode="numeric" pattern="[0-9]*" id="schedNode" maxlength="7">
+<label for="schedTime">Time (24h, <span id="schedServerTime"></span>)</label>
+<input type="time" id="schedTime" value="08:00">
+<div class="schedDays">Days: <label><input type=checkbox class="schedDay" value="0">Su</label>
+<label><input type=checkbox class="schedDay" value="1">Mo</label><label><input type=checkbox class="schedDay" value="2">Tu</label>
+<label><input type=checkbox class="schedDay" value="3">We</label><label><input type=checkbox class="schedDay" value="4">Th</label>
+<label><input type=checkbox class="schedDay" value="5">Fr</label><label><input type=checkbox class="schedDay" value="6">Sa</label>
+<small>(none = every day)</small></div>
+<div><label><input type=checkbox id="schedPerm">Permanent</label>
+<label><input type=checkbox id="schedAutodisc">Disconnect all first</label></div>
+<div class="favEditActions">
+<input type="button" value="Add Schedule" class="small" onClick="addSchedule();">
+<input type="button" value="Close" class="small" onClick="closeScheduleDialog();">
+</div>
+<div id="schedMsg"></div>
+<table id="schedList" class="favs"></table>
+</div>
+</div>
 ';
 	else
 		echo '<input type=hidden id="localnode" name="localnode" value="' . $node . '">' . NL;
