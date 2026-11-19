@@ -1,7 +1,7 @@
 <?php
 // AllScan main includes & common functions
 // Author: David Gleason - AllScan.info
-$AllScanVersion = "v1.05";
+$AllScanVersion = "v1.06";
 require_once('Html.php');
 require_once('logUtils.php');
 require_once('timeUtils.php');
@@ -635,10 +635,6 @@ function readFileLines($fname, &$msg, $bak=false) {
 		$msg[] = error("Write $fname.bak failed. Check directory/file permissions");
 		return false;
 	}
-	/* if($bak && !chmod("$fname.bak", 0664)) {
-		$msg[] = "Chmod 0664 $fname.bak failed. Check directory/file permissions";
-		return false;
-	} */
 	return explode(NL, $f);
 }
 
@@ -648,10 +644,6 @@ function writeFileLines($fname, $f, &$msg) {
 		$msg[] = error("Write $fname failed. Check directory/file permissions");
 		return false;
 	}
-	/*if(!chmod($fname, 0664)) {
-		$msg[] = "Chmod 0664 $fname.new failed. Check directory/file permissions";
-		return false;
-	}*/
 	return true;
 }
 
